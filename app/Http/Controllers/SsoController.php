@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\StatusUsulan;
 use Illuminate\Http\Request;
 // use Illuminate\Support\Facades\URL;
 use Microsoft\Graph\Graph;
@@ -195,6 +196,8 @@ class SsoController extends Controller
     public function tes($nip)
     {
         // dd($nip);
-        UserHelp::admin_get_record_by_nip($nip);
+        // UserHelp::admin_get_record_by_nip($nip);
+        $StatusUsulan = StatusUsulan::first();
+        dd($StatusUsulan);
     }
 }
