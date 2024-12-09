@@ -33,7 +33,7 @@ class User
 	{
 		$pegawai = Pegawai::where('nip', $nip)->first();
 
-		dd($pegawai);
+		// dd($pegawai);
 
 		return $pegawai;
 	}

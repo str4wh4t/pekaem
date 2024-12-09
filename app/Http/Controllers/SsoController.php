@@ -196,8 +196,8 @@ class SsoController extends Controller
     public function tes($nip)
     {
         // dd($nip);
-        // UserHelp::admin_get_record_by_nip($nip);
-        $StatusUsulan = StatusUsulan::first();
-        dd($StatusUsulan);
+        UserHelp::admin_get_record_by_nip($nip);
+        // $StatusUsulan = StatusUsulan::first();
+        // dd($StatusUsulan);
     }
 }
