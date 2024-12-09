@@ -12,43 +12,44 @@ class SsoController extends Controller
 {
     //
 
-    private $_provider ;
+    private $_provider;
 
-	private $_config ;
+    private $_config;
 
-	public function __construct()
-	{
-		// $this->_config = [
-  //               'clientId'                => 'acaab266-9f8f-43d8-b08e-c490676edefe',
-  //               'clientSecret'            => 'H1/OIDdnnujWy0lS9l2XTjQ26m1R3Q4zljZMQv9b3Sk=',
-  //               'redirectUri'             => 'http://localhost:8000/sso/authen',
-  //               'urlAuthorize'            => 'https://login.microsoftonline.com/03290435-ff74-45d1-aeaa-173677221cf8/oauth2/v2.0/authorize',
-  //               'urlAccessToken'          => 'https://login.microsoftonline.com/03290435-ff74-45d1-aeaa-173677221cf8/oauth2/v2.0/token',
-  //               'urlResourceOwnerDetails' => '',
-  //               'scopes'                  => 'profile openid offline_access email User.Read',
-  //           ] ;
+    public function __construct()
+    {
+        // $this->_config = [
+        //               'clientId'                => 'acaab266-9f8f-43d8-b08e-c490676edefe',
+        //               'clientSecret'            => 'H1/OIDdnnujWy0lS9l2XTjQ26m1R3Q4zljZMQv9b3Sk=',
+        //               'redirectUri'             => 'http://localhost:8000/sso/authen',
+        //               'urlAuthorize'            => 'https://login.microsoftonline.com/03290435-ff74-45d1-aeaa-173677221cf8/oauth2/v2.0/authorize',
+        //               'urlAccessToken'          => 'https://login.microsoftonline.com/03290435-ff74-45d1-aeaa-173677221cf8/oauth2/v2.0/token',
+        //               'urlResourceOwnerDetails' => '',
+        //               'scopes'                  => 'profile openid offline_access email User.Read',
+        //           ] ;
 
         $this->_config = [
             'clientId'                => 'd4e33023-d86d-4234-8a41-cd60a2145e36',
-                'clientSecret'            => 'HHIQsID9tD9Tyi+s9TEnpm1w8yfRnBuT78N3UQodUEA=',
-                'redirectUri'             => url('/') . '/sso/authen',
-                'urlAuthorize'            => 'https://login.microsoftonline.com/03290435-ff74-45d1-aeaa-173677221cf8/oauth2/v2.0/authorize',
-                'urlAccessToken'          => 'https://login.microsoftonline.com/03290435-ff74-45d1-aeaa-173677221cf8/oauth2/v2.0/token',
-                'urlResourceOwnerDetails' => '',
-                'scopes'                  => 'profile openid offline_access email User.Read',
-         	];
-	}
+            'clientSecret'            => 'HHIQsID9tD9Tyi+s9TEnpm1w8yfRnBuT78N3UQodUEA=',
+            'redirectUri'             => url('/') . '/sso/authen',
+            'urlAuthorize'            => 'https://login.microsoftonline.com/03290435-ff74-45d1-aeaa-173677221cf8/oauth2/v2.0/authorize',
+            'urlAccessToken'          => 'https://login.microsoftonline.com/03290435-ff74-45d1-aeaa-173677221cf8/oauth2/v2.0/token',
+            'urlResourceOwnerDetails' => '',
+            'scopes'                  => 'profile openid offline_access email User.Read',
+        ];
+    }
 
-    public function login(Request $request){
+    public function login(Request $request)
+    {
 
-		if($request->session()->has('is_login')){
-		    session_destroy();
-			return redirect('/dashboard');
-		}
+        if ($request->session()->has('is_login')) {
+            session_destroy();
+            return redirect('/dashboard');
+        }
 
 
 
-		// Initialize the OAuth client
+        // Initialize the OAuth client
         $oauthClient = new \League\OAuth2\Client\Provider\GenericProvider($this->_config);
 
         $authUrl = $oauthClient->getAuthorizationUrl();
@@ -66,10 +67,11 @@ class SsoController extends Controller
         // redirect($authUrl);
         //
         return redirect()->to($authUrl);
-	}
+    }
 
-	public function authen(Request $request){
-		// Validate state
+    public function authen(Request $request)
+    {
+        // Validate state
         $expectedState = $request->session()->get('oauthState');
         $request->session()->forget('oauthState');
         // $request->session()->forget('oauthState');
@@ -78,7 +80,7 @@ class SsoController extends Controller
 
         // echo $expectedState ; echo '<br>' ;
         // echo $providedState ; echo '<br>' ;
-		// echo '<pre>' ;
+        // echo '<pre>' ;
         // die;
 
 
@@ -112,91 +114,87 @@ class SsoController extends Controller
                 $graph->setAccessToken($accessToken->getToken());
 
                 $user = $graph->createRequest('GET', '/me')
-                			->setReturnType(Model\User::class)
-                			->execute();
+                    ->setReturnType(Model\User::class)
+                    ->execute();
 
                 // vdebug($user->getSurname());
                 // vdebug($user->getUserPrincipalName());
 
-                if(empty($user->getUserPrincipalName())){
-                	return redirect('/login')->with('message', "Login gagal, anda tidak memiliki akses ke Aplikasi.");
+                if (empty($user->getUserPrincipalName())) {
+                    return redirect('/login')->with('message', "Login gagal, anda tidak memiliki akses ke Aplikasi.");
                 }
 
-            	$user_data = explode('@',$user->getUserPrincipalName());
+                $user_data = explode('@', $user->getUserPrincipalName());
 
-            	// dd($user_data);
+                // dd($user_data);
 
-            	// $students_alumni = ['students.undip.ac.id','alumni.undip.ac.id'];
-            	$students = ['students.undip.ac.id'];
+                // $students_alumni = ['students.undip.ac.id','alumni.undip.ac.id'];
+                $students = ['students.undip.ac.id'];
 
-            	if(in_array($user_data[1], $students)){
-            		// JIKA MAHASISWA
+                if (in_array($user_data[1], $students)) {
+                    // JIKA MAHASISWA
 
-		        	$mhs = UserHelp::mhs_get_record_by_nim($user->getSurname());
+                    $mhs = UserHelp::mhs_get_record_by_nim($user->getSurname());
 
-		        	if(!empty($mhs)){
+                    if (!empty($mhs)) {
 
-		    				$session_data = [
-							    'username' 			=> $mhs->nim,
-                                'nama_lengkap'      => strtoupper($mhs->nama),
-							    'login_at'    		=> date('Y-m-d H:i:s'),
-							    'login_as'        	=> 'MHS',
-							    'role_as'        	=> 'MHS',
-							];
+                        $session_data = [
+                            'username'             => $mhs->nim,
+                            'nama_lengkap'      => strtoupper($mhs->nama),
+                            'login_at'            => date('Y-m-d H:i:s'),
+                            'login_as'            => 'MHS',
+                            'role_as'            => 'MHS',
+                        ];
 
-							$request->session()->put('session_data', $session_data);
+                        $request->session()->put('session_data', $session_data);
 
-							return redirect('/dashboard');
+                        return redirect('/dashboard');
+                    } else {
+                        return redirect('/')->with('message', "Login gagal, anda tidak memiliki akses ke Aplikasi.");
+                    }
+                }
 
-					}else{
-					    return redirect('/')->with('message', "Login gagal, anda tidak memiliki akses ke Aplikasi.");
-			       	}
+                // JIKA SELAIN MHS
 
-            	}
+                $roles = UserHelp::admin_get_roles_by_nip($user->getSurname());
 
-            	// JIKA SELAIN MHS
+                if (empty($roles)) {
+                    return redirect('/')->with('message', "Login gagal, anda tidak memiliki akses ke Aplikasi.");
+                }
 
-            	$roles = UserHelp::admin_get_roles_by_nip($user->getSurname());
+                $pegawai = UserHelp::admin_get_record_by_nip($user->getSurname());
 
-            	if(empty($roles)){
-            		return redirect('/')->with('message', "Login gagal, anda tidak memiliki akses ke Aplikasi.");
-            	}
+                $session_data = [
+                    'username'             => $pegawai->nip,
+                    'nama_lengkap'      => $pegawai->glr_dpn . ' ' . $pegawai->nama . ' ' . $pegawai->glr_blkg,
+                    'login_at'            => date('Y-m-d H:i:s'),
+                    'login_as'            => 'ADMIN',
+                    'role_as'            => null,
+                ];
 
-            	$pegawai = UserHelp::admin_get_record_by_nip($user->getSurname());
+                $request->session()->put('session_data', $session_data);
 
-            	$session_data = [
-							    'username' 			=> $pegawai->nip,
-                                'nama_lengkap'      => $pegawai->glr_dpn . ' ' . $pegawai->nama . ' ' . $pegawai->glr_blkg,
-							    'login_at'    		=> date('Y-m-d H:i:s'),
-							    'login_as'        	=> 'ADMIN',
-							    'role_as'        	=> null,
-							];
-
-				$request->session()->put('session_data', $session_data);
-
-		       	return redirect('/dashboard');
-
-            }
-            catch (League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
-            	dd($e);
-            }
-            catch (Microsoft\Graph\Exception\GraphException $e) {
-            	dd($e);
-            }
-            catch (GuzzleHttp\Exception\RequestException $e) {
-            	dd($e);
+                return redirect('/dashboard');
+            } catch (League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
+                dd($e);
+            } catch (Microsoft\Graph\Exception\GraphException $e) {
+                dd($e);
+            } catch (GuzzleHttp\Exception\RequestException $e) {
+                dd($e);
             }
         }
+    }
 
-	}
 
-
-    public function logout(Request $request){
+    public function logout(Request $request)
+    {
         $request->session()->flush();
         return redirect('/login')->with('message', "Anda telah logout dari sistem.");
     }
 
-	public function tes($nip){
-		UserHelp::admin_get_record_by_nip($nip);
-	}
+    public function tes($nip)
+    {
+        dd($nip);
+        UserHelp::admin_get_record_by_nip($nip);
+    }
 }
