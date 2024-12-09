@@ -31,8 +31,6 @@ class User
 
 	public static function admin_get_record_by_nip($nip)
 	{
-		dd('nip', $nip);
-
 		$pegawai = Pegawai::where('nip', $nip)->first();
 
 		dd($pegawai);
