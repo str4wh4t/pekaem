@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -53,6 +55,22 @@ Route::get('share/pendaftaran', 'PendaftaranController@list')->name('share.penda
 Route::get('share/pendaftaran/list/{jenis?}/{pegawai_id?}', 'PendaftaranController@list')->name('share.pendaftaran.list');
 Route::get('share/pendaftaran/read/{uuid}', 'PendaftaranController@read')->name('share.pendaftaran.read');
 Route::post('share/pendaftaran/ajax/{method}', 'PendaftaranController@ajax')->name('share.pendaftaran.ajax');
+
+Route::prefix('admin')->group(function () {
+    Route::resource('/kategori-kriteria', 'KategoriKriteriaController');
+});
+
+Route::prefix('admin/kategori-kriteria/{kategori_kriteria}')->group(function () {
+    Route::resource('kriteria-penilaian', 'KriteriaPenilaianController');
+});
+
+Route::prefix('admin')->group(function () {
+    Route::resource('/kategori-kegiatan', 'KategoriKegiatanController');
+});
+
+Route::prefix('admin/kategori-kegiatan/{kategori_kegiatan}')->group(function () {
+    Route::resource('jenis-pkm', 'JenisPkmController');
+});
 
 // Route::resource('sso','SsoController');
 // Route::resource('crud','CrudsController');

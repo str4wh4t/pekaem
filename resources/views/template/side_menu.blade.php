@@ -1,31 +1,48 @@
 <div class="main-menu menu-fixed menu-light menu-accordion menu-shadow" data-scroll-to-active="true">
 	<div class="main-menu-content">
 		<ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
-			<li class=" nav-item"><a href="{{ route('dashboard') }}"><i class="icon-home"></i><span class="menu-title" data-i18n="nav.dash.main">Dashboard</span></a>
+			<li class=" nav-item small">
+				<a class="p-0 mt-1" href="{{ route('dashboard') }}"><i class="icon-home"></i><span class="menu-title" data-i18n="nav.dash.main">Dashboard</span></a>
 			</li>
 
-			<li class=" nav-item"><a href="{{ route('share.pendaftaran') }}"><i class="icon-note"></i><span class="menu-title" data-i18n="nav.templates.main">Pendaftaran</span></a>
+			<li class=" nav-item small">
+				<a class="p-0 mt-1" href="{{ route('share.pendaftaran') }}"><i class="icon-note"></i><span class="menu-title" data-i18n="nav.templates.main">Pendaftaran</span></a>
 				<ul class="menu-content">
 					<li><a class="menu-item" href="{{ route('mhs.pendaftaran.add') }}" data-i18n="nav.templates.vert.main">Form Pendaftaran</a></li>
 					<li><a class="menu-item" href="{{ route('share.pendaftaran.list') }}" data-i18n="nav.templates.vert.main">Daftar Usulan</a></li>
 				</ul>
 			</li>
 
-            <li class=" nav-item">
-                <a href="{{ route('admin.pembimbing.list') }}">
+            <li class=" nav-item small">
+                <a class="p-0 mt-1" href="{{ route('admin.pembimbing.list') }}">
                     <i class="fa fa-street-view"></i>
                     <span class="menu-title" data-i18n="nav.category.general">Pembimbing</span>
                 </a>
 			</li>
 
-            <li class=" nav-item">
-                <a href="{{ route('admin.reviewer.list') }}">
+            <li class=" nav-item small">
+                <a class="p-0 mt-1" href="{{ route('admin.reviewer.list') }}">
                     <i class="fa fa-universal-access"></i>
                     <span class="menu-title" data-i18n="nav.category.general">Reviewer</span>
                 </a>
 			</li>
 
-			<li class=" nav-item"><a href="{{ route('admin.users.list') }}"><i class="ft-users"></i><span class="menu-title" data-i18n="nav.category.general">User</span></a>
+			<li class=" nav-item small">
+                <a class="p-0 mt-1" href="{{ route('kategori-kriteria.index') }}">
+                    <i class="fa fa-pencil-square"></i>
+                    <span class="menu-title" data-i18n="nav.category.general">Kriteria</span>
+                </a>
+			</li>
+
+			<li class=" nav-item small">
+                <a class="p-0 mt-1" href="{{ route('kategori-kegiatan.index') }}">
+                    <i class="fa fa-pencil-square"></i>
+                    <span class="menu-title" data-i18n="nav.category.general">Kegiatan</span>
+                </a>
+			</li>
+
+			<li class=" nav-item small">
+				<a class="p-0 mt-1" href="{{ route('admin.users.list') }}"><i class="ft-users"></i><span class="menu-title" data-i18n="nav.category.general">User</span></a>
 				<ul class="menu-content">
 					<li><a class="menu-item" href="{{ route('admin.users.list') }}" data-i18n="nav.templates.vert.main">Manaj. User</a></li>
 					<li><a class="menu-item" href="{{ route('admin.users.roles') }}" data-i18n="nav.templates.vert.roles">Manaj. Roles</a></li>

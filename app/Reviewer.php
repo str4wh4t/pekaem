@@ -20,4 +20,9 @@ class Reviewer extends Model
     {
         return $this->hasMany('App\ReviewerUsulanPkm');
     }
+
+    public function penilaian_reviewer()
+    {
+        return $this->hasMany('App\PenilaianReviewer');
+    }
 }

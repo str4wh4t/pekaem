@@ -12,6 +12,8 @@ use App\Review;
 use App\Perbaikan;
 use App\ReviewerUsulanPkm;
 use App\Http\Controllers\Controller;
+use App\KategoriKegiatan;
+use App\PegawaiRoles;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -21,6 +23,7 @@ use UserHelp;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request as GuzzleRequest;
 use GuzzleHttp\Exception\BadResponseException;
+use Illuminate\Validation\ValidationException;
 
 class PendaftaranController extends Controller
 {
@@ -80,7 +83,7 @@ class PendaftaranController extends Controller
 				$perbaikan = new Perbaikan;
 				$perbaikan->usulan_pkm_id = $usulan_pkm->id;
 				$perbaikan->catatan_perbaikan = $request->catatan_perbaikan;
-				$perbaikan->mhs_nim = Userhelp::mhs_get_logged_nim();
+				$perbaikan->mhs_nim = UserHelp::mhs_get_logged_nim();
 				$perbaikan->save();
 			}
 
@@ -88,9 +91,16 @@ class PendaftaranController extends Controller
 
 			if (empty($id)) {
 				$anggota_pkm = new AnggotaPkm;
-				$anggota_pkm->mhs_nim = Userhelp::mhs_get_logged_nim();
+				$anggota_pkm->mhs_nim = UserHelp::mhs_get_logged_nim();
 				$anggota_pkm->sebagai = 0; // 0 : KETUA
 				UsulanPkm::find($usulan_pkm->id)->anggota_pkm()->save($anggota_pkm);
+
+				// SET PEGAWAI YANG DIPILIH SEBAGAI PEMBIMBING
+				$pegawai_roles = new PegawaiRoles();
+				$pegawai_roles->pegawai_id = $request->pegawai_id;
+				$pegawai_roles->roles_id = 'PEMBIMBING';
+				$pegawai_roles->status_role = '1'; // OTOMATIS AKTIF
+				$pegawai_roles->save();
 			}
 
 			$list_nim = $request->list_nim;
@@ -307,6 +317,7 @@ class PendaftaranController extends Controller
 	public function add()
 	{
 		$jenis_pkm = JenisPkm::all()->sortBy("id");
+		$kategori_kegiatan_list = KategoriKegiatan::all()->sortBy("id");
 		$status_usulan = StatusUsulan::all()->sortBy("id");
 		$mhs = Mhs::findOrFail(UserHelp::mhs_get_logged_nim());
 
@@ -351,6 +362,7 @@ class PendaftaranController extends Controller
 		$mhs->kode_prodi = $return->nama_ps;
 
 		$this->_data['jenis_pkm'] = $jenis_pkm;
+		$this->_data['kategori_kegiatan_list'] = $kategori_kegiatan_list;
 		$this->_data['status_usulan'] = $status_usulan;
 		$this->_data['mhs'] = $mhs;
 		return view('pendaftaran.form', $this->_data);

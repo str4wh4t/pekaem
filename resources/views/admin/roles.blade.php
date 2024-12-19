@@ -100,8 +100,7 @@ $(document).on('click','#btn_add_role',function(){
                     </div>
                     <div class="card-content collapse show">
                         <div class="card-body card-dashboard">
-                            {{-- <p class="card-text">Berikut adalah daftar admin yang terdaftar pada sistem PKM.</p> --}}
-                            <div class="row">
+                            {{-- <div class="row">
                                 <div class="col-lg-4">
                                     <div class="row">
                                         <div class="col-lg-12">
@@ -119,11 +118,10 @@ $(document).on('click','#btn_add_role',function(){
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
-                                    {{-- <button class="btn btn-info"><i class="ft-plus-circle"></i> Asign User</button> --}}
                                     <button type="button" id="btn_add_role" class="btn btn-float btn-float-lg btn-outline-pink"><i class="ft-plus-circle"></i><span>Add Role</span></button>
                                 </div>
                             </div>
-                            <hr>
+                            <hr> --}}
                             @if(session()->has('message'))
                                 <div class="alert alert-success">
                                     <b>{{ session()->get('message') }}</b>
@@ -135,7 +133,7 @@ $(document).on('click','#btn_add_role',function(){
                                         <th>No</th>
                                         <th>Role</th>
                                         <th>Keterangan</th>
-                                        <th>Aksi</th>
+                                        {{-- <th>Aksi</th> --}}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -144,9 +142,9 @@ $(document).on('click','#btn_add_role',function(){
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $role->role }}</td>
                                         <td>{{ $role->keterangan }}</td>
-                                        <td>
+                                        {{-- <td>
                                             <a class="btn btn-danger btn-sm btn_hapus" href="{{ route('admin.users.roles.hapus', ['id' => $role->id]) }}"  ><i class="fa fa-times" ></i> Hapus</a>
-                                        </td>
+                                        </td> --}}
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -155,7 +153,7 @@ $(document).on('click','#btn_add_role',function(){
                                         <th>No</th>
                                         <th>Role</th>
                                         <th>Informasi</th>
-                                        <th>Aksi</th>
+                                        {{-- <th>Aksi</th> --}}
                                     </tr>
                                 </tfoot>
                             </table>

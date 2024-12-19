@@ -42,6 +42,11 @@ class UsulanPkm extends Model
         return $this->hasMany('App\Revisi');
     }
 
+    public function penilaian_reviewer()
+    {
+        return $this->hasMany('App\PenilaianReviewer');
+    }
+
     public function review()
     {
         return $this->hasMany('App\Review');
@@ -61,5 +66,4 @@ class UsulanPkm extends Model
     {
         return $this->hasMany('App\ReviewerUsulanPkm');
     }
-
 }

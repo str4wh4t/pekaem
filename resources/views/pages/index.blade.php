@@ -53,24 +53,24 @@
             </div>
             <div class="project-info-count col-lg-4 col-md-12">
                <div class="project-info-icon bg-success">
-                  <h2 style="color: #fff"><?= $usulan_pkm_lolos ?></h2>
+                  <h2 style="color: #fff"><?= $usulan_pkm_sudah_dinilai ?></h2>
                   <div class="project-info-sub-icon">
                      <span class="fa fa-files-o"></span>
                   </div>
                </div>
                <div class="project-info-text pt-1">
-                  <h5>Total Proposal Lolos</h5>
+                  <h5>Total Proposal Sudah Dinilai</h5>
                </div>
             </div>
             <div class="project-info-count col-lg-4 col-md-12">
                <div class="project-info-icon bg-danger">
-                  <h2 style="color: #fff"><?= $usulan_pkm_tidak_lolos ?></h2>
+                  <h2 style="color: #fff"><?= $usulan_pkm_belum_dinilai ?></h2>
                   <div class="project-info-sub-icon">
                      <span class="fa fa-files-o"></span>
                   </div>
                </div>
                <div class="project-info-text pt-1">
-                  <h5>Total Proposal Tidak Lolos</h5>
+                  <h5>Total Proposal Belum Dinilai</h5>
                </div>
             </div>
          </div>

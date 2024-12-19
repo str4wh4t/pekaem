@@ -158,12 +158,12 @@ function hapus_pendaftaran(){
 @section('content')
 <div class="content-header row">
 	<div class="content-header-left col-md-6 col-12 mb-2">
-		<h3 class="content-header-title">Pendaftaran PKM</h3>
+		<h3 class="content-header-title">Pendaftaran</h3>
 		<div class="row breadcrumbs-top">
 			<div class="breadcrumb-wrapper col-12">
 				<ol class="breadcrumb">
-					<li class="breadcrumb-item"><a href="index.html">Home</a>
-					</li>
+					{{-- <li class="breadcrumb-item"><a href="index.html">Home</a>
+					</li> --}}
 					{{-- <li class="breadcrumb-item"><a href="#">Form Layouts</a>
 					</li>
 					<li class="breadcrumb-item active">Basic Forms
@@ -199,7 +199,7 @@ function hapus_pendaftaran(){
 					<div class="card-content collapse show">
 						<div class="card-body">
 							<div class="card-text">
-								<p>Silahkan isikan data diri anda dan informasi PKM yang akan anda ajukan.</p>
+								<p>Silahkan isikan data diri anda dan informasi kegiatan yang akan anda ajukan.</p>
 							</div>
 
 							@if(session()->has('message'))
@@ -222,7 +222,7 @@ function hapus_pendaftaran(){
 								{{ csrf_field() }}
 								<input type="hidden" name="id" value="{{ @$usulan_pkm->uuid }}">
 								<div class="form-body">
-									<h4 class="form-section"><i class="ft-user"></i> Personal Info (KETUA PKM)</h4>
+									<h4 class="form-section"><i class="ft-user"></i> Personal Info (KETUA)</h4>
 									<div class="row">
 										<div class="col-md-6">
 											<div class="form-group">
@@ -280,11 +280,24 @@ function hapus_pendaftaran(){
 										</div>
 									</div>
 
-									<h4 class="form-section"><i class="fa fa-paperclip"></i> Info PKM</h4>
+									<h4 class="form-section"><i class="fa fa-paperclip"></i> Info Kegiatan</h4>
 
 									<div class="form-group">
 										<label for="companyName">Judul</label>
 										<input type="text" id="judul" class="form-control" placeholder="Judul" name="judul" value="{{ @$usulan_pkm->judul }}">
+									</div>
+
+									<div class="row">
+										<div class="col-md-6">
+											<div class="form-group">
+												<label for="jenis">Kategori</label>
+												<select id="jenis" name="jenis" class="form-control">
+													@foreach($kategori_kegiatan_list as $kategori_kegiatan)
+													<option value="{{ $kategori_kegiatan->id }}">{{ $kategori_kegiatan->nama_kategori_kegiatan }}</option>
+													@endforeach
+												</select>
+											</div>
+										</div>
 									</div>
 
 									<div class="row">
@@ -332,13 +345,13 @@ function hapus_pendaftaran(){
 					                    @endforelse
 				                    @endisset
 
-									<h4 class="form-section"><i class="ft-user"></i> Anggota PKM</h4>
+									<h4 class="form-section"><i class="ft-user"></i> Anggota</h4>
 
 									<div class="row">
 										<div class="col-md-3">
 											<label class="label-control" for="nim">Ketua</label>
 										</div>
-										<div class="col-md-4">
+										<div class="col-md-7">
 											<div class="form-group">
 												<input type="text" id="" class="form-control" placeholder="" name="nim" value="{{ $mhs->nama }}" disabled="disabled" >
 											</div>
@@ -352,7 +365,7 @@ function hapus_pendaftaran(){
 											<div class="col-md-3">
 												<label class="label-control" for="nim">Anggota</label>
 											</div>
-											<div class="col-md-4">
+											<div class="col-md-7">
 												<div class="form-group">
 													<input type="text" id="" class="form-control" placeholder="" name="nim" value="{{ $anggota->mhs->nama }}" disabled="disabled" >
 												</div>
@@ -375,7 +388,7 @@ function hapus_pendaftaran(){
 												<div class="col-md-3">
 													<label class="label-control" for="nim">Anggota</label>
 												</div>
-												<div class="col-md-4">
+												<div class="col-md-7">
 													<div class="form-group">
 														<select id="" class="form-control cari_mhs" placeholder="Cari mhs" name="nim"></select>
 													</div>
@@ -391,7 +404,7 @@ function hapus_pendaftaran(){
 		                                </button>
 		                            </div>
 
-		                            <h4 class="form-section"><i class="ft-user"></i> Pembimbing PKM</h4>
+		                            <h4 class="form-section"><i class="ft-user"></i> Pembimbing</h4>
 		                            @isset($usulan_pkm->status_usulan->keterangan)
 			                            @if($usulan_pkm->status_usulan->keterangan == 'BARU')
 										<div class="input-group">
@@ -490,7 +503,7 @@ function hapus_pendaftaran(){
 											</button>
 										@else
 					                        	<div class="alert alert-info">
-						                        	Usulan PKM anda telah diproses [ <b>STATUS :</b> {{ $usulan_pkm->status_usulan->keterangan }} ]
+						                        	Usulan anda telah diproses [ <b>STATUS :</b> {{ $usulan_pkm->status_usulan->keterangan }} ]
 						                        </div>
 										@endif
 									@else

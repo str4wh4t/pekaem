@@ -9,7 +9,6 @@ class StatusUsulan extends Model
     //
 
     protected $table = 'status_usulan';
-    // protected $primaryKey = 'usulan_pkm_id';
     protected $dateFormat = 'Y-m-d H:i:s';
 
     public function usulan_pkm()
@@ -21,5 +20,4 @@ class StatusUsulan extends Model
     {
         return $this->hasMany('App\Revisi');
     }
-
 }

@@ -1,5 +1,6 @@
 <?php
 
+use Beta\Microsoft\Graph\Model\Status;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -11,6 +12,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // $this->call(UsersTableSeeder::class);
+        $this->call(StatusUsulanSeeder::class);
+        $this->call(RolesSeeder::class);
     }
 }
