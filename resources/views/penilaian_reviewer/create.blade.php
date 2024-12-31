@@ -34,7 +34,7 @@ $('.zero-configuration').DataTable();
 @section('content')
 <div class="content-header row">
     <div class="content-header-left col-md-6 col-12 mb-2">
-        <h3 class="content-header-title">List Kriteria Penilaian</h3>
+        <h3 class="content-header-title">Create Penilaian Reviewer</h3>
         <div class="row breadcrumbs-top">
             <div class="breadcrumb-wrapper col-12">
                 <ol class="breadcrumb">
@@ -55,7 +55,7 @@ $('.zero-configuration').DataTable();
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Daftar Kriteria Penilaian</h4>
+                        <h4 class="card-title">Create Penilaian Reviewer</h4>
                         <a class="heading-elements-toggle"><i class="fa fa-ellipsis-v font-medium-3"></i></a>
                         <div class="heading-elements">
                             <ul class="list-inline mb-0">
@@ -71,41 +71,53 @@ $('.zero-configuration').DataTable();
                                     <b>{{ session()->get('message') }}</b>
                                 </div>
                             @endif
+                            @if ($errors->any())
+                                <div class="alert alert-danger">
+                                    <ul class="mb-0">
+                                        @foreach ($errors->all() as $error)
+                                            <li style="list-style: initial">{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+                            <div class="alert alert-info">
+                                <b>Subkegiatan : </b> {{ $usulan_pkm->jenis_pkm->nama_pkm }}
+                            </div>
                             <div class="alert alert-info">
                                 <b>Kategori Kriteria : </b> {{ $kategori_kriteria->nama_kategori_kriteria }}
                             </div>
-                            <a class="btn btn-primary" href="{{ route('kriteria-penilaian.create', ['kategori_kriteria' => $kategori_kriteria])  }}"><i class="fa fa-plus-circle"></i> Tambah data</a>
-                            <hr>
-                            <table class="table table-striped table-bordered zero-configuration">
-                                <thead>
-                                    <tr>
-                                        <th>Urutan</th>
-                                        <th>Nama Kriteria</th>
-                                        <th>Bobot</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($kriteria_penilaian_list as $i => $kriteria_penilaian)
-                                    <tr>
-                                        <td>{{ $kriteria_penilaian->urutan }}</td>
-                                        <td>{{ $kriteria_penilaian->nama_kriteria }}</td>
-                                        <td>{{ $kriteria_penilaian->bobot }}</td>
-                                        <td>
-                                           <a class="btn btn-info btn-sm" href="{{ route('kriteria-penilaian.edit', ['kategori_kriteria' => $kategori_kriteria, 'kriteria_penilaian' => $kriteria_penilaian]) }}"  ><i class="fa fa-pencil-square-o" ></i> Edit</a>
-                                        </td>
-                                    </tr>
+                            <form class="form" action="{{ route('penilaian-reviewer.store', ['usulan_pkm' => $usulan_pkm]) }}" method="POST">
+								{{ csrf_field() }}
+                                <input type="hidden" name="urutan" value="{{ 1 }}">
+								<div class="form-body">
+                                    @foreach ( $kriteria_penilaian_list as $kriteria_penilaian )
+									<div class="row">
+										<div class="col-md-9 d-flex align-items-center">
+											{{-- <div class="form-group"> --}}
+												<label for="nama_kriteria_{{ $kriteria_penilaian->id }}"><b>{{ $kriteria_penilaian->nama_kriteria }}</b> [ bobot : <span class="text-danger"><b>{{ $kriteria_penilaian->bobot }}</b></span> ]</label>
+                                                {{-- <input type="text" id="nama_kriteria_{{ $kriteria_penilaian->id }}" class="form-control" placeholder="" name="nama_kriteria_{{ $kriteria_penilaian->id }}" value="{{ old('nama_kriteria') }}" > --}}
+											{{-- </div> --}}
+										</div>
+                                        <div class="col-md-3">
+											<div class="form-group">
+												<label for="score_{{ $kriteria_penilaian->id }}">Skor</label>
+												<input type="text" id="score_{{ $kriteria_penilaian->id }}" class="form-control" placeholder="Bobot" name="score_{{ $kriteria_penilaian->id }}" value="{{ old('score_' . $kriteria_penilaian->id ) }}" >
+											</div>
+										</div>
+									</div>
                                     @endforeach
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Nama Kriteria</th>
-                                        <th>Bobot</th>
-                                         <th>Aksi</th>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                                </div>
+                                <div class="form-actions">
+									
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fa fa-check-square-o"></i> Save
+                                        </button>
+                                    
+                                        <a class="btn btn-warning" href="{{ route('share.pendaftaran.read', ['uuid' => $usulan_pkm->uuid]) }}">
+                                            <i class="fa fa-undo"></i> Kembali
+                                        </a>
+								</div>
+                            </form>
                         </div>
                     </div>
                 </div>

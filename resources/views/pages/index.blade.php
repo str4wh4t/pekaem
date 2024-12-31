@@ -85,11 +85,13 @@
                   <div class="insights px-2">
                      <div><span class="text-info h3">{{ count($usulan_pkm->where('jenis_pkm_id',$jenis_pkm_row->id)) }}</span> <span class="float-right">{{ $jenis_pkm_row->nama_pkm }}</span></div>
                      <div class="progress progress-md mt-1 mb-0">
-                         @if(!empty($usulan_pkm_total)):
-                         <div class="progress-bar bg-info" role="progressbar" style="width: {{ round((count($usulan_pkm->where('jenis_pkm_id',$jenis_pkm_row->id))/$usulan_pkm_total)*100,2) }}%" aria-valuenow="{{ round((count($usulan_pkm->where('jenis_pkm_id',$jenis_pkm_row->id))/$usulan_pkm_total)*100,2) }}" aria-valuemin="0" aria-valuemax="100">{{ round((count($usulan_pkm->where('jenis_pkm_id',$jenis_pkm_row->id))/$usulan_pkm_total)*100,2) }}%</div>
-                         @else:
+                         @if(!empty($usulan_pkm_total))
+                         <div class="progress-bar bg-info" role="progressbar" style="width: {{ round((count($usulan_pkm->where('jenis_pkm_id',$jenis_pkm_row->id))/$usulan_pkm_total)*100,2) }}%" aria-valuenow="{{ round((count($usulan_pkm->where('jenis_pkm_id',$jenis_pkm_row->id))/$usulan_pkm_total)*100,2) }}" aria-valuemin="0" aria-valuemax="100">
+                           {{ round((count($usulan_pkm->where('jenis_pkm_id',$jenis_pkm_row->id))/$usulan_pkm_total)*100,2) }}%
+                        </div>
+                         @else
                          <div class="progress-bar bg-info" role="progressbar" style="width: {{ 0 }}%" aria-valuenow="{{ 0 }}" aria-valuemin="0" aria-valuemax="100">{{ 0 }}%</div>
-                         @endif;
+                         @endif
                      </div>
                   </div>
                </div>

@@ -38,8 +38,8 @@ $('.zero-configuration').DataTable();
         <div class="row breadcrumbs-top">
             <div class="breadcrumb-wrapper col-12">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.html">Home</a>
-                    </li>
+                    {{-- <li class="breadcrumb-item"><a href="index.html">Home</a>
+                    </li> --}}
                     {{-- <li class="breadcrumb-item"><a href="#">Form Layouts</a>
                     </li>
                     <li class="breadcrumb-item active">Basic Forms
@@ -102,10 +102,15 @@ $('.zero-configuration').DataTable();
                                         {{-- <td>{{ $pegawai->jenis_pegawai }}</td>
                                         <td>{{ $pegawai->prodi_eduk }}</td> --}}
                                         <td>
-                                           {{ count($pegawai->usulan_pkm) }} Proposal
+                                            {{ 
+                                                // $pegawai->usulan_pkm()->whereHas('status_usulan', function ($query) {
+                                                //     $query->where('urutan', 1);
+                                                // })->count()
+                                                $pegawai->usulan_pkm()->count() 
+                                            }} Proposal
                                         </td>
                                         <td>
-                                           <a class="btn btn-info btn-sm" href="{{ route('share.pendaftaran.list', ['jenis' => 'pembimbing','pegawai_id' => $pegawai->id]) }}"  ><i class="fa fa-pencil-square-o" ></i> Lihat</a>
+                                            <a class="btn btn-info btn-sm" href="{{ route('share.pendaftaran.list', ['jenis' => 'pembimbing','pegawai_id' => $pegawai->id]) }}"  ><i class="fa fa-pencil-square-o" ></i> Lihat</a>
                                         </td>
                                     </tr>
                                     @endforeach

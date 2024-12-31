@@ -257,7 +257,11 @@ $("#pegawai").select2({
                                         <td>{{ $pegawai->prodi_eduk }}</td> --}}
                                         <td>
                                             @foreach($pegawai->roles as $role)
-                                            {!! '[ ' . $role->role . ' <a href="#" class="del_role" data-pegawai="'. $pegawai->id .'" data-role="'. $role->id .'"><i class="fa fa-times" ></i></a> ] ' !!}
+                                                @if($role->role == 'PEMBIMBING')
+                                                {!! '[ ' . $role->role . ' ] ' !!}
+                                                @else
+                                                {!! '[ ' . $role->role . ' <a href="#" class="del_role" data-pegawai="'. $pegawai->id .'" data-role="'. $role->id .'"><i class="fa fa-times" ></i></a> ] ' !!}
+                                                @endif
                                             @endforeach
                                         </td>
                                         {{-- <td>{{ UserHelp::admin_status_role_text("") }}</td> --}}

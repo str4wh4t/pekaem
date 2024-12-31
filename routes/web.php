@@ -72,5 +72,9 @@ Route::prefix('admin/kategori-kegiatan/{kategori_kegiatan}')->group(function () 
     Route::resource('jenis-pkm', 'JenisPkmController');
 });
 
+Route::prefix('admin/usulan-pkm/{usulan_pkm}')->group(function () {
+    Route::resource('penilaian-reviewer', 'PenilaianReviewerController');
+});
+
 // Route::resource('sso','SsoController');
 // Route::resource('crud','CrudsController');

@@ -66,4 +66,9 @@ class UsulanPkm extends Model
     {
         return $this->hasMany('App\ReviewerUsulanPkm');
     }
+
+    public function usulan_pkm_dokumen()
+    {
+        return $this->hasMany('App\UsulanPkmDokumen');
+    }
 }

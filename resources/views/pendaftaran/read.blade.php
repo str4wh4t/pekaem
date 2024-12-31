@@ -31,7 +31,8 @@ let $repeater = $('.repeater-default').repeater({
 
 @isset($usulan_pkm->jenis_pkm_id)
 $('#jenis').val('{{ $usulan_pkm->jenis_pkm_id }}');
-@endisset
+$('#kategori_kegiatan').val("{{ $usulan_pkm->kategori_kegiatan_id }}");
+@endif
 
 {{--@isset($usulan_pkm->anggota_pkm[1]->nim)--}}
 {{--$repeater.setList([--}}
@@ -198,6 +199,24 @@ $(document).on('click','#btn_tolak',function(){
 	return false;
 });
 
+$(document).on('click','#btn_lanjut',function(){
+	// let pesan = $('textarea[name="catatan_pembimbing"]').val();
+	// if(pesan.trim() != ''){
+	// 	if(confirm("Yakin akan menyetujui ?")){
+	// 		$('input[name="approval"]').val("DISETUJUI");
+	// 		$('form[name="form_read"]').submit();
+	// 	}
+	// }else{
+	// 	alert('Catatan pembimbing masih kosong.');
+	// }
+
+	if(confirm("Yakin akan menyetujui ?")){
+		$('input[name="approval"]').val("LANJUT");
+		$('form[name="form_read"]').submit();
+	}
+	return false;
+});
+
 $(document).on('click','#btn_lolos',function(){
 	let pesan = $('textarea[name="catatan_reviewer"]').val();
 	if(pesan.trim() != ''){
@@ -235,8 +254,8 @@ $(document).on('click','#btn_gagal',function(){
 		<div class="row breadcrumbs-top">
 			<div class="breadcrumb-wrapper col-12">
 				<ol class="breadcrumb">
-					<li class="breadcrumb-item"><a href="index.html">Home</a>
-					</li>
+					{{-- <li class="breadcrumb-item"><a href="index.html">Home</a>
+					</li> --}}
 					{{-- <li class="breadcrumb-item"><a href="#">Form Layouts</a>
 					</li>
 					<li class="breadcrumb-item active">Basic Forms
@@ -291,7 +310,7 @@ $(document).on('click','#btn_gagal',function(){
 					            </div>
 					        @endif
 
-							@if((Userhelp::get_selected_role() == 'PEMBIMBING')||(Userhelp::get_selected_role() == 'REVIEWER'))
+							@if((Userhelp::get_selected_role() == 'PEMBIMBING') || (Userhelp::get_selected_role() == 'WD1-TASKFORCE') || (Userhelp::get_selected_role() == 'REVIEWER'))
 							<form class="form" action="{{ route('admin.pendaftaran.approval', ['uuid' => $usulan_pkm->uuid]) }}" method="POST" enctype="multipart/form-data" name="form_read">
 							@endif
 							@if(Userhelp::get_selected_role() == 'ADMIN')
@@ -367,6 +386,21 @@ $(document).on('click','#btn_gagal',function(){
 									</div>
 
 									<div class="row">
+										<div class="col-md-6">
+											<div class="form-group">
+												<label for="kategori_kegiatan">Kategori</label>
+												<select id="kategori_kegiatan" name="kategori_kegiatan_id" class="form-control" disabled="disabled">
+													@foreach($kategori_kegiatan_list as $kategori_kegiatan)
+													<option value="{{ $kategori_kegiatan->id }}">
+														{{ $kategori_kegiatan->nama_kategori_kegiatan }}
+													</option>
+													@endforeach
+												</select>
+											</div>
+										</div>
+									</div>
+
+									<div class="row">
 
 										<div class="col-md-6">
 											<div class="form-group">
@@ -406,7 +440,9 @@ $(document).on('click','#btn_gagal',function(){
 									<div>File yang telah disimpan :</div>
 									<hr>
 									@forelse ($files_to_show as $file)
-				                        <div class="alert alert-warning">{{-- <button class="btn btn-danger btn-sm btn_hapus_document" type="button" data-repeater-delete="" data-id="{{ $usulan_pkm->uuid }}" data-file="{{ $file }}"><i class="ft-x"></i></button>  --}}<a href="{{ asset('storage/documents/' . $usulan_pkm->uuid . '_file_' . $file ) }}">{{ $file }}</a></div>
+				                        <div class="alert alert-warning">
+											<a href="{{ asset('storage/' . $file->document_path ) }}" target="_blank">{{ $file->document_path }}</a>
+										</div>
 				                    @empty
 				                    	<div class="alert alert-danger">Anda belum memiliki berkas untuk diverifikasi.</div>
 				                    @endforelse
@@ -418,7 +454,7 @@ $(document).on('click','#btn_gagal',function(){
 										<div class="col-md-3">
 											<label class="label-control" for="nim">Ketua</label>
 										</div>
-										<div class="col-md-4">
+										<div class="col-md-7">
 											<div class="form-group">
 												<input type="text" id="" class="form-control" placeholder="" name="nim" value="{{ $mhs->nama }}" disabled="disabled" >
 											</div>
@@ -432,9 +468,12 @@ $(document).on('click','#btn_gagal',function(){
 										<div class="col-md-3">
 											<label class="label-control" for="nim">Anggota</label>
 										</div>
-										<div class="col-md-4">
+										<div class="col-md-7">
 											<div class="form-group">
 												<input type="text" id="" class="form-control" placeholder="" name="nim" value="{{ $anggota->mhs->nama }}" disabled="disabled" >
+												<small>
+													Fakultas : {{ $anggota->mhs->nama_fak_ijazah }} , Prodi : {{ $anggota->mhs->nama_forlap }}
+												</small>
 											</div>
 										</div>
 										{{-- <div class="col-md-2">
@@ -472,10 +511,11 @@ $(document).on('click','#btn_gagal',function(){
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="ft-search"></i></span>
                                         </div>
-                                        <select id="pembimbing" class="form-control" placeholder="Cari dosen" name="pegawai_id" disabled="disabled" style="width: 80%"></select>
-                                    </div>
+                                        {{-- <select id="pembimbing" class="form-control" placeholder="Cari dosen" name="pegawai_id" disabled="disabled" style="width: 80%"></select> --}}
+										<input type="text" id="" class="form-control" placeholder="" value="{{ $usulan_pkm->pegawai->glr_dpn . " " . $usulan_pkm->pegawai->nama . " " . $usulan_pkm->pegawai->glr_blkg . " [" . $usulan_pkm->pegawai->nip . "]" . " [" . $usulan_pkm->pegawai->nidn . "]" }}" disabled="disabled" >
+	                                </div>
 
-                                    <br>
+									<br>
 
                                     <h4 class="form-section"><i class="fa fa-pencil"></i> Catatan Pembimbing</h4>
                                     @forelse ($usulan_pkm->revisi as $revisi)
@@ -507,6 +547,7 @@ $(document).on('click','#btn_gagal',function(){
 
 									<br>
 
+									<!-- 
 									<h4 class="form-section"><i class="fa fa-pencil"></i> Catatan Reviewer</h4>
                                     @forelse ($usulan_pkm->review as $review)
 				                        <div class="alert {{ $review->status_usulan->keterangan == "TOLAK" ? "alert-warning" : "alert-success" }}">
@@ -525,6 +566,7 @@ $(document).on('click','#btn_gagal',function(){
 									@endif
 
 									<br>
+									-->
 
 								@if(Userhelp::get_selected_role() == 'ADMIN')
 								<h4 class="form-section"><i class="fa fa-pencil"></i> Ploting Reviewer</h4>
@@ -594,11 +636,26 @@ $(document).on('click','#btn_gagal',function(){
 										@endif
                                 @endif
 
+								@if(Userhelp::get_selected_role() == 'WD1-TASKFORCE')
+										@if($usulan_pkm->status_usulan->keterangan == "DISETUJUI")
+										{{-- <button class="btn btn-info" id="btn_tolak" type="button">
+											<i class="fa fa-pencil" ></i> Tolak
+										</button> --}}
+										<button class="btn btn-success" id="btn_lanjut" type="button">
+											<i class="fa fa-thumbs-up" ></i> Lanjut
+										</button>
+										@else
+										<div class="alert alert-warning">
+											Anda telah memproses usulan ini.
+										</div>
+										@endif
+                                @endif
+
                                 @if(Userhelp::get_selected_role() == 'ADMIN')
 										{{-- <a class="btn btn-danger btn_hapus" href="{{ route('admin.pendaftaran.approval', ['id' => $usulan_pkm->id]) }}"  >
 											<i class="fa fa-thumbs-down" ></i> Tolak
 										</a> --}}
-										@if($usulan_pkm->status_usulan->keterangan == "DISETUJUI")
+										@if($usulan_pkm->status_usulan->keterangan == "LANJUT")
 										<button class="btn btn-success" id="btn_setujui" type="submit">
 											<i class="fa fa-thumbs-up" ></i> Save
 										</button>
@@ -613,13 +670,18 @@ $(document).on('click','#btn_gagal',function(){
 										{{-- <a class="btn btn-danger btn_hapus" href="{{ route('admin.pendaftaran.approval', ['id' => $usulan_pkm->id]) }}"  >
 											<i class="fa fa-thumbs-down" ></i> Tolak
 										</a> --}}
-										@if($usulan_pkm->status_usulan->keterangan == "DISETUJUI")
-										<button class="btn btn-danger" id="btn_gagal" type="submit">
+										@if($usulan_pkm->status_usulan->keterangan == "LANJUT")
+										{{-- <button class="btn btn-danger" id="btn_gagal" type="submit">
 											<i class="fa fa-thumbs-down" ></i> Gagal
 										</button>
 										<button class="btn btn-success" id="btn_lolos" type="submit">
 											<i class="fa fa-thumbs-up" ></i> Lolos
-										</button>
+										</button> --}}
+										{{-- <button class="btn btn-success" id="btn_lolos" type="submit">
+											<i class="fa fa-edit" ></i> Nilai
+										</button> --}}
+										<a class="btn btn-success mr-1" href="{{ route('penilaian-reviewer.create', ['usulan_pkm' => $usulan_pkm]) }}">
+											<i class="fa fa-edit" ></i> Nilai
 										@else
 										<div class="alert alert-warning">
 											Anda telah memproses usulan ini.

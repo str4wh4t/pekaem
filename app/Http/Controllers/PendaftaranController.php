@@ -14,16 +14,17 @@ use App\ReviewerUsulanPkm;
 use App\Http\Controllers\Controller;
 use App\KategoriKegiatan;
 use App\PegawaiRoles;
+use App\UsulanPkmDokumen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Builder;
-use Uuid;
-use UserHelp;
+use \App\Helpers\User as UserHelp;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request as GuzzleRequest;
 use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Validation\ValidationException;
+use Webpatser\Uuid\Uuid;
 
 class PendaftaranController extends Controller
 {
@@ -40,12 +41,14 @@ class PendaftaranController extends Controller
 		// dd($list_nim[0]);
 		// die;
 		//validasi multiple file
-		$validation = $request->validate([
-			'judul'	=> 'required|min:5|max:500',
-			'jenis'	=> 'required',
-			'berkas.*' => 'required|mimes:pdf|max:5120',
-			'pegawai_id'	=> 'required',
-		]);
+		// $request->validate([
+		// 	'judul'	=> 'required|min:5|max:500',
+		// 	'kategori_kegiatan_id'	=> 'required|exists:kategori_kegiatan,id',
+		// 	'jenis_pkm_id'	=> 'required|exists:jenis_pkm,id',
+		// 	'berkas' => 'required|array', // Pastikan 'berkas' adalah array
+		// 	'berkas.*' => 'file|mimes:pdf|max:5120', // Validasi setiap file dalam array
+		// 	'pegawai_id'	=> 'required',
+		// ]);
 
 		// $request->input('nim');
 		// if(!empty($files)){
@@ -53,10 +56,25 @@ class PendaftaranController extends Controller
 		// $usulan_pkm->save();
 		$id = '';
 		if (!empty($request->id)) {
+			$request->validate([
+				'judul'	=> 'required|min:5|max:500',
+				'kategori_kegiatan_id'	=> 'required|exists:kategori_kegiatan,id',
+				'jenis_pkm_id'	=> 'required|exists:jenis_pkm,id',
+				'berkas.*' => 'file|mimes:pdf|max:5120', // Validasi setiap file dalam array
+				'pegawai_id'	=> 'required',
+			]);
 			$id = UsulanPkm::where('uuid', $request->id)->first()->id;
 		}
 
 		if (empty($id)) {
+			$request->validate([
+				'judul'	=> 'required|min:5|max:500',
+				'kategori_kegiatan_id'	=> 'required|exists:kategori_kegiatan,id',
+				'jenis_pkm_id'	=> 'required|exists:jenis_pkm,id',
+				'berkas' => 'required|array', // Pastikan 'berkas' adalah array
+				'berkas.*' => 'file|mimes:pdf|max:5120', // Validasi setiap file dalam array
+				'pegawai_id'	=> 'required',
+			]);
 			/// IF NEW
 			$usulan_pkm = new UsulanPkm;
 			$usulan_pkm->mhs_nim = UserHelp::mhs_get_logged_nim();
@@ -70,9 +88,9 @@ class PendaftaranController extends Controller
 		}
 
 		$usulan_pkm->judul = $request->judul;
-		$usulan_pkm->jenis_pkm_id = $request->jenis;
+		$usulan_pkm->kategori_kegiatan_id = $request->kategori_kegiatan_id;
+		$usulan_pkm->jenis_pkm_id = $request->jenis_pkm_id;
 		$usulan_pkm->pegawai_id = $request->pegawai_id;
-
 
 		DB::beginTransaction();
 
@@ -96,11 +114,14 @@ class PendaftaranController extends Controller
 				UsulanPkm::find($usulan_pkm->id)->anggota_pkm()->save($anggota_pkm);
 
 				// SET PEGAWAI YANG DIPILIH SEBAGAI PEMBIMBING
-				$pegawai_roles = new PegawaiRoles();
-				$pegawai_roles->pegawai_id = $request->pegawai_id;
-				$pegawai_roles->roles_id = 'PEMBIMBING';
-				$pegawai_roles->status_role = '1'; // OTOMATIS AKTIF
-				$pegawai_roles->save();
+				$pegawai_roles = PegawaiRoles::where('pegawai_id', $request->pegawai_id)->where('roles_id', 3)->first();
+				if (empty($pegawai_roles)) {
+					$pegawai_roles = new PegawaiRoles();
+					$pegawai_roles->pegawai_id = $request->pegawai_id;
+					$pegawai_roles->roles_id = 3; // 'PEMBIMBING';
+					$pegawai_roles->status_role = '1'; // OTOMATIS AKTIF
+					$pegawai_roles->save();
+				}
 			}
 
 			$list_nim = $request->list_nim;
@@ -121,25 +142,32 @@ class PendaftaranController extends Controller
 			// }
 
 			//tampung file yang diupload
-			$files = $request->file('berkas');
+			// $files = $request->file('berkas');
 			//define variable folder sebagai array
 			// $folder = [];
 
-			if ((empty($id)) && (empty($files))) { // IF ADD MUST HAVE FILES
-				DB::rollback();
-				return redirect()->back()->withErrors(['Berkas upload is required']);
-			}
+			// if ((empty($id)) && (empty($files))) { // IF ADD MUST HAVE FILES
+			// 	DB::rollback();
+			// 	return redirect()->back()->withErrors(['Berkas upload is required']);
+			// }
 
-			if (!empty($files)) {
-				foreach ($files as $i => $file) {
+			if ($request->hasFile('berkas')) {
+				foreach ($request->file('berkas') as $file) {
 					//custom name masing2 file
-					$nama_file = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-					$nama_file = str_replace(' ', '_', $nama_file);
-					$nama_file = str_replace('.', '_', $nama_file);
-					$filename = $usulan_pkm->uuid . '_file_' . $nama_file . '.' . $file->getClientOriginalExtension();
+					// $nama_file = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+					// $nama_file = str_replace(' ', '_', $nama_file);
+					// $nama_file = str_replace('.', '_', $nama_file);
+					// $filename = $usulan_pkm->uuid . '_file_' . $nama_file . '.' . $file->getClientOriginalExtension();
 					// upload file
 					// $folder[] = $file->storeAs('public/documents/', $filename);
-					$file->storeAs('public/documents/', $filename);
+					// $file->storeAs('public/documents/', $filename);
+
+					$path = $file->store('documents', 'public');
+
+					UsulanPkmDokumen::create([
+						'usulan_pkm_id' => $usulan_pkm->id,
+						'document_path' => $path
+					]);
 				}
 			}
 		} catch (ValidationException $e) {
@@ -165,65 +193,68 @@ class PendaftaranController extends Controller
 		$id = UsulanPkm::where('uuid', $uuid)->first()->id;
 		$usulan_pkm = UsulanPkm::findOrFail($id);
 		$jenis_pkm = JenisPkm::all()->sortBy("id");
+		$kategori_kegiatan_list = KategoriKegiatan::all()->sortBy("id");
 		$mhs = Mhs::findOrFail(UserHelp::mhs_get_logged_nim());
 
 		// foreach($usulan_pkm->anggota_pkm as $anggota){
 		// 	dd($anggota->mhs->nim);
 		// }
 
-		$files = Storage::files('public/documents');
-		$files_to_show = [];
-		foreach ($files as $file) {
-			$nama_file = str_replace('public/documents/', '', $file);
-			$nama_file_arr = explode('_file_', $nama_file);
-			if ($nama_file_arr[0] == $uuid) {
-				$files_to_show[] = $nama_file_arr[1];
-			}
-		}
+		// $files = Storage::files('public/documents');
+		// $files_to_show = [];
+		// foreach ($files as $file) {
+		// 	$nama_file = str_replace('public/documents/', '', $file);
+		// 	$nama_file_arr = explode('_file_', $nama_file);
+		// 	if ($nama_file_arr[0] == $uuid) {
+		// 		$files_to_show[] = $nama_file_arr[1];
+		// 	}
+		// }
 
-		try {
-			$client = new Client();
-			$post_data = [
-				'auth' =>  json_encode(['user' => 'sempak', 'pass' => 'teles']),
-				'kode_fakultas' => $mhs->kode_fakultas,
-				'get' => json_encode(["kodeF", "nama_fak_ijazah"])
-			];
-			$req = new GuzzleRequest('POST', env('API_SIAP') . '/get_data_fakultas');
-			$res = $client->send($req, ['form_params' => $post_data]);
-			$return = json_decode($res->getBody()->getContents());
-			if (empty($return)) {
-				throw new BadResponseException('Data kosong.', $req);
-			}
-		} catch (BadResponseException $exception) {
-			//	        dd($exception->getMessage());
-			abort(403, substr($exception->getMessage(), 0, 25));
-		}
+		$files_to_show = $usulan_pkm->usulan_pkm_dokumen;
 
-		$mhs->kode_fakultas = $return->nama_fak_ijazah;
+		// try {
+		// 	$client = new Client();
+		// 	$post_data = [
+		// 		'auth' =>  json_encode(['user' => 'sempak', 'pass' => 'teles']),
+		// 		'kode_fakultas' => $mhs->kode_fakultas,
+		// 		'get' => json_encode(["kodeF", "nama_fak_ijazah"])
+		// 	];
+		// 	$req = new GuzzleRequest('POST', env('API_SIAP') . '/get_data_fakultas');
+		// 	$res = $client->send($req, ['form_params' => $post_data]);
+		// 	$return = json_decode($res->getBody()->getContents());
+		// 	if (empty($return)) {
+		// 		throw new BadResponseException('Data kosong.', $req);
+		// 	}
+		// } catch (BadResponseException $exception) {
+		// 	abort(403, substr($exception->getMessage(), 0, 25));
+		// }
 
-		try {
-			$client = new Client();
-			$post_data = [
-				'auth' =>  json_encode(['user' => 'sempak', 'pass' => 'teles']),
-				'kode_prodi' => $mhs->kode_prodi,
-				'get' => json_encode(["kode_prodi_pdpt", "nama_ps"])
-			];
-			$req = new GuzzleRequest('POST', env('API_SIAP') . '/get_data_prodi');
-			$res = $client->send($req, ['form_params' => $post_data]);
-			$return = json_decode($res->getBody()->getContents());
-			if (empty($return)) {
-				throw new BadResponseException('Data kosong.', $req);
-			}
-		} catch (BadResponseException $exception) {
-			//	        dd($exception->getMessage());
-			abort(403, substr($exception->getMessage(), 0, 25));
-		}
+		// $mhs->kode_fakultas = $return->nama_fak_ijazah;
 
-		$mhs->kode_prodi = $return->nama_ps;
+		// try {
+		// 	$client = new Client();
+		// 	$post_data = [
+		// 		'auth' =>  json_encode(['user' => 'sempak', 'pass' => 'teles']),
+		// 		'kode_prodi' => $mhs->kode_prodi,
+		// 		'get' => json_encode(["kode_prodi_pdpt", "nama_ps"])
+		// 	];
+		// 	$req = new GuzzleRequest('POST', env('API_SIAP') . '/get_data_prodi');
+		// 	$res = $client->send($req, ['form_params' => $post_data]);
+		// 	$return = json_decode($res->getBody()->getContents());
+		// 	if (empty($return)) {
+		// 		throw new BadResponseException('Data kosong.', $req);
+		// 	}
+		// } catch (BadResponseException $exception) {
+		// 	abort(403, substr($exception->getMessage(), 0, 25));
+		// }
+
+		// $mhs->kode_prodi = $return->nama_ps;
 
 		$this->_data['files_to_show'] = $files_to_show;
 		$this->_data['usulan_pkm'] = $usulan_pkm;
 		$this->_data['jenis_pkm'] = $jenis_pkm;
+		$this->_data['kategori_kegiatan_list'] = $kategori_kegiatan_list;
+
 		$this->_data['mhs'] = $mhs;
 
 		return view('pendaftaran.form', $this->_data);
@@ -238,11 +269,16 @@ class PendaftaranController extends Controller
 
 	private function _hapus_document(Request $request)
 	{
-		$uuid = $request->id;
+		$id = $request->id;
 		$file = $request->file;
-		$file = 'public/documents/' . $uuid . '_file_' . $file;
-		// dd($file);
+		// $file = 'public/documents/' . $uuid . '_file_' . $file;
+		$usulan_pkm_dokumen = UsulanPkmDokumen::where('usulan_pkm_id', $id)->where('document_path', $file)->first();
+		if (empty($usulan_pkm_dokumen)) {
+			return ['status' => 'error'];
+		}
+		$file = 'public/' . $file;
 		Storage::delete($file);
+		$usulan_pkm_dokumen->delete();
 		return ['status' => 'ok'];
 	}
 
@@ -266,15 +302,26 @@ class PendaftaranController extends Controller
 	private function _ajukan(Request $request)
 	{
 		$usulan_pkm = UsulanPkm::findOrFail($request->id);
+		if ($usulan_pkm->usulan_pkm_dokumen->count() == 0) {
+			return ['status' => 'error', 'message' => 'Berkas usulan tidak boleh kosong.'];
+		}
 		$usulan_pkm->status_usulan_id = StatusUsulan::where('keterangan', 'MENUNGGU')->first()->id;
 		$usulan_pkm->save();
 		$request->session()->flash('message', 'Usulan telah diajukan.');
 		return ['status' => 'ok'];
 	}
 
+	private function _get_jenis_pkm(Request $request)
+	{
+		$jenis_pkm_list = JenisPkm::where('kategori_kegiatan_id', $request->kategori_kegiatan_id)->get();
+		$this->_data['jenis_pkm_list'] = $jenis_pkm_list;
+
+		return $this->_data;
+	}
+
 	public function list(Request $request)
 	{
-		$usulan_pkm = UsulanPkm::all()->sortBy("judul");
+		// $usulan_pkm = UsulanPkm::all()->sortBy("judul");
 
 		if (UserHelp::get_selected_role() == "MHS") {
 			$usulan_pkm = UsulanPkm::where('mhs_nim', UserHelp::mhs_get_logged_nim())->get();
@@ -282,11 +329,25 @@ class PendaftaranController extends Controller
 		if (UserHelp::get_selected_role() == "PEMBIMBING") {
 			$pembimbing = UserHelp::admin_get_record_by_nip(UserHelp::admin_get_logged_nip());
 			$usulan_pkm = UsulanPkm::where('pegawai_id', $pembimbing->id)
-				->where('status_usulan_id', '!=', StatusUsulan::where('keterangan', 'BARU')->first()->id)
+				->whereHas('status_usulan', function (Builder $query) {
+					$query->where('urutan', '>', 0);
+				})
+				->get();
+		}
+		if (UserHelp::get_selected_role() == "WD1-TASKFORCE") {
+			$taskforce = UserHelp::admin_get_record_by_nip(UserHelp::admin_get_logged_nip());
+			// HARUS DIMAP ANTARA KODE FAKULTAS MHS DAN KODE FAKULTAS PEGAWAI
+			$usulan_pkm = UsulanPkm::whereHas('status_usulan', function (Builder $query) {
+				$query->where('urutan', '>', 1);
+			})
 				->get();
 		}
 		if (UserHelp::get_selected_role() == "ADMIN") {
 			// $usulan_pkm = UsulanPkm::where('status_usulan_id',StatusUsulan::where('keterangan','DISETUJUI')->first()->id)
+			$usulan_pkm = UsulanPkm::whereHas('status_usulan', function (Builder $query) {
+				$query->where('urutan', '>', 2);
+			})
+				->get();
 			if (!empty($request->jenis)) {
 				if ($request->jenis == 'pembimbing') {
 					$usulan_pkm = UsulanPkm::where('pegawai_id', $request->pegawai_id)->get();
@@ -321,45 +382,45 @@ class PendaftaranController extends Controller
 		$status_usulan = StatusUsulan::all()->sortBy("id");
 		$mhs = Mhs::findOrFail(UserHelp::mhs_get_logged_nim());
 
-		try {
-			$client = new Client(['verify' => false]);
-			$post_data = [
-				'auth' =>  json_encode(['user' => 'sempak', 'pass' => 'teles']),
-				'kode_fakultas' => $mhs->kode_fakultas,
-				'get' => json_encode(["kodeF", "nama_fak_ijazah"])
-			];
-			$req = new GuzzleRequest('POST', env('API_SIAP') . '/get_data_fakultas');
-			$res = $client->send($req, ['form_params' => $post_data]);
-			$return = json_decode($res->getBody()->getContents());
-			if (empty($return)) {
-				throw new BadResponseException('Data kosong.', $req);
-			}
-		} catch (BadResponseException $exception) {
-			//	        dd($exception->getMessage());
-			abort(403, substr($exception->getMessage(), 0, 25));
-		}
+		// try {
+		// 	$client = new Client(['verify' => false]);
+		// 	$post_data = [
+		// 		'auth' =>  json_encode(['user' => 'sempak', 'pass' => 'teles']),
+		// 		'kode_fakultas' => $mhs->kode_fakultas,
+		// 		'get' => json_encode(["kodeF", "nama_fak_ijazah"])
+		// 	];
+		// 	$req = new GuzzleRequest('POST', env('API_SIAP') . '/get_data_fakultas');
+		// 	$res = $client->send($req, ['form_params' => $post_data]);
+		// 	$return = json_decode($res->getBody()->getContents());
+		// 	if (empty($return)) {
+		// 		throw new BadResponseException('Data kosong.', $req);
+		// 	}
+		// } catch (BadResponseException $exception) {
+		// 	//	        dd($exception->getMessage());
+		// 	abort(403, substr($exception->getMessage(), 0, 25));
+		// }
 
-		$mhs->kode_fakultas = $return->nama_fak_ijazah;
+		// $mhs->kode_fakultas = $return->nama_fak_ijazah;
 
-		try {
-			$client = new Client();
-			$post_data = [
-				'auth' =>  json_encode(['user' => 'sempak', 'pass' => 'teles']),
-				'kode_prodi' => $mhs->kode_prodi,
-				'get' => json_encode(["kode_prodi_pdpt", "nama_ps"])
-			];
-			$req = new GuzzleRequest('POST', env('API_SIAP') . '/get_data_prodi');
-			$res = $client->send($req, ['form_params' => $post_data]);
-			$return = json_decode($res->getBody()->getContents());
-			if (empty($return)) {
-				throw new BadResponseException('Data kosong.', $req);
-			}
-		} catch (BadResponseException $exception) {
-			//	        dd($exception->getMessage());
-			abort(403, substr($exception->getMessage(), 0, 25));
-		}
+		// try {
+		// 	$client = new Client();
+		// 	$post_data = [
+		// 		'auth' =>  json_encode(['user' => 'sempak', 'pass' => 'teles']),
+		// 		'kode_prodi' => $mhs->kode_prodi,
+		// 		'get' => json_encode(["kode_prodi_pdpt", "nama_ps"])
+		// 	];
+		// 	$req = new GuzzleRequest('POST', env('API_SIAP') . '/get_data_prodi');
+		// 	$res = $client->send($req, ['form_params' => $post_data]);
+		// 	$return = json_decode($res->getBody()->getContents());
+		// 	if (empty($return)) {
+		// 		throw new BadResponseException('Data kosong.', $req);
+		// 	}
+		// } catch (BadResponseException $exception) {
+		// 	//	        dd($exception->getMessage());
+		// 	abort(403, substr($exception->getMessage(), 0, 25));
+		// }
 
-		$mhs->kode_prodi = $return->nama_ps;
+		// $mhs->kode_prodi = $return->nama_ps;
 
 		$this->_data['jenis_pkm'] = $jenis_pkm;
 		$this->_data['kategori_kegiatan_list'] = $kategori_kegiatan_list;
@@ -372,17 +433,25 @@ class PendaftaranController extends Controller
 	{
 		$id = UsulanPkm::where('uuid', $uuid)->first()->id;
 		$usulan_pkm = UsulanPkm::findOrFail($id);
-		$usulan_pkm->delete();
 
-		$files = Storage::files('public/documents');
-		foreach ($files as $file) {
-			$nama_file = str_replace('public/documents/', '', $file);
-			$nama_file_arr = explode('_file_', $nama_file);
-			if ($nama_file_arr[0] == $uuid) {
-				$file_to_delete = 'public/documents/' . $uuid . '_file_' . $nama_file_arr[1];
-				Storage::delete($file_to_delete);
+		if ($usulan_pkm->usulan_pkm_dokumen->count() > 0) {
+			foreach ($usulan_pkm->usulan_pkm_dokumen as $usulan_pkm_dokumen) {
+				$file = 'public/' . $usulan_pkm_dokumen->document_path;
+				Storage::delete($file);
+				$usulan_pkm_dokumen->delete();
 			}
 		}
+
+		// foreach ($usulan_pkm->usulan_pkm_dokumen as $usulan_pkm_dokumen) {
+		// 	$nama_file = str_replace('public/documents/', '', $file);
+		// 	$nama_file_arr = explode('_file_', $nama_file);
+		// 	if ($nama_file_arr[0] == $uuid) {
+		// 		$file_to_delete = 'public/documents/' . $uuid . '_file_' . $nama_file_arr[1];
+		// 		Storage::delete($file_to_delete);
+		// 	}
+		// }
+
+		$usulan_pkm->delete();
 
 		return redirect()->route('share.pendaftaran.list')->with('message', 'Data berhasil di-hapus.');
 	}
@@ -391,6 +460,7 @@ class PendaftaranController extends Controller
 	{
 		$id = UsulanPkm::where('uuid', $uuid)->first()->id;
 		$usulan_pkm = UsulanPkm::findOrFail($id);
+		$kategori_kegiatan_list = KategoriKegiatan::all()->sortBy("id");
 		$jenis_pkm = JenisPkm::all()->sortBy("id");
 		$status_usulan = StatusUsulan::all()->sortBy("id");
 		// $mhs = Mhs::findOrFail(UserHelp::mhs_get_logged_nim());
@@ -401,58 +471,61 @@ class PendaftaranController extends Controller
 		// dd($usulan_pkm->reviewer_usulan_pkm->where('reviewer_id',27)[0]->id);
 		// }
 
-		$files = Storage::files('public/documents');
-		$files_to_show = [];
-		foreach ($files as $file) {
-			$nama_file = str_replace('public/documents/', '', $file);
-			$nama_file_arr = explode('_file_', $nama_file);
-			if ($nama_file_arr[0] == $uuid) {
-				$files_to_show[] = $nama_file_arr[1];
-			}
-		}
+		// $files = Storage::files('public/documents');
+		// $files_to_show = [];
+		// foreach ($files as $file) {
+		// 	$nama_file = str_replace('public/documents/', '', $file);
+		// 	$nama_file_arr = explode('_file_', $nama_file);
+		// 	if ($nama_file_arr[0] == $uuid) {
+		// 		$files_to_show[] = $nama_file_arr[1];
+		// 	}
+		// }
 
-		try {
-			$client = new Client();
-			$post_data = [
-				'auth' =>  json_encode(['user' => 'sempak', 'pass' => 'teles']),
-				'kode_fakultas' => $mhs->kode_fakultas,
-				'get' => json_encode(["kodeF", "nama_fak_ijazah"])
-			];
-			$req = new GuzzleRequest('POST', env('API_SIAP') . '/get_data_fakultas');
-			$res = $client->send($req, ['form_params' => $post_data]);
-			$return = json_decode($res->getBody()->getContents());
-			if (empty($return)) {
-				throw new BadResponseException('Data kosong.', $req);
-			}
-		} catch (BadResponseException $exception) {
-			//	        dd($exception->getMessage());
-			abort(403, substr($exception->getMessage(), 0, 25));
-		}
+		$files_to_show = $usulan_pkm->usulan_pkm_dokumen;
 
-		$mhs->kode_fakultas = $return->nama_fak_ijazah;
+		// try {
+		// 	$client = new Client();
+		// 	$post_data = [
+		// 		'auth' =>  json_encode(['user' => 'sempak', 'pass' => 'teles']),
+		// 		'kode_fakultas' => $mhs->kode_fakultas,
+		// 		'get' => json_encode(["kodeF", "nama_fak_ijazah"])
+		// 	];
+		// 	$req = new GuzzleRequest('POST', env('API_SIAP') . '/get_data_fakultas');
+		// 	$res = $client->send($req, ['form_params' => $post_data]);
+		// 	$return = json_decode($res->getBody()->getContents());
+		// 	if (empty($return)) {
+		// 		throw new BadResponseException('Data kosong.', $req);
+		// 	}
+		// } catch (BadResponseException $exception) {
+		// 	//	        dd($exception->getMessage());
+		// 	abort(403, substr($exception->getMessage(), 0, 25));
+		// }
 
-		try {
-			$client = new Client();
-			$post_data = [
-				'auth' =>  json_encode(['user' => 'sempak', 'pass' => 'teles']),
-				'kode_prodi' => $mhs->kode_prodi,
-				'get' => json_encode(["kode_prodi_pdpt", "nama_ps"])
-			];
-			$req = new GuzzleRequest('POST', env('API_SIAP') . '/get_data_prodi');
-			$res = $client->send($req, ['form_params' => $post_data]);
-			$return = json_decode($res->getBody()->getContents());
-			if (empty($return)) {
-				throw new BadResponseException('Data kosong.', $req);
-			}
-		} catch (BadResponseException $exception) {
-			//	        dd($exception->getMessage());
-			abort(403, substr($exception->getMessage(), 0, 25));
-		}
+		// $mhs->kode_fakultas = $return->nama_fak_ijazah;
 
-		$mhs->kode_prodi = $return->nama_ps;
+		// try {
+		// 	$client = new Client();
+		// 	$post_data = [
+		// 		'auth' =>  json_encode(['user' => 'sempak', 'pass' => 'teles']),
+		// 		'kode_prodi' => $mhs->kode_prodi,
+		// 		'get' => json_encode(["kode_prodi_pdpt", "nama_ps"])
+		// 	];
+		// 	$req = new GuzzleRequest('POST', env('API_SIAP') . '/get_data_prodi');
+		// 	$res = $client->send($req, ['form_params' => $post_data]);
+		// 	$return = json_decode($res->getBody()->getContents());
+		// 	if (empty($return)) {
+		// 		throw new BadResponseException('Data kosong.', $req);
+		// 	}
+		// } catch (BadResponseException $exception) {
+		// 	//	        dd($exception->getMessage());
+		// 	abort(403, substr($exception->getMessage(), 0, 25));
+		// }
+
+		// $mhs->kode_prodi = $return->nama_ps;
 
 		$this->_data['files_to_show'] = $files_to_show;
 		$this->_data['usulan_pkm'] = $usulan_pkm;
+		$this->_data['kategori_kegiatan_list'] = $kategori_kegiatan_list;
 		$this->_data['jenis_pkm'] = $jenis_pkm;
 		$this->_data['status_usulan'] = $status_usulan;
 		$this->_data['mhs'] = $mhs;

@@ -19,7 +19,11 @@
 // Default
 
 @if(count($usulan_pkm) > 0)
-$('.zero-configuration').DataTable();
+$('.zero-configuration').DataTable(
+    {
+        scrollX: true
+    }
+);
 @endif
 
 $(document).on('click','.btn_hapus',function(){
@@ -41,8 +45,8 @@ $(document).on('click','.btn_hapus',function(){
         <div class="row breadcrumbs-top">
             <div class="breadcrumb-wrapper col-12">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="index.html">Home</a>
-                    </li>
+                    {{-- <li class="breadcrumb-item"><a href="index.html">Home</a>
+                    </li> --}}
                     {{-- <li class="breadcrumb-item"><a href="#">Form Layouts</a>
                     </li>
                     <li class="breadcrumb-item active">Basic Forms
@@ -91,7 +95,8 @@ $(document).on('click','.btn_hapus',function(){
                                         <th>No</th>
                                         <th>Mhs</th>
                                         <th>Judul</th>
-                                        <th>Jenis</th>
+                                        <th>Keg</th>
+                                        <th>Subkeg</th>
                                         <th>Pembimbing</th>
                                         <th>Tgl Ajuan</th>
                                         <th>Status</th>
@@ -104,6 +109,7 @@ $(document).on('click','.btn_hapus',function(){
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $u->mhs->nama . ' [' . $u->mhs->nim . ']' }}</td>
                                         <td>{{ $u->judul }}</td>
+                                        <td>{{ $u->jenis_pkm->kategori_kegiatan->nama_kategori_kegiatan }}</td>
                                         <td>{{ $u->jenis_pkm->nama_pkm }}</td>
                                         {{-- <td>{{ $u->anggota_pkm[0]->mhs->nama }}</td> --}}
                                         <td>{{ $u->pegawai->glr_dpn . " " . $u->pegawai->nama . " " . $u->pegawai->glr_blkg }}</td>
@@ -123,7 +129,7 @@ $(document).on('click','.btn_hapus',function(){
                                             <a class="btn btn-danger btn-sm btn_hapus" href="{{ route('mhs.pendaftaran.hapus', ['uuid' => $u->uuid]) }}"  ><i class="fa fa-times" ></i> Hapus</a>
                                             @endif
                                         @endif
-                                        @if(Userhelp::get_selected_role() == 'PEMBIMBING')
+                                        @if(Userhelp::get_selected_role() == 'PEMBIMBING' || Userhelp::get_selected_role() == 'WD1-TASKFORCE')
                                             <a class="btn btn-info btn-sm" href="{{ route('share.pendaftaran.read', ['uuid' => $u->uuid]) }}"  >
                                                 <i class="fa fa-folder-open" ></i> Lihat
                                             </a>
@@ -154,7 +160,7 @@ $(document).on('click','.btn_hapus',function(){
                                     </tr>
                                     @empty
 	                                <tr>
-	                                    <td colspan="6">Belum terdapat event</td>
+	                                    <td colspan="6">Belum terdapat data</td>
 	                                </tr>
                                     @endforelse
                                 </tbody>
@@ -163,7 +169,8 @@ $(document).on('click','.btn_hapus',function(){
                                         <th>No</th>
                                         <th>Mhs</th>
                                         <th>Judul</th>
-                                        <th>Jenis</th>
+                                        <th>Keg</th>
+                                        <th>Subkeg</th>
                                         <th>Pembimbing</th>
                                         <th>Tgl Ajuan</th>
                                         <th>Status</th>

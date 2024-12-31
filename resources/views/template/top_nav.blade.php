@@ -20,7 +20,7 @@
 						<li class="dropdown dropdown-user nav-item">
 							<a class="dropdown-toggle nav-link dropdown-user-link" href="#" data-toggle="dropdown">
 								<span class="avatar"><img src="{{ asset('assets/template/robust/app-assets/images/portrait/small/avatar-s-1.png') }}" alt="avatar"><i></i></span>  {{-- avatar-online --}}
-								<span class="user-name">{{ UserHelp::get_selected_nama_lengkap() }} [ {{ UserHelp::get_selected_role() }} ]</span>
+								<span class="user-name">{{-- UserHelp::get_selected_nama_lengkap() --}} [ {{ UserHelp::get_selected_role() }} ]</span>
 							</a>
 							<div class="dropdown-menu dropdown-menu-right">
 								{{-- <a class="dropdown-item" href="user-profile.html"><i class="ft-user"></i> Edit Profile</a>

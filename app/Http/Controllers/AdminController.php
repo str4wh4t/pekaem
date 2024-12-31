@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\User as UserHelp;
 use App\PegawaiRoles;
 use App\Roles;
 use App\Pegawai;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Controller;
 use App\KriteriaPenilaian;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
@@ -19,7 +21,7 @@ class AdminController extends Controller
     public function list()
     {
         // $pegawai_roles = PegawaiRoles::all()->sortBy("pegawai_id");
-        $roles = Roles::all()->where('id', '!=', 1)->sortBy("id"); /// EXCEPT SUPER
+        $roles = Roles::all()->where('id', '!=', 1)->where('id', '!=', 3)->sortBy("id"); /// EXCEPT SUPER
         $pegawai_has_role = Pegawai::has('roles')->get();
         // dd($pegawai_has_role);
         $this->_data['roles'] = $roles;
@@ -150,7 +152,7 @@ class AdminController extends Controller
                 ->orWhere('nama', 'LIKE', '%' . $request->text . '%');
         })
             ->where('status_terakhir', 'Aktif')
-            ->get(['nim AS id', DB::raw('CONCAT(nama," ","[",nim,"]") as text')]);
+            ->get(['nim AS id', DB::raw('CONCAT(nama," ","[",nim,"]"," ","[",nama_forlap,"]"," ","[",nama_fak_ijazah,"]") as text')]);
 
         $this->_data['items'] = $mhs;
 
@@ -189,13 +191,18 @@ class AdminController extends Controller
     public function list_pembimbing()
     {
         // $pegawai_roles = PegawaiRoles::all()->sortBy("pegawai_id");
-        $pembimbing = Pegawai::where('jnspeg', '1') // HANYA DOSEN
-            ->where('status', '1') // HANYA AKTIF
-            ->whereHas('roles', function (Builder $query) {
-                $query->where('roles.role', 'PEMBIMBING');
-            })
-            ->get();
-        //        dd($pembimbing);
+        if (UserHelp::get_selected_role() == 'PEMBIMBING') {
+            $pembimbing = Pegawai::where('nip', UserHelp::admin_get_logged_nip())->get();
+        } else {
+            $pembimbing = Pegawai::where('jnspeg', '1') // HANYA DOSEN
+                ->where('status', '1') // HANYA AKTIF
+                ->whereHas('roles', function (Builder $query) {
+                    $query->where('roles.role', 'PEMBIMBING');
+                })
+                ->get();
+        }
+
+
         $this->_data['pembimbing'] = $pembimbing;
 
         return view('admin.list_pembimbing', $this->_data);

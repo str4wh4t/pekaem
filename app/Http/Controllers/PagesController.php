@@ -7,7 +7,7 @@ use App\UsulanPkm;
 use App\StatusUsulan;
 use App\JenisPkm;
 use Illuminate\Http\Request;
-use UserHelp;
+use App\Helpers\User as UserHelp;
 
 class PagesController extends Controller
 {

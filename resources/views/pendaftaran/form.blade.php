@@ -126,7 +126,7 @@ function init_select(){
 					results: data.items
 				};
 			}
-	  }
+	  	}
 	});
 }
 
@@ -150,6 +150,50 @@ function hapus_pendaftaran(){
     }
     return false;
 }
+
+$(document).on('change', '#kategori_kegiatan',{'_token':csrf}, function () {
+    const kategori_kegiatan_id = $(this).val();
+	$('#jenis_pkm').empty().append('<option value="" disabled selected>Pilih Subkategori</option>');
+
+    // Kirim permintaan AJAX ke server
+    $.ajax({
+        url: ("{{ route('share.pendaftaran.ajax', ['method' => 'get_jenis_pkm']) }}"), // Endpoint untuk mendapatkan data
+		method: 'POST', // Gunakan POST jika Anda mengirimkan data
+		data: {
+			'kategori_kegiatan_id': kategori_kegiatan_id, // Data yang dikirim
+			'_token': csrf // Token CSRF untuk validasi Laravel
+		},
+		method:'POST',
+        success: function (data) {
+            $('#jenis_pkm').empty().append('<option value="" disabled selected>Pilih Subkategori</option>');
+
+            $.each(data.jenis_pkm_list, function (key, value) {
+                $('#jenis_pkm').append(
+                    `<option value="${value.id}">${value.nama_pkm}</option>`
+                );
+            });
+
+			@if( old('jenis_pkm_id', @$usulan_pkm->jenis_pkm_id) != null )
+
+			const valueToCheck = "{{ old('jenis_pkm_id', @$usulan_pkm->jenis_pkm_id) }}";
+			const isValueExists = $('#jenis_pkm option[value="'+ valueToCheck +'"]').length > 0;
+
+			if (isValueExists) {
+				$('#jenis_pkm').val(valueToCheck);
+				$('#jenis_pkm').trigger('change');
+			} else {
+				$('#kategori_kriteria').val(null);
+			}
+			
+			@endif
+        }
+    });
+});
+
+@if( old('kategori_kegiatan_id', @$usulan_pkm->kategori_kegiatan_id) != null )
+$('#kategori_kegiatan').val("{{ old('kategori_kegiatan_id', @$usulan_pkm->kategori_kegiatan_id) }}");
+$('#kategori_kegiatan').trigger('change');
+@endif
 
 </script>
 <!-- END PAGE LEVEL JS-->
@@ -255,13 +299,13 @@ function hapus_pendaftaran(){
 										<div class="col-md-6">
 											<div class="form-group">
 												<label for="fakultas">Fakultas</label>
-												<input type="text" id="fakultas" class="form-control" placeholder="Fakultas" name="fakultas" value="{{ $mhs->kode_fakultas }}" readonly="readonly" >
+												<input type="text" id="fakultas" class="form-control" placeholder="Fakultas" name="fakultas" value="{{ $mhs->nama_fak_ijazah }}" readonly="readonly" >
 											</div>
 										</div>
 										<div class="col-md-6">
 											<div class="form-group">
 												<label for="prodi">Prodi</label>
-												<input type="text" id="prodi" class="form-control" placeholder="Prodi" name="prodi" value="{{ $mhs->kode_prodi }}" readonly="readonly" >
+												<input type="text" id="prodi" class="form-control" placeholder="Prodi" name="prodi" value="{{ $mhs->nama_forlap }}" readonly="readonly" >
 											</div>
 										</div>
 									</div>
@@ -284,16 +328,19 @@ function hapus_pendaftaran(){
 
 									<div class="form-group">
 										<label for="companyName">Judul</label>
-										<input type="text" id="judul" class="form-control" placeholder="Judul" name="judul" value="{{ @$usulan_pkm->judul }}">
+										<input type="text" id="judul" class="form-control" placeholder="Judul" name="judul" value="{{ old('judul', @$usulan_pkm->judul) }}">
 									</div>
 
 									<div class="row">
 										<div class="col-md-6">
 											<div class="form-group">
-												<label for="jenis">Kategori</label>
-												<select id="jenis" name="jenis" class="form-control">
+												<label for="kategori_kegiatan">Kategori</label>
+												<select id="kategori_kegiatan" name="kategori_kegiatan_id" class="form-control">
+													<option value="" disabled {{ old('kategori_kegiatan_id', @$usulan_pkm->kategori_kegiatan_id ?? '') == null ? 'selected' : '' }}>Pilih kategori</option>
 													@foreach($kategori_kegiatan_list as $kategori_kegiatan)
-													<option value="{{ $kategori_kegiatan->id }}">{{ $kategori_kegiatan->nama_kategori_kegiatan }}</option>
+													<option value="{{ $kategori_kegiatan->id }}">
+														{{ $kategori_kegiatan->nama_kategori_kegiatan }}
+													</option>
 													@endforeach
 												</select>
 											</div>
@@ -303,11 +350,9 @@ function hapus_pendaftaran(){
 									<div class="row">
 										<div class="col-md-6">
 											<div class="form-group">
-												<label for="jenis">Jenis</label>
-												<select id="jenis" name="jenis" class="form-control">
-													@foreach($jenis_pkm as $j)
-													<option value="{{ $j->id }}">{{ $j->nama_pkm }}</option>
-													@endforeach
+												<label for="jenis_pkm">Jenis</label>
+												<select id="jenis_pkm" name="jenis_pkm_id" class="form-control">
+													<option value="" disabled selected>Pilih subkategori</option>
 												</select>
 											</div>
 										</div>
@@ -337,9 +382,9 @@ function hapus_pendaftaran(){
 										@forelse ($files_to_show as $file)
 					                        <div class="alert alert-warning">
 					                        	@if(($usulan_pkm->status_usulan->keterangan == "BARU")||($usulan_pkm->status_usulan->keterangan == "DITOLAK"))
-					                        	<button class="btn btn-danger btn-sm btn_hapus_document" type="button" data-repeater-delete="" data-id="{{ $usulan_pkm->uuid }}" data-file="{{ $file }}"><i class="ft-x"></i></button>
+					                        	<button class="btn btn-danger btn-sm btn_hapus_document" type="button" data-repeater-delete="" data-id="{{ $usulan_pkm->id }}" data-file="{{ $file->document_path }}"><i class="ft-x"></i></button>
 					                        	@endif
-					                        	<a href="{{ asset('storage/documents/' . $usulan_pkm->uuid . '_file_' . $file ) }}">{{ $file }}</a></div>
+					                        	<a href="{{ asset('storage/' . $file->document_path ) }}" target="_blank">{{ $file->document_path }}</a></div>
 					                    @empty
 					                    	<div class="alert alert-danger">Anda belum memiliki berkas untuk diverifikasi.</div>
 					                    @endforelse
@@ -368,6 +413,9 @@ function hapus_pendaftaran(){
 											<div class="col-md-7">
 												<div class="form-group">
 													<input type="text" id="" class="form-control" placeholder="" name="nim" value="{{ $anggota->mhs->nama }}" disabled="disabled" >
+													<small>
+														Fakultas : {{ $anggota->mhs->nama_fak_ijazah }} , Prodi : {{ $anggota->mhs->nama_forlap }}
+													</small>
 												</div>
 											</div>
 											@if(($usulan_pkm->status_usulan->keterangan == "BARU")||($usulan_pkm->status_usulan->keterangan == "DITOLAK"))
@@ -419,7 +467,8 @@ function hapus_pendaftaran(){
 	                                            <span class="input-group-text"><i class="ft-search"></i></span>
 	                                        </div>
 	                                        <input type="hidden" name="pegawai_id" value="{{ $usulan_pkm->pegawai_id }}">
-	                                        <select id="pembimbing" class="form-control" placeholder="Cari dosen" name="pegawai_id" style="width: 80%" disabled="disabled"></select>
+	                                        {{-- <select id="pembimbing" class="form-control" placeholder="Cari dosen" name="pegawai_id" style="width: 80%" disabled="disabled"></select> --}}
+											<input type="text" id="" class="form-control" placeholder="" value="{{ $usulan_pkm->pegawai->glr_dpn . " " . $usulan_pkm->pegawai->nama . " " . $usulan_pkm->pegawai->glr_blkg . " [" . $usulan_pkm->pegawai->nip . "]" . " [" . $usulan_pkm->pegawai->nidn . "]" }}" disabled="disabled" >
 	                                    </div>
 	                                    @endif
                                     @else

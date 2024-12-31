@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\StatusUsulan;
+use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 // use Illuminate\Support\Facades\URL;
 use Microsoft\Graph\Graph;
 use Microsoft\Graph\Model;
-use UserHelp;
+use App\Helpers\User as UserHelp;
 
 class SsoController extends Controller
 {
@@ -176,11 +178,11 @@ class SsoController extends Controller
                 $request->session()->put('session_data', $session_data);
 
                 return redirect('/dashboard');
-            } catch (League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
+            } catch (\League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
                 dd($e);
-            } catch (Microsoft\Graph\Exception\GraphException $e) {
+            } catch (\Microsoft\Graph\Exception\GraphException $e) {
                 dd($e);
-            } catch (GuzzleHttp\Exception\RequestException $e) {
+            } catch (\GuzzleHttp\Exception\RequestException $e) {
                 dd($e);
             }
         }
