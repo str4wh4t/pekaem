@@ -172,6 +172,85 @@ CREATE TABLE IF NOT EXISTS `usulan_pkm` (
   CONSTRAINT `FK_usulan_pkm_status_usulan` FOREIGN KEY (`status_usulan_id`) REFERENCES `status_usulan` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- Dumping structure for view pekaem.reviewer
+-- Creating temporary table to overcome VIEW dependency errors
+CREATE TABLE `reviewer` (
+	`id` INT(10) NOT NULL,
+	`nama` VARCHAR(70) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`nip` VARCHAR(22) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`niplama` VARCHAR(22) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`nik` VARCHAR(16) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`karpeg` VARCHAR(15) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`nidn` VARCHAR(11) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`nidk` VARCHAR(11) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`npwp` VARCHAR(15) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`faceprintid` VARCHAR(15) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`glr_dpn` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`glr_blkg` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`tmp_lhr` VARCHAR(30) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`tgl_lhr` DATE NULL,
+	`jnskel` VARCHAR(1) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`status_kawin` INT(10) NULL,
+	`agama_id` INT(10) NULL,
+	`ibukandung` VARCHAR(150) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`tmt_cpns` DATE NULL,
+	`golongan_id` INT(10) NOT NULL,
+	`tmtgol` DATE NULL,
+	`kum` VARCHAR(8) NOT NULL COMMENT 'tidak dipakai, sudah didanti di tb_riwayatjabatan' COLLATE 'utf8mb4_0900_ai_ci',
+	`tmt_kum` DATE NULL COMMENT 'tidak dipakai, sudah didanti di tb_riwayatjabatan',
+	`dmk` VARCHAR(100) NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`jabatan_id` INT(10) NOT NULL COMMENT 'persiapan migrasi ke tb_riwayatjabatan',
+	`tmtjab` DATE NULL,
+	`mkth` INT(10) NOT NULL,
+	`mkbl` INT(10) NOT NULL,
+	`latihjab_id` INT(10) NOT NULL COMMENT 'Sudah tidak dipakai',
+	`tmt_latihjab` DATE NULL COMMENT 'Sudah tidak dipakai',
+	`ijazah_id` INT(10) NOT NULL,
+	`namapend` VARCHAR(100) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`luluspend` YEAR NULL,
+	`jnspeg` VARCHAR(20) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`serdos` INT(10) NOT NULL,
+	`tmtserdos` YEAR NULL,
+	`noserdos` VARCHAR(15) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`ket` VARCHAR(100) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`unit_id` INT(10) NOT NULL,
+	`unit2_id` INT(10) NULL,
+	`unit3_id` INT(10) NULL,
+	`status` INT(10) NOT NULL,
+	`tmt_status` DATE NULL,
+	`create_by` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`create_date` DATETIME NULL,
+	`update_by` VARCHAR(50) NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`update_date` DATETIME NULL,
+	`foto` VARCHAR(200) NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`status_kepeg` INT(10) NOT NULL,
+	`alamat` VARCHAR(200) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`rt` INT(10) NOT NULL,
+	`rw` INT(10) NOT NULL,
+	`kelurahan` VARCHAR(100) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`kecamatan` VARCHAR(100) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`kabupaten` VARCHAR(100) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`provinsi` VARCHAR(100) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`kodepos` INT(10) NOT NULL,
+	`telp` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`hp` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`email` VARCHAR(70) NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`tinggi` FLOAT NULL,
+	`beratbadan` FLOAT NULL,
+	`rambut` VARCHAR(70) NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`bentukmuka` VARCHAR(70) NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`warnakulit` VARCHAR(70) NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`cirikhas` VARCHAR(200) NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`cacat_tubuh` VARCHAR(200) NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`hobi` VARCHAR(200) NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`asal_dosen` VARCHAR(15) NOT NULL COMMENT 'Diisi Pegawai dari dalam atau dari luar' COLLATE 'utf8mb4_0900_ai_ci',
+	`gol_darah` VARCHAR(2) NULL COLLATE 'utf8mb4_0900_ai_ci'
+) ENGINE=MyISAM;
+
+-- Removing temporary table and create final VIEW structure
+DROP TABLE IF EXISTS `reviewer`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `reviewer` AS select `p`.`id` AS `id`,`p`.`nama` AS `nama`,`p`.`nip` AS `nip`,`p`.`niplama` AS `niplama`,`p`.`nik` AS `nik`,`p`.`karpeg` AS `karpeg`,`p`.`nidn` AS `nidn`,`p`.`nidk` AS `nidk`,`p`.`npwp` AS `npwp`,`p`.`faceprintid` AS `faceprintid`,`p`.`glr_dpn` AS `glr_dpn`,`p`.`glr_blkg` AS `glr_blkg`,`p`.`tmp_lhr` AS `tmp_lhr`,`p`.`tgl_lhr` AS `tgl_lhr`,`p`.`jnskel` AS `jnskel`,`p`.`status_kawin` AS `status_kawin`,`p`.`agama_id` AS `agama_id`,`p`.`ibukandung` AS `ibukandung`,`p`.`tmt_cpns` AS `tmt_cpns`,`p`.`golongan_id` AS `golongan_id`,`p`.`tmtgol` AS `tmtgol`,`p`.`kum` AS `kum`,`p`.`tmt_kum` AS `tmt_kum`,`p`.`dmk` AS `dmk`,`p`.`jabatan_id` AS `jabatan_id`,`p`.`tmtjab` AS `tmtjab`,`p`.`mkth` AS `mkth`,`p`.`mkbl` AS `mkbl`,`p`.`latihjab_id` AS `latihjab_id`,`p`.`tmt_latihjab` AS `tmt_latihjab`,`p`.`ijazah_id` AS `ijazah_id`,`p`.`namapend` AS `namapend`,`p`.`luluspend` AS `luluspend`,`p`.`jnspeg` AS `jnspeg`,`p`.`serdos` AS `serdos`,`p`.`tmtserdos` AS `tmtserdos`,`p`.`noserdos` AS `noserdos`,`p`.`ket` AS `ket`,`p`.`unit_id` AS `unit_id`,`p`.`unit2_id` AS `unit2_id`,`p`.`unit3_id` AS `unit3_id`,`p`.`status` AS `status`,`p`.`tmt_status` AS `tmt_status`,`p`.`create_by` AS `create_by`,`p`.`create_date` AS `create_date`,`p`.`update_by` AS `update_by`,`p`.`update_date` AS `update_date`,`p`.`foto` AS `foto`,`p`.`status_kepeg` AS `status_kepeg`,`p`.`alamat` AS `alamat`,`p`.`rt` AS `rt`,`p`.`rw` AS `rw`,`p`.`kelurahan` AS `kelurahan`,`p`.`kecamatan` AS `kecamatan`,`p`.`kabupaten` AS `kabupaten`,`p`.`provinsi` AS `provinsi`,`p`.`kodepos` AS `kodepos`,`p`.`telp` AS `telp`,`p`.`hp` AS `hp`,`p`.`email` AS `email`,`p`.`tinggi` AS `tinggi`,`p`.`beratbadan` AS `beratbadan`,`p`.`rambut` AS `rambut`,`p`.`bentukmuka` AS `bentukmuka`,`p`.`warnakulit` AS `warnakulit`,`p`.`cirikhas` AS `cirikhas`,`p`.`cacat_tubuh` AS `cacat_tubuh`,`p`.`hobi` AS `hobi`,`p`.`asal_dosen` AS `asal_dosen`,`p`.`gol_darah` AS `gol_darah` from (`pegawai` `p` join `pegawai_roles` `pr` on((`pr`.`pegawai_id` = `p`.`id`))) where (`pr`.`roles_id` = '4');
+
 -- Data exporting was unselected.
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
