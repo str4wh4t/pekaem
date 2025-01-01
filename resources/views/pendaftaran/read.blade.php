@@ -20,13 +20,38 @@
 
 let csrf = $('meta[name=csrf-token]').attr("content");
 // Default
+const maxReviewers = 2; // Maksimal jumlah elemen
 let $repeater = $('.repeater-default').repeater({
 	// isFirstItemUndeletable: true,
 	show:function(){
 		init_select();
 		$(this).show();
+		updateLabels();
+		toggleAddButton();
+	},
+	hide: function (deleteElement) {
+		$(this).remove(); 
+		toggleAddButton();
+		console.log('hide');
 	}
 });
+
+// Fungsi untuk memperbarui label Reviewer
+function updateLabels() {
+	$repeater.find('[data-repeater-item]').each(function (index) {
+		$(this).find('.label-control').text('Reviewer ' + (index + 1));
+	});
+}
+
+// Fungsi untuk menampilkan/menyembunyikan tombol "Tambah Reviewer"
+function toggleAddButton() {
+	const itemCount = $repeater.find('[data-repeater-item]').length;
+	if (itemCount >= maxReviewers) {
+		$('#add-reviewer').hide();
+	} else {
+		$('#add-reviewer').show();
+	}
+}
 
 
 @isset($usulan_pkm->jenis_pkm_id)
@@ -186,6 +211,15 @@ $(document).on('click','#btn_setujui',function(){
 	return false;
 });
 
+$(document).on('click','#btn_tetapkan_penilaian',function(){
+	if(confirm("Yakin akan menetapkan ?")){
+		$('form[name="form_read"]').attr('action', '{{ route('admin.pendaftaran.approval', ['uuid' => $usulan_pkm->uuid]) }}');
+		$('input[name="approval"]').val("SUDAH_DINILAI");
+		$('form[name="form_read"]').submit();
+	}
+	return false;
+});
+
 $(document).on('click','#btn_tolak',function(){
 	let pesan = $('textarea[name="catatan_pembimbing"]').val();
 	if(pesan.trim() != ''){
@@ -212,6 +246,24 @@ $(document).on('click','#btn_lanjut',function(){
 
 	if(confirm("Yakin akan menyetujui ?")){
 		$('input[name="approval"]').val("LANJUT");
+		$('form[name="form_read"]').submit();
+	}
+	return false;
+});
+
+$(document).on('click','#btn_gagal_lanjut',function(){
+	// let pesan = $('textarea[name="catatan_pembimbing"]').val();
+	// if(pesan.trim() != ''){
+	// 	if(confirm("Yakin akan menyetujui ?")){
+	// 		$('input[name="approval"]').val("DISETUJUI");
+	// 		$('form[name="form_read"]').submit();
+	// 	}
+	// }else{
+	// 	alert('Catatan pembimbing masih kosong.');
+	// }
+
+	if(confirm("Yakin akan dikembalikan ?")){
+		$('input[name="approval"]').val("BARU");
 		$('form[name="form_read"]').submit();
 	}
 	return false;
@@ -310,11 +362,11 @@ $(document).on('click','#btn_gagal',function(){
 					            </div>
 					        @endif
 
-							@if((Userhelp::get_selected_role() == 'PEMBIMBING') || (Userhelp::get_selected_role() == 'WD1-TASKFORCE') || (Userhelp::get_selected_role() == 'REVIEWER'))
+							@if((Userhelp::get_selected_role() == 'PEMBIMBING') || (Userhelp::get_selected_role() == 'WD1') || (Userhelp::get_selected_role() == 'REVIEWER'))
 							<form class="form" action="{{ route('admin.pendaftaran.approval', ['uuid' => $usulan_pkm->uuid]) }}" method="POST" enctype="multipart/form-data" name="form_read">
 							@endif
 							@if(Userhelp::get_selected_role() == 'ADMIN')
-							<form class="form" action="{{ route('admin.pendaftaran.set.reviewer', ['uuid' => $usulan_pkm->uuid]) }}" method="POST" enctype="multipart/form-data" name="form_read">
+							<form class="form" action="{{ route('admin.pendaftaran.set-reviewer', ['uuid' => $usulan_pkm->uuid]) }}" method="POST" enctype="multipart/form-data" name="form_read">
 							@endif
 								{{ csrf_field() }}
 								<input type="hidden" name="id" value="{{ @$usulan_pkm->uuid }}">
@@ -353,13 +405,13 @@ $(document).on('click','#btn_gagal',function(){
 										<div class="col-md-6">
 											<div class="form-group">
 												<label for="fakultas">Fakultas</label>
-												<input type="text" id="fakultas" class="form-control" placeholder="Fakultas" name="fakultas" value="{{ $mhs->kode_fakultas }}" readonly="readonly" >
+												<input type="text" id="fakultas" class="form-control" placeholder="Fakultas" name="fakultas" value="{{ $mhs->nama_fak_ijazah }}" readonly="readonly" >
 											</div>
 										</div>
 										<div class="col-md-6">
 											<div class="form-group">
 												<label for="prodi">Prodi</label>
-												<input type="text" id="prodi" class="form-control" placeholder="Prodi" name="prodi" value="{{ $mhs->kode_prodi }}" readonly="readonly" >
+												<input type="text" id="prodi" class="form-control" placeholder="Prodi" name="prodi" value="{{ $mhs->nama_forlap }}" readonly="readonly" >
 											</div>
 										</div>
 									</div>
@@ -516,7 +568,7 @@ $(document).on('click','#btn_gagal',function(){
 	                                </div>
 
 									<br>
-
+									{{--
                                     <h4 class="form-section"><i class="fa fa-pencil"></i> Catatan Pembimbing</h4>
                                     @forelse ($usulan_pkm->revisi as $revisi)
 				                        <div class="alert {{ $revisi->status_usulan->keterangan == "DITOLAK" ? "alert-warning" : "alert-success" }}">
@@ -533,21 +585,9 @@ $(document).on('click','#btn_gagal',function(){
 									@endif
 
 									<br>
-
-				                    <h4 class="form-section"><i class="fa fa-pencil"></i> Catatan Perbaikan</h4>
-									@forelse ($usulan_pkm->perbaikan as $perbaikan)
-				                    <div class="alert alert-info">
-				                       	{!! '<b>Catatan :</b> '.  $perbaikan->catatan_perbaikan .' <b>[ Pada : '. $perbaikan->created_at .' ]</b>' !!}
-			                        </div>
-			                        @empty
-			                        	<div class="alert alert-info">
-				                        	Belum ada catatan perubahan
-				                        </div>
-			                        @endforelse
-
-									<br>
-
-									<!-- 
+									--}}
+									
+									{{--
 									<h4 class="form-section"><i class="fa fa-pencil"></i> Catatan Reviewer</h4>
                                     @forelse ($usulan_pkm->review as $review)
 				                        <div class="alert {{ $review->status_usulan->keterangan == "TOLAK" ? "alert-warning" : "alert-success" }}">
@@ -566,38 +606,47 @@ $(document).on('click','#btn_gagal',function(){
 									@endif
 
 									<br>
-									-->
+									--}}
+
+									<h4 class="form-section"><i class="fa fa-pencil"></i> Catatan Perbaikan</h4>
+									@forelse ($usulan_pkm->perbaikan as $perbaikan)
+				                    <div class="alert alert-info">
+				                       	{!! '<b>Catatan :</b> '.  $perbaikan->catatan_perbaikan .' <b>[ Pada : '. $perbaikan->created_at .' ]</b>' !!}
+			                        </div>
+			                        @empty
+			                        	<div class="alert alert-info">
+				                        	Belum ada catatan perubahan
+				                        </div>
+			                        @endforelse
+
+									<br>
 
 								@if(Userhelp::get_selected_role() == 'ADMIN')
 								<h4 class="form-section"><i class="fa fa-pencil"></i> Ploting Reviewer</h4>
 
-								@isset($usulan_pkm->reviewer)
-									@forelse($usulan_pkm->reviewer as $reviewer)
+								@if($usulan_pkm->reviewer->count() == 1)
+									@foreach($usulan_pkm->reviewer as $i => $reviewer)
 									<div class="row">
 										<div class="col-md-3">
-											<label class="label-control" for="id">Reviewer</label>
+											<label class="label-control" for="id">Reviewer {{ $i + 1 }}</label>
 										</div>
 										<div class="col-md-4">
 											<div class="form-group">
-												<input type="text" id="" class="form-control" placeholder="" name="id" value="{{ $reviewer->nama }}" disabled="disabled" >
+												<input type="text" id="" class="form-control" placeholder="" name="id" value="{{ $reviewer->glr_dpn . " " . $reviewer->nama . " " . $reviewer->glr_blkg }}" disabled="disabled" >
 											</div>
 										</div>
-                                        @if($usulan_pkm->status_usulan->keterangan == "DISETUJUI")
+                                        @if($reviewer->penilaian_reviewer()->where('usulan_pkm_id', $usulan_pkm->id)->count() == 0)
 										<div class="col-md-2">
 											<button class="btn btn-danger btn_hapus_reviewer" type="button" data-reviewer-id="{{ $reviewer->id }}" data-usulan-pkm-id="{{ $usulan_pkm->id }}"><i class="ft-x"></i></button>
 										</div>
                                         @endif
 									</div>
-									@empty
-
-									@endforelse
-								@endisset
-
-                                <div class="form-group repeater-default">
+									@endforeach
+	                                <div class="form-group repeater-default">
 	                                <div data-repeater-list="list_id">
 	                                    <div class="row" data-repeater-item>
 											<div class="col-md-3">
-												<label class="label-control" for="id">Reviewer</label>
+												<label class="label-control" for="id">Reviewer 2</label>
 											</div>
 											<div class="col-md-4">
 												<div class="form-group">
@@ -609,10 +658,51 @@ $(document).on('click','#btn_gagal',function(){
 											</div>
 										</div>
 	                                </div>
-	                                <button type="button" data-repeater-create class="btn btn-primary">
+	                            </div>
+								@elseif($usulan_pkm->reviewer->count() == 2)
+									@foreach($usulan_pkm->reviewer()->orderBy('urutan')->get() as $i => $reviewer)
+									<div class="row">
+										<div class="col-md-3">
+											<label class="label-control" for="id">Reviewer {{ $i + 1 }}</label>
+										</div>
+										<div class="col-md-4">
+											<div class="form-group">
+												<input type="text" id="" class="form-control" placeholder="" name="id" value="{{ $reviewer->glr_dpn . " " . $reviewer->nama . " " . $reviewer->glr_blkg }}" disabled="disabled" >
+											</div>
+										</div>
+                                        @if($reviewer->penilaian_reviewer()->where('usulan_pkm_id', $usulan_pkm->id)->count() == 0)
+										<div class="col-md-2">
+											<button class="btn btn-danger btn_hapus_reviewer" type="button" data-reviewer-id="{{ $reviewer->id }}" data-usulan-pkm-id="{{ $usulan_pkm->id }}"><i class="ft-x"></i></button>
+										</div>
+										@else
+										<div class="col-md-2">
+											<a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer]) }}" >Lihat Penilaian</a>
+										</div>
+                                        @endif
+									</div>
+									@endforeach
+								@else
+                                <div class="form-group repeater-default">
+	                                <div data-repeater-list="list_id">
+	                                    <div class="row" data-repeater-item>
+											<div class="col-md-3">
+												<label class="label-control" for="id">Reviewer 1</label>
+											</div>
+											<div class="col-md-4">
+												<div class="form-group">
+													<select id="" class="form-control cari_reviewer" placeholder="Cari reviewer" name="id"></select>
+												</div>
+											</div>
+											<div class="col-md-2">
+												<button class="btn btn-danger" type="button" data-repeater-delete><i class="ft-x"></i></button>
+											</div>
+										</div>
+	                                </div>
+	                                <button type="button" data-repeater-create id="add-reviewer" class="btn btn-primary">
 	                                    <i class="ft-plus"></i> Tambah Reviewer
 	                                </button>
 	                            </div>
+								@endif
 	                            @endif
 
                                 </div>
@@ -636,13 +726,16 @@ $(document).on('click','#btn_gagal',function(){
 										@endif
                                 @endif
 
-								@if(Userhelp::get_selected_role() == 'WD1-TASKFORCE')
+								@if(Userhelp::get_selected_role() == 'WD1')
 										@if($usulan_pkm->status_usulan->keterangan == "DISETUJUI")
 										{{-- <button class="btn btn-info" id="btn_tolak" type="button">
 											<i class="fa fa-pencil" ></i> Tolak
 										</button> --}}
 										<button class="btn btn-success" id="btn_lanjut" type="button">
-											<i class="fa fa-thumbs-up" ></i> Lanjut
+											<i class="fa fa-thumbs-up" ></i> Lanjutkan
+										</button>
+										<button class="btn btn-danger" id="btn_gagal_lanjut" type="button">
+											<i class="fa fa-thumbs-down" ></i> Kebalikan
 										</button>
 										@else
 										<div class="alert alert-warning">
@@ -656,9 +749,14 @@ $(document).on('click','#btn_gagal',function(){
 											<i class="fa fa-thumbs-down" ></i> Tolak
 										</a> --}}
 										@if($usulan_pkm->status_usulan->keterangan == "LANJUT")
-										<button class="btn btn-success" id="btn_setujui" type="submit">
-											<i class="fa fa-thumbs-up" ></i> Save
-										</button>
+											<button class="btn btn-success" type="submit">
+												<i class="fa fa-thumbs-up" ></i> Save
+											</button>
+											@if($usulan_pkm->penilaian_reviewer()->distinct()->count('reviewer_id') == $usulan_pkm->reviewer_usulan_pkm->count())
+											<button class="btn btn-danger" type="button" id="btn_tetapkan_penilaian">
+												<i class="fa fa-paper-plane" ></i> Tetapkan Penilaian
+											</button>
+											@endif
 										@else
 										<div class="alert alert-warning">
 											Anda telah memproses usulan ini.
@@ -677,15 +775,18 @@ $(document).on('click','#btn_gagal',function(){
 										<button class="btn btn-success" id="btn_lolos" type="submit">
 											<i class="fa fa-thumbs-up" ></i> Lolos
 										</button> --}}
-										{{-- <button class="btn btn-success" id="btn_lolos" type="submit">
+											@if($usulan_pkm->penilaian_reviewer()->where('reviewer_id', $pegawai->id)->count() != 0)
+											<div class="alert alert-warning">
+												Anda telah menilai usulan ini.
+											</div>
+											@endif
+										<a class="btn btn-success" href="{{ route('penilaian-reviewer.create', ['usulan_pkm' => $usulan_pkm]) }}">
 											<i class="fa fa-edit" ></i> Nilai
-										</button> --}}
-										<a class="btn btn-success mr-1" href="{{ route('penilaian-reviewer.create', ['usulan_pkm' => $usulan_pkm]) }}">
-											<i class="fa fa-edit" ></i> Nilai
+										</a>
 										@else
-										<div class="alert alert-warning">
-											Anda telah memproses usulan ini.
-										</div>
+										<a class="btn btn-success" href="{{ route('penilaian-reviewer.create', ['usulan_pkm' => $usulan_pkm]) }}">
+											<i class="fa fa-edit" ></i> Nilai
+										</a>
 										@endif
                                 @endif
 

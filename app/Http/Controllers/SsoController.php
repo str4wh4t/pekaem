@@ -47,7 +47,7 @@ class SsoController extends Controller
 
         if ($request->session()->has('is_login')) {
             session_destroy();
-            return redirect('/dashboard');
+            return redirect('dashboard');
         }
 
 
@@ -124,7 +124,7 @@ class SsoController extends Controller
                 // vdebug($user->getUserPrincipalName());
 
                 if (empty($user->getUserPrincipalName())) {
-                    return redirect('/login')->with('message', "Login gagal, anda tidak memiliki akses ke Aplikasi.");
+                    return redirect('login')->with('message', "Anda tidak memiliki akses ke aplikasi.");
                 }
 
                 $user_data = explode('@', $user->getUserPrincipalName());
@@ -137,6 +137,8 @@ class SsoController extends Controller
                 if (in_array($user_data[1], $students)) {
                     // JIKA MAHASISWA
 
+                    return redirect('login')->with('message', "Anda tidak memiliki akses ke aplikasi.");
+
                     $mhs = UserHelp::mhs_get_record_by_nim($user->getSurname());
 
                     if (!empty($mhs)) {
@@ -144,16 +146,18 @@ class SsoController extends Controller
                         $session_data = [
                             'username'             => $mhs->nim,
                             'nama_lengkap'      => strtoupper($mhs->nama),
+                            'kodeF' =>          $mhs->kode_fakultas,
                             'login_at'            => date('Y-m-d H:i:s'),
                             'login_as'            => 'MHS',
                             'role_as'            => 'MHS',
+                            'kode_fakultas_as'           => null,
                         ];
 
                         $request->session()->put('session_data', $session_data);
 
-                        return redirect('/dashboard');
+                        return redirect('dashboard');
                     } else {
-                        return redirect('/')->with('message', "Login gagal, anda tidak memiliki akses ke Aplikasi.");
+                        return redirect('/')->with('message', "Anda tidak memiliki akses ke aplikasi.");
                     }
                 }
 
@@ -162,7 +166,7 @@ class SsoController extends Controller
                 $roles = UserHelp::admin_get_roles_by_nip($user->getSurname());
 
                 if (empty($roles)) {
-                    return redirect('/')->with('message', "Login gagal, anda tidak memiliki akses ke Aplikasi.");
+                    return redirect('/')->with('message', "Anda tidak memiliki akses ke aplikasi.");
                 }
 
                 $pegawai = UserHelp::admin_get_record_by_nip($user->getSurname());
@@ -170,14 +174,16 @@ class SsoController extends Controller
                 $session_data = [
                     'username'             => $pegawai->nip,
                     'nama_lengkap'      => $pegawai->glr_dpn . ' ' . $pegawai->nama . ' ' . $pegawai->glr_blkg,
+                    'kodeF' =>          null, // $pegawai->mapping_fakultas->fakultas->kodeF,
                     'login_at'            => date('Y-m-d H:i:s'),
                     'login_as'            => 'ADMIN',
                     'role_as'            => null,
+                    'kode_fakultas_as'           => null,
                 ];
 
                 $request->session()->put('session_data', $session_data);
 
-                return redirect('/dashboard');
+                return redirect('dashboard');
             } catch (\League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
                 dd($e);
             } catch (\Microsoft\Graph\Exception\GraphException $e) {
@@ -192,13 +198,14 @@ class SsoController extends Controller
     public function logout(Request $request)
     {
         $request->session()->flush();
-        return redirect('/login')->with('message', "Anda telah logout dari sistem.");
+        return redirect('login')->with('message', "Anda telah logout dari sistem.");
     }
 
     public function tes($nip)
     {
+        return redirect('login');
         // dd($nip);
-        UserHelp::admin_get_record_by_nip($nip);
+        // UserHelp::admin_get_record_by_nip($nip);
         // $StatusUsulan = StatusUsulan::first();
         // dd($StatusUsulan);
     }

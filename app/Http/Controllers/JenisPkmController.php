@@ -112,4 +112,14 @@ class JenisPkmController extends Controller
             return redirect()->route('jenis-pkm.index', ['kategori_kegiatan' => $kategoriKegiatan])->with('message', 'Data tidak bisa dihapus karena sudah digunakan.');
         }
     }
+
+    public function daftar_penilaian(KategoriKegiatan $kategoriKegiatan, JenisPkm $jenisPkm)
+    {
+        $tahun = date('Y');
+        $this->_data['usulan_pkm_list'] = $jenisPkm->usulan_pkm()->where('tahun', $tahun)->orderBy('nilai_total', 'desc')->get();
+        $this->_data['kategori_kegiatan'] = $kategoriKegiatan;
+        $this->_data['jenis_pkm'] = $jenisPkm;
+        return view('jenis_pkm.daftar_penilaian', $this->_data);
+
+	}
 }

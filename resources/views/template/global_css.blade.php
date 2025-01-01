@@ -15,6 +15,15 @@
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/template/robust/app-assets/css/pages/users.css') }}">
 <!-- END PAGE LEVEL (GLOBAL)-->
 
+<style type="text/css">
+.table th, .table td {
+    padding: .75rem;
+}
+.table{
+    font-size: smaller;
+}
+</style>
+
 <!-- BEGIN PAGE LEVEL CSS (PAGE LEVEL)-->
 @stack('page_level_css')
 <!-- END PAGE LEVEL CSS (PAGE LEVEL)-->

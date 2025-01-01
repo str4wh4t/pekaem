@@ -4,6 +4,8 @@
 <!-- BEGIN PAGE LEVEL CSS-->
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/template/robust/app-assets/vendors/css/forms/selects/select2.min.css') }}">
 <!-- END PAGE LEVEL CSS-->
+<style type="text/css">
+</style>
 @endpush
 
 @push('page_vendor_level_js')
@@ -128,6 +130,31 @@ function init_select(){
 			}
 	  	}
 	});
+
+	$(".cari_mhs_modal").select2({
+		dropdownParent: $('#modalPilih'),
+		placeholder: 'Cari...',
+		minimumInputLength: 3,
+		width: '100%',
+	 	ajax: {
+		    url: "{{ route('admin.users.ajax', ['method' => 'cari_mhs']) }}",
+		    dataType: 'json',
+		    data: function (params){
+	      			var query = {
+	        			'text' : params.term,
+		            	'_token' :csrf,
+	      			}
+	      		return query;
+		    },
+		    method:'POST',
+	        processResults: function (data){
+				// Transforms the top-level key of the response object from 'items' to 'results'
+				return {
+					results: data.items
+				};
+			}
+	  	}
+	});
 }
 
 $(document).on('click','#btn_ajukan',function(){
@@ -189,6 +216,14 @@ $(document).on('change', '#kategori_kegiatan',{'_token':csrf}, function () {
         }
     });
 });
+
+$(document).ready(function () {
+      // Show the modal when the page is loaded
+	  @if ($mhs->nim == null)
+      $('#modalPilih').modal('show');
+	  @endif
+});
+		
 
 @if( old('kategori_kegiatan_id', @$usulan_pkm->kategori_kegiatan_id) != null )
 $('#kategori_kegiatan').val("{{ old('kategori_kegiatan_id', @$usulan_pkm->kategori_kegiatan_id) }}");
@@ -265,6 +300,7 @@ $('#kategori_kegiatan').trigger('change');
 							<form class="form" action="{{ route('admin.pendaftaran.simpan') }}" method="POST" enctype="multipart/form-data">
 								{{ csrf_field() }}
 								<input type="hidden" name="id" value="{{ @$usulan_pkm->uuid }}">
+								<input type="hidden" name="mhs_nim" value="{{ $mhs->nim }}">
 								<div class="form-body">
 									<h4 class="form-section"><i class="ft-user"></i> Personal Info (KETUA)</h4>
 									<div class="row">
@@ -483,7 +519,6 @@ $('#kategori_kegiatan').trigger('change');
                                     <br>
 
 									@isset($usulan_pkm->status_usulan->keterangan)
-										{{--
 										@if(@$usulan_pkm->status_usulan->keterangan != "BARU")
 		                                    <h4 class="form-section"><i class="fa fa-pencil"></i> Catatan Pembimbing</h4>
 		                                    @forelse ($usulan_pkm->revisi as $revisi)
@@ -496,7 +531,6 @@ $('#kategori_kegiatan').trigger('change');
 						                        </div>
 						                    @endforelse
 					                    @endif
-										--}}
 
 					                    @if(@$usulan_pkm->status_usulan->urutan >= 2)
 		                                    <h4 class="form-section"><i class="fa fa-pencil"></i> Catatan Reviewer</h4>
@@ -545,7 +579,7 @@ $('#kategori_kegiatan').trigger('change');
                                             <button type="submit" class="btn btn-primary">
 												<i class="fa fa-check-square-o"></i> Save
 											</button>
-                                            <a class="btn btn-danger" onclick="return hapus_pendaftaran()" href="{{ route('admin.pendaftaran.hapus',['uuid' => $usulan_pkm->uuid])  }}">
+                                            <a class="btn btn-danger" onclick="return hapus_pendaftaran()" href="{{ route('mhs.pendaftaran.hapus',['uuid' => $usulan_pkm->uuid])  }}">
 												<i class="fa fa-trash-o"></i> Hapus
 											</a>
 										@elseif(@$usulan_pkm->status_usulan->keterangan == "DITOLAK")
@@ -554,11 +588,8 @@ $('#kategori_kegiatan').trigger('change');
 											</button>
 										@else
 					                        	<div class="alert alert-info">
-						                        	Usulan anda telah diproses [ <b>STATUS :</b> {{ $usulan_pkm->status_usulan->keterangan == 'DISETUJUI' ? 'DIUSULKAN' : $usulan_pkm->status_usulan->keterangan }} ]
+						                        	Usulan anda telah diproses [ <b>STATUS :</b> {{ $usulan_pkm->status_usulan->keterangan }} ]
 						                        </div>
-												<a class="btn btn-danger" onclick="return hapus_pendaftaran()" href="{{ route('admin.pendaftaran.hapus',['uuid' => $usulan_pkm->uuid])  }}">
-												<i class="fa fa-trash-o"></i> Hapus
-											</a>
 										@endif
 									@else
 										<button type="submit" class="btn btn-primary">
@@ -577,5 +608,41 @@ $('#kategori_kegiatan').trigger('change');
 		</div>
 	</section>
 	<!-- // Basic form layout section end -->
+</div>
+<!-- Modal -->
+<div class="modal fade" id="modalPilih" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+        <form action="{{ route('admin.pendaftaran.create') }}" method="GET">
+        @csrf
+            <div class="modal-header">
+            <h5 class="modal-title" id="modalPilihLabel">Pilih Mhs</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+				<div class="form-body">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="form-group">
+								<label for="nama_lengkap">Mhs Sebagai Ketua</label>
+								<select id="" class="form-control cari_mhs_modal" placeholder="" name="nim"></select>
+							</div>
+						</div>
+					</div>
+				</div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">
+                    Proses
+                </button>
+				<a class="btn btn-warning" href="{{ route('share.pendaftaran.list') }}">
+					<i class="fa fa-undo"></i> Kembali
+				</a>
+            </div>
+        </form>
+        </div>
+    </div>
 </div>
 @endsection

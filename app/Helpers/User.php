@@ -56,6 +56,18 @@ class User
 		return $roles;
 	}
 
+	public static function admin_get_pegawai_roles_by_nip($nip)
+	{
+		// $PegawaiRoles = PegawaiRoles::with(['pegawai' => function ($query) use($nip){
+		//     $query->where('nip',$nip);
+		// }])->get();
+
+		$pegawai = Pegawai::where('nip', $nip)->with('roles')->first();
+	
+
+		return $pegawai->pegawai_roles;
+	}
+
 	public static function admin_get_logged_nip()
 	{
 		$nip = null;
@@ -149,5 +161,16 @@ class User
 		}
 
 		return $nama_lengkap;
+	}
+
+	public static function get_selected_kode_fakultas()
+	{
+		$kode_fakultas = null;
+		if (null !== session('session_data')) {
+			$session_data = session('session_data');
+			$kode_fakultas = $session_data['kode_fakultas_as'];
+		}
+
+		return $kode_fakultas;
 	}
 }

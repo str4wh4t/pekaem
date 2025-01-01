@@ -14,4 +14,7 @@ yarn-error.log
 composer.phar
 pekaem.code-workspace
 nohup.out
+/.fleet
 /.idea
+/.vscode
+.DS_Store

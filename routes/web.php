@@ -28,9 +28,13 @@ Route::post('login/ajax/{method}', 'PagesController@ajax')->name('login.ajax');
 // });
 
 Route::get('mhs/pendaftaran/add', 'PendaftaranController@add')->name('mhs.pendaftaran.add');
+Route::get('admin/pendaftaran/create', 'PendaftaranController@create')->name('admin.pendaftaran.create');
 Route::get('mhs/pendaftaran/edit/{uuid}', 'PendaftaranController@edit')->name('mhs.pendaftaran.edit');
+Route::get('admin/pendaftaran/edit/{uuid}', 'PendaftaranController@edit')->name('admin.pendaftaran.edit');
 Route::get('mhs/pendaftaran/hapus/{uuid}', 'PendaftaranController@hapus')->name('mhs.pendaftaran.hapus');
+Route::get('admin/pendaftaran/hapus/{uuid}', 'PendaftaranController@hapus')->name('admin.pendaftaran.hapus');
 Route::post('mhs/pendaftaran/simpan', 'PendaftaranController@simpan')->name('mhs.pendaftaran.simpan');
+Route::post('admin/pendaftaran/simpan', 'PendaftaranController@simpan')->name('admin.pendaftaran.simpan');
 Route::post('mhs/users/ajax/{method}', 'AdminController@ajax')->name('mhs.users.ajax');
 
 Route::get('admin/users/list', 'AdminController@list')->name('admin.users.list');
@@ -40,7 +44,7 @@ Route::post('admin/users/asign', 'AdminController@asign')->name('admin.users.asi
 Route::post('admin/users/ajax/{method}', 'AdminController@ajax')->name('admin.users.ajax');
 Route::get('admin/choose_role', 'PagesController@choose_role')->name('admin.choose_role');
 Route::post('admin/pendaftaran/approval/{uuid}', 'PendaftaranController@approval')->name('admin.pendaftaran.approval');
-Route::post('admin/pendaftaran/set/reviewer/{uuid}', 'PendaftaranController@set_reviewer')->name('admin.pendaftaran.set.reviewer');
+Route::post('admin/pendaftaran/set-reviewer/{uuid}', 'PendaftaranController@set_reviewer')->name('admin.pendaftaran.set-reviewer');
 Route::get('admin/pendaftaran/ploting/reviewer', 'PendaftaranController@ploting_reviewer')->name('admin.pendaftaran.ploting.reviewer');
 Route::get('admin/pendaftaran/ploting/list', 'PendaftaranController@ploting_reviewer')->name('admin.pendaftaran.ploting.list');
 Route::get('admin/pembimbing/list', 'AdminController@list_pembimbing')->name('admin.pembimbing.list');
@@ -70,10 +74,13 @@ Route::prefix('admin')->group(function () {
 
 Route::prefix('admin/kategori-kegiatan/{kategori_kegiatan}')->group(function () {
     Route::resource('jenis-pkm', 'JenisPkmController');
+    Route::get('jenis-pkm/{jenis_pkm}/daftar-penilaian', 'JenisPkmController@daftar_penilaian')->name('jenis-pkm.daftar-penilaian');
 });
 
 Route::prefix('admin/usulan-pkm/{usulan_pkm}')->group(function () {
     Route::resource('penilaian-reviewer', 'PenilaianReviewerController');
+    Route::get('penilaian-reviewer/{penilaian_reviewer}/batal', 'PenilaianReviewerController@batal')->name('penilaian-reviewer.batal');
+    Route::get('penilaian-reviewer/{reviewer}/lihat', 'PenilaianReviewerController@lihat')->name('penilaian-reviewer.lihat');
 });
 
 // Route::resource('sso','SsoController');

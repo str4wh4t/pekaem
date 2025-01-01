@@ -18,6 +18,11 @@ class AlterUsulanPkmTable extends Migration
             $table->foreign('kategori_kegiatan_id')
                 ->references('id')->on('kategori_kegiatan')
                 ->onDelete('restrict');
+            // tambah field created_by
+            $table->string('created_by')->after('pegawai_id');
+            $table->year('tahun')->after('pegawai_id');
+            $table->string('kode_fakultas', 2)->after('pegawai_id');
+            $table->double('nilai_total', 10, 2)->default(0)->after('pegawai_id');
         });
     }
 

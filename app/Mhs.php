@@ -20,4 +20,9 @@ class Mhs extends Model
     {
         return $this->hasMany('App\AnggotaPkm');
     }
+
+    public function fakultas()
+    {
+        return $this->belongsTo('App\Fakultas', 'kode_fakultas', 'kodeF');
+    }
 }

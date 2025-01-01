@@ -45,7 +45,7 @@ $(document).ready(function () {
     }
 
     // Event listener untuk input skor
-    $('.score-input').on('change', function () {
+    $('.score-input').on('input', function () {
         const $input = $(this);
         const value = $input.val();
         const $row = $input.closest('tr');
@@ -84,7 +84,12 @@ $(document).ready(function () {
     calculateTotal();
 });
 
-
+function batalkan_penilaian(){
+    if(confirm('Yakin akan dibatalkan ?')){
+        return true;
+    }
+    return false;
+}
 
 </script>
 @endpush
@@ -151,8 +156,9 @@ $(document).ready(function () {
                                 <b class="float-right">Lihat Penilaian : <a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $usulan_pkm->reviewer_usulan_pkm()->where('urutan', $urutan == 1 ? 2 : 1)->first()->reviewer_id ]) }}">Reviewer {{ $urutan == 1 ? "2" : "1" }}</a></b>
                                 @endif
                             </div>
-                            <form class="form" action="{{ route('penilaian-reviewer.store', ['usulan_pkm' => $usulan_pkm]) }}" method="POST">
-								{{ csrf_field() }}
+                            <form class="form" action="{{ route('penilaian-reviewer.update', ['usulan_pkm' => $usulan_pkm, 'penilaian_reviewer' => $penilaian_reviewer_edit]) }}" method="POST">
+                                {{ csrf_field() }}
+                                @method('PUT')
 								<div class="form-body">
                                     
                                 <div class="table-responsive">
@@ -177,16 +183,17 @@ $(document).ready(function () {
                                                 </td>
                                                 <td class="text-center align-middle">
                                                     <div class="form-group mb-0">
-                                                    <select id="score_{{ $kriteria_penilaian->id }}" 
-                                                            class="form-control form-control-sm text-center score-input" 
-                                                            name="data[{{ $kriteria_penilaian->id }}][score]">
+                                                        <select id="score_{{ $kriteria_penilaian->id }}" 
+                                                                class="form-control form-control-sm text-center score-input" 
+                                                                name="data[{{ $kriteria_penilaian->id }}][score]">
                                                             <option value="" disabled selected>Pilih Skor</option>
                                                             @foreach ([1, 2, 3, 5, 6, 7] as $score)
-                                                            <option value="{{ $score }}" {{ old('data.' . $kriteria_penilaian->id . '.score') == $score ? 'selected' : '' }}>
-                                                                {{ $score }}
-                                                            </option>
+                                                                <option value="{{ $score }}" 
+                                                                        {{ old('data.' . $kriteria_penilaian->id . '.score', $penilaian_reviewer[$kriteria_penilaian->id]['score'] ?? null) == $score ? 'selected' : '' }}>
+                                                                    {{ $score }}
+                                                                </option>
                                                             @endforeach
-                                                    </select>
+                                                        </select>
                                                     </div>
                                                 </td>
                                                 <td class="text-center align-middle">
@@ -200,7 +207,7 @@ $(document).ready(function () {
                                                             class="form-control form-control-sm" 
                                                             placeholder="" 
                                                             name="data[{{ $kriteria_penilaian->id }}][komentar]" 
-                                                            value="{{ old('data.' . $kriteria_penilaian->id . '.komentar') }}">
+                                                            value="{{ old('data.' . $kriteria_penilaian->id . '.komentar', $penilaian_reviewer[$kriteria_penilaian->id]['komentar']) }}">
                                                     </div>
                                                 </td>
                                             </tr>
@@ -218,33 +225,20 @@ $(document).ready(function () {
                                     </table>
                                 </div>
 
-
-
-
-                                    {{-- 
-									<div class="row">
-										<div class="col-md-9 d-flex align-items-center">
-												<label for="nama_kriteria_{{ $kriteria_penilaian->id }}"><b>{{ $kriteria_penilaian->nama_kriteria }}</b> [ bobot : <span class="text-danger"><b>{{ $kriteria_penilaian->bobot }}</b></span> ]</label>
-										</div>
-                                        <div class="col-md-3">
-											<div class="form-group">
-												<label for="score_{{ $kriteria_penilaian->id }}">Skor</label>
-												
-											</div>
-										</div>
-									</div>
-                                    --}}
-
                                 </div>
                                 <h4 class="form-section"><i class="fa fa-pencil"></i> Catatan Reviewer</h4>
 									<div class="form-group">
-										<textarea class="form-control" placeholder="Isian catatan reviewer" name="catatan_reviewer">{{ old('catatan_reviewer') }}</textarea>
+										<textarea class="form-control" placeholder="Isian catatan reviewer" name="catatan_reviewer">{{ old('catatan_reviewer', $catatan_reviewer ) }}</textarea>
 									</div>
                                 <div class="form-actions">
 									
                                         <button type="submit" class="btn btn-primary">
                                             <i class="fa fa-check-square-o"></i> Save
                                         </button>
+
+                                        <a class="btn btn-danger" onclick="return batalkan_penilaian()" href="{{ route('penilaian-reviewer.batal',['usulan_pkm' => $usulan_pkm, 'penilaian_reviewer' => $penilaian_reviewer_edit])  }}">
+												<i class="fa fa-trash-o"></i> Batalkan
+											</a>
                                     
                                         <a class="btn btn-warning" href="{{ route('share.pendaftaran.read', ['uuid' => $usulan_pkm->uuid]) }}">
                                             <i class="fa fa-undo"></i> Kembali

@@ -39,23 +39,35 @@ $(document).on('click','.btn_hapus',function(){
 $(document).on('change','#roles',function(){
     // $('#pegawai').val('');
     $('#pegawai').val(null).trigger('change');
+    $('#fakultas').val(null).trigger('change');
 });
 
 $(document).on('click','#btn_asign_user',function(){
-    let role = $('#roles').val();
-    let id = $('#pegawai').val();
-    if(role == '' || id == ''){
-        alert('Data belum dipilih !');
+    let roles_id = $('#roles').val();
+    let pegawai_id = $('#pegawai').val();
+    let fakultas_id = $('#fakultas').val();
+    // Validasi awal untuk memastikan roles_id dan pegawai_id tidak kosong
+    console.log(roles_id, pegawai_id, fakultas_id);
+    if (roles_id == null || pegawai_id == null) {
+        alert('Data belum dipilih!');
         return false;
     }
+
+    // Validasi tambahan jika roles_id adalah 5 atau 6
+    if ((roles_id == '5' || roles_id == '6') && fakultas_id == null) {
+        alert('Fakultas harus dipilih jika Roles adalah WD1 atau ADMINFAKULTAS!');
+        return false;
+    }
+    
     if(confirm('Yakin akan asign user ?')){
         $.ajax({
             url:  "{{ route('admin.users.ajax', ['method' => 'asign']) }}",
             dataType: "json",
             method:'POST',
             data:{
-                'role' : role,
-                'id' : id,
+                'roles_id' : roles_id,
+                'pegawai_id' : pegawai_id,
+                'fakultas_id': fakultas_id,
                 '_token' :csrf,
             },
             success: function(result){
@@ -126,6 +138,28 @@ $(document).on('click','.del_role',function(){
 $("#pegawai").select2({
     ajax: {
         url:  "{{ route('admin.users.ajax', ['method' => 'cari']) }}",
+        dataType: 'json',
+        data: function (params){
+                var query = {
+                    'text' : params.term,
+                    'role' : $('#roles').val(),
+                    '_token' :csrf,
+                }
+            return query;
+        },
+        method:'POST',
+        processResults: function (data){
+            // Transforms the top-level key of the response object from 'items' to 'results'
+            return {
+                results: data.items
+            };
+        }
+  }
+});
+
+$("#fakultas").select2({
+    ajax: {
+        url:  "{{ route('admin.users.ajax', ['method' => 'cari_fakultas']) }}",
         dataType: 'json',
         data: function (params){
                 var query = {
@@ -222,6 +256,20 @@ $("#pegawai").select2({
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="form-group">
+                                                {{-- <input type="text" id="fakultas" class="form-control" placeholder="Pegawai" name="fakultas"> --}}
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text"><i class="ft-search"></i></span>
+                                                    </div>
+                                                    <select id="fakultas" class="form-control" placeholder="Cari fakultas" name="fakultas"></select>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-lg-2">
                                     {{-- <button class="btn btn-info"><i class="ft-plus-circle"></i> Asign User</button> --}}
@@ -256,11 +304,13 @@ $("#pegawai").select2({
                                         {{-- <td>{{ $pegawai->jenis_pegawai }}</td>
                                         <td>{{ $pegawai->prodi_eduk }}</td> --}}
                                         <td>
-                                            @foreach($pegawai->roles as $role)
-                                                @if($role->role == 'PEMBIMBING')
-                                                {!! '[ ' . $role->role . ' ] ' !!}
+                                            @foreach($pegawai->pegawai_roles as $pegawai_role)
+                                                @if($pegawai_role->roles->role == 'PEMBIMBING')
+                                                {!! '[ ' . $pegawai_role->roles->role . ' ] ' !!}
+                                                @elseif($pegawai_role->roles->role == 'ADMINFAKULTAS' || $pegawai_role->roles->role == 'WD1')
+                                                {!! '[ ' . $pegawai_role->roles->role . ' <small>('. $pegawai_role->fakultas->nama_fak_ijazah .')</small> <a href="#" class="del_role" data-pegawai="'. $pegawai->id .'" data-role="'. $pegawai_role->roles->id .'"><i class="fa fa-times" ></i></a> ] ' !!}
                                                 @else
-                                                {!! '[ ' . $role->role . ' <a href="#" class="del_role" data-pegawai="'. $pegawai->id .'" data-role="'. $role->id .'"><i class="fa fa-times" ></i></a> ] ' !!}
+                                                {!! '[ ' . $pegawai_role->roles->role . ' <a href="#" class="del_role" data-pegawai="'. $pegawai->id .'" data-role="'. $pegawai_role->roles->id .'"><i class="fa fa-times" ></i></a> ] ' !!}
                                                 @endif
                                             @endforeach
                                         </td>

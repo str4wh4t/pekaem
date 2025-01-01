@@ -15,6 +15,7 @@ use App\Http\Controllers\Controller;
 use App\KategoriKegiatan;
 use App\PegawaiRoles;
 use App\UsulanPkmDokumen;
+use App\PenilaianReviewer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -65,9 +66,9 @@ class PendaftaranController extends Controller
 			]);
 			$id = UsulanPkm::where('uuid', $request->id)->first()->id;
 		}
-
 		if (empty($id)) {
 			$request->validate([
+				'mhs_nim'	=> 'required',
 				'judul'	=> 'required|min:5|max:500',
 				'kategori_kegiatan_id'	=> 'required|exists:kategori_kegiatan,id',
 				'jenis_pkm_id'	=> 'required|exists:jenis_pkm,id',
@@ -75,14 +76,19 @@ class PendaftaranController extends Controller
 				'berkas.*' => 'file|mimes:pdf|max:5120', // Validasi setiap file dalam array
 				'pegawai_id'	=> 'required',
 			]);
+			
 			/// IF NEW
 			$usulan_pkm = new UsulanPkm;
-			$usulan_pkm->mhs_nim = UserHelp::mhs_get_logged_nim();
+			// $usulan_pkm->mhs_nim = UserHelp::mhs_get_logged_nim();
+			$usulan_pkm->mhs_nim = $request->mhs_nim;
 			$usulan_pkm->uuid = Uuid::generate();
 			$usulan_pkm->status_usulan_id = StatusUsulan::where('keterangan', 'BARU')->first()->id;
 		} else {
 			/// IF EDIT
 			$usulan_pkm = UsulanPkm::findOrFail($id);
+			if($usulan_pkm->created_by != UserHelp::admin_get_logged_nip()){
+				return redirect()->back()->with('message', 'Dilarang mengubah usulan.');
+			}
 			// $anggota_pkm_old = AnggotaPkm::where('usulan_pkm_id',$id);
 			// $anggota_pkm_old->delete();
 		}
@@ -91,6 +97,8 @@ class PendaftaranController extends Controller
 		$usulan_pkm->kategori_kegiatan_id = $request->kategori_kegiatan_id;
 		$usulan_pkm->jenis_pkm_id = $request->jenis_pkm_id;
 		$usulan_pkm->pegawai_id = $request->pegawai_id;
+		$usulan_pkm->tahun = date('Y');
+		$usulan_pkm->created_by = UserHelp::admin_get_logged_nip();
 
 		DB::beginTransaction();
 
@@ -101,7 +109,8 @@ class PendaftaranController extends Controller
 				$perbaikan = new Perbaikan;
 				$perbaikan->usulan_pkm_id = $usulan_pkm->id;
 				$perbaikan->catatan_perbaikan = $request->catatan_perbaikan;
-				$perbaikan->mhs_nim = UserHelp::mhs_get_logged_nim();
+				// $perbaikan->mhs_nim = UserHelp::mhs_get_logged_nim();
+				$perbaikan->mhs_nim = $request->mhs_nim;
 				$perbaikan->save();
 			}
 
@@ -109,19 +118,21 @@ class PendaftaranController extends Controller
 
 			if (empty($id)) {
 				$anggota_pkm = new AnggotaPkm;
-				$anggota_pkm->mhs_nim = UserHelp::mhs_get_logged_nim();
+				// $anggota_pkm->mhs_nim = UserHelp::mhs_get_logged_nim();
+				$anggota_pkm->mhs_nim = $request->mhs_nim;
 				$anggota_pkm->sebagai = 0; // 0 : KETUA
 				UsulanPkm::find($usulan_pkm->id)->anggota_pkm()->save($anggota_pkm);
 
-				// SET PEGAWAI YANG DIPILIH SEBAGAI PEMBIMBING
-				$pegawai_roles = PegawaiRoles::where('pegawai_id', $request->pegawai_id)->where('roles_id', 3)->first();
-				if (empty($pegawai_roles)) {
-					$pegawai_roles = new PegawaiRoles();
-					$pegawai_roles->pegawai_id = $request->pegawai_id;
-					$pegawai_roles->roles_id = 3; // 'PEMBIMBING';
-					$pegawai_roles->status_role = '1'; // OTOMATIS AKTIF
-					$pegawai_roles->save();
-				}
+			}
+
+			// SET PEGAWAI YANG DIPILIH SEBAGAI PEMBIMBING
+			$pegawai_roles = PegawaiRoles::where('pegawai_id', $request->pegawai_id)->where('roles_id', 3)->first();
+			if (empty($pegawai_roles)) {
+				$pegawai_roles = new PegawaiRoles();
+				$pegawai_roles->pegawai_id = $request->pegawai_id;
+				$pegawai_roles->roles_id = 3; // 'PEMBIMBING';
+				$pegawai_roles->status_role = '1'; // OTOMATIS AKTIF
+				$pegawai_roles->save();
 			}
 
 			$list_nim = $request->list_nim;
@@ -190,11 +201,13 @@ class PendaftaranController extends Controller
 
 	public function edit(Request $request, $uuid)
 	{
-		$id = UsulanPkm::where('uuid', $uuid)->first()->id;
-		$usulan_pkm = UsulanPkm::findOrFail($id);
+		$usulan_pkm = UsulanPkm::where('uuid', $uuid)->firstOrFail();
+		if($usulan_pkm->created_by != UserHelp::admin_get_logged_nip()){
+			return redirect()->back()->with('message', 'Dilarang mengubah usulan.');
+		}
 		$jenis_pkm = JenisPkm::all()->sortBy("id");
 		$kategori_kegiatan_list = KategoriKegiatan::all()->sortBy("id");
-		$mhs = Mhs::findOrFail(UserHelp::mhs_get_logged_nim());
+		$mhs = $usulan_pkm->mhs;
 
 		// foreach($usulan_pkm->anggota_pkm as $anggota){
 		// 	dd($anggota->mhs->nim);
@@ -272,9 +285,9 @@ class PendaftaranController extends Controller
 		$id = $request->id;
 		$file = $request->file;
 		// $file = 'public/documents/' . $uuid . '_file_' . $file;
-		$usulan_pkm_dokumen = UsulanPkmDokumen::where('usulan_pkm_id', $id)->where('document_path', $file)->first();
-		if (empty($usulan_pkm_dokumen)) {
-			return ['status' => 'error'];
+		$usulan_pkm_dokumen = UsulanPkmDokumen::where('usulan_pkm_id', $id)->where('document_path', $file)->firstOrFail();
+		if($usulan_pkm_dokumen->usulan_pkm->created_by != UserHelp::admin_get_logged_nip()){
+			return redirect()->back()->with('message', 'Dilarang mengubah usulan.');
 		}
 		$file = 'public/' . $file;
 		Storage::delete($file);
@@ -285,6 +298,9 @@ class PendaftaranController extends Controller
 	private function _hapus_anggota(Request $request)
 	{
 		$anggota_pkm = AnggotaPkm::findOrFail($request->id);
+		if($anggota_pkm->usulan_pkm->created_by != UserHelp::admin_get_logged_nip()){
+			return redirect()->back()->with('message', 'Dilarang mengubah usulan.');
+		}
 		$anggota_pkm->delete();
 		return ['status' => 'ok'];
 	}
@@ -294,21 +310,67 @@ class PendaftaranController extends Controller
 		if (UserHelp::get_selected_role() != "ADMIN") {
 			return ['status' => 'error'];
 		}
-		$reviewer_usulan_pkm = ReviewerUsulanPkm::where('reviewer_id', $request->reviewer_id)->where('usulan_pkm_id', $request->usulan_pkm_id);
-		$reviewer_usulan_pkm->delete();
-		return ['status' => 'ok'];
+		DB::beginTransaction();
+
+        try {
+			$reviewer_usulan_pkm = ReviewerUsulanPkm::where('reviewer_id', $request->reviewer_id)->where('usulan_pkm_id', $request->usulan_pkm_id);
+			$reviewer_usulan_pkm->delete();
+			// urutkan ulang reviewer
+			$reviewer_usulan_pkm = ReviewerUsulanPkm::where('usulan_pkm_id', $request->usulan_pkm_id)->get();
+			$urutan = 1;
+			foreach ($reviewer_usulan_pkm as $reviewer) {
+				$reviewer->urutan = $urutan;
+				$reviewer->save();
+				$urutan++;
+			}
+			DB::commit();
+			return ['status' => 'ok'];
+		} catch (\Exception $e) {
+			DB::rollback();
+			return redirect()->back()->with('message', 'Terjadi kesalahan saat memproses: ' . $e->getMessage());
+			return ['status' => 'error'];
+		}
 	}
 
 	private function _ajukan(Request $request)
 	{
 		$usulan_pkm = UsulanPkm::findOrFail($request->id);
+		if($usulan_pkm->created_by != UserHelp::admin_get_logged_nip()){
+			return ['status' => 'error', 'message' => 'Dilarang mengajukan usulan.'];
+		}
 		if ($usulan_pkm->usulan_pkm_dokumen->count() == 0) {
 			return ['status' => 'error', 'message' => 'Berkas usulan tidak boleh kosong.'];
 		}
-		$usulan_pkm->status_usulan_id = StatusUsulan::where('keterangan', 'MENUNGGU')->first()->id;
+		// $usulan_pkm->status_usulan_id = StatusUsulan::where('keterangan', 'MENUNGGU')->first()->id;
+		$usulan_pkm->status_usulan_id = StatusUsulan::where('keterangan', 'DISETUJUI')->first()->id;
 		$usulan_pkm->save();
 		$request->session()->flash('message', 'Usulan telah diajukan.');
 		return ['status' => 'ok'];
+	}
+
+	private function _bulk_ajukan(Request $request)
+	{
+		$ids = $request->ids;
+		$daftar_usulan_pkm = UsulanPkm::whereIn('id', $ids)->get();
+		try{
+			foreach ($daftar_usulan_pkm as $usulan_pkm) {
+				if($usulan_pkm->created_by != UserHelp::admin_get_logged_nip()){
+					throw new \Exception('Dilarang mengajukan usulan.');
+				}
+				if ($usulan_pkm->usulan_pkm_dokumen->count() == 0) {
+					throw new \Exception('Berkas usulan tidak boleh kosong.');
+				}
+			}
+			foreach ($daftar_usulan_pkm as $usulan_pkm) {
+				// $usulan_pkm->status_usulan_id = StatusUsulan::where('keterangan', 'MENUNGGU')->first()->id;
+				$usulan_pkm->status_usulan_id = StatusUsulan::where('keterangan', 'DISETUJUI')->first()->id;
+				$usulan_pkm->save();
+			}
+			$request->session()->flash('message', 'Usulan telah diajukan.');
+			return ['status' => 'ok'];
+		}catch(\Exception $e){
+			return ['status' => 'error', 'message' => $e->getMessage()];
+		}
 	}
 
 	private function _get_jenis_pkm(Request $request)
@@ -322,49 +384,72 @@ class PendaftaranController extends Controller
 	public function list(Request $request)
 	{
 		// $usulan_pkm = UsulanPkm::all()->sortBy("judul");
+		$tahun = date('Y');
+		if (UserHelp::get_selected_role() == "SUPER") {
+			$usulan_pkm = UsulanPkm::where('tahun', $tahun)->get();
+		}
+
 
 		if (UserHelp::get_selected_role() == "MHS") {
-			$usulan_pkm = UsulanPkm::where('mhs_nim', UserHelp::mhs_get_logged_nim())->get();
+			$usulan_pkm = UsulanPkm::where('tahun', $tahun)->where('mhs_nim', UserHelp::mhs_get_logged_nim())->get();
 		}
 		if (UserHelp::get_selected_role() == "PEMBIMBING") {
 			$pembimbing = UserHelp::admin_get_record_by_nip(UserHelp::admin_get_logged_nip());
-			$usulan_pkm = UsulanPkm::where('pegawai_id', $pembimbing->id)
+			$usulan_pkm = UsulanPkm::where('tahun', $tahun)
+				->where('pegawai_id', $pembimbing->id)
 				->whereHas('status_usulan', function (Builder $query) {
 					$query->where('urutan', '>', 0);
 				})
 				->get();
 		}
-		if (UserHelp::get_selected_role() == "WD1-TASKFORCE") {
-			$taskforce = UserHelp::admin_get_record_by_nip(UserHelp::admin_get_logged_nip());
-			// HARUS DIMAP ANTARA KODE FAKULTAS MHS DAN KODE FAKULTAS PEGAWAI
+		if (UserHelp::get_selected_role() == "ADMINFAKULTAS") {
+			$kode_fakultas = UserHelp::get_selected_kode_fakultas();
+			$usulan_pkm = UsulanPkm::where('created_by', UserHelp::admin_get_logged_nip())
+				->where('kode_fakultas', $kode_fakultas)
+				->where('tahun', $tahun)
+				->get();
+		}
+		if (UserHelp::get_selected_role() == "WD1") {
+			$kode_fakultas = UserHelp::get_selected_kode_fakultas();
 			$usulan_pkm = UsulanPkm::whereHas('status_usulan', function (Builder $query) {
 				$query->where('urutan', '>', 1);
 			})
+				->where('kode_fakultas', $kode_fakultas)
+				->where('tahun', $tahun)
 				->get();
 		}
 		if (UserHelp::get_selected_role() == "ADMIN") {
 			// $usulan_pkm = UsulanPkm::where('status_usulan_id',StatusUsulan::where('keterangan','DISETUJUI')->first()->id)
-			$usulan_pkm = UsulanPkm::whereHas('status_usulan', function (Builder $query) {
+			$usulan_pkm = UsulanPkm::where('tahun', $tahun)
+			->whereHas('status_usulan', function (Builder $query) {
 				$query->where('urutan', '>', 2);
 			})
 				->get();
 			if (!empty($request->jenis)) {
 				if ($request->jenis == 'pembimbing') {
-					$usulan_pkm = UsulanPkm::where('pegawai_id', $request->pegawai_id)->get();
+					$usulan_pkm = UsulanPkm::where('tahun', $tahun)->where('pegawai_id', $request->pegawai_id)->get();
 				}
 				if ($request->jenis == 'reviewer') {
-					$usulan_pkm = UsulanPkm::wherehas('reviewer', function (Builder $query) use ($request) {
-						$query->where('reviewer.id', $request->pegawai_id);
-					})->get();
+					$usulan_pkm = UsulanPkm::where('tahun', $tahun)
+						->wherehas('reviewer', function (Builder $query) use ($request) {
+							$query->where('reviewer.id', $request->pegawai_id);
+						})->get();
 				}
 			}
 		}
 		if (UserHelp::get_selected_role() == "REVIEWER") {
 			$reviewer = UserHelp::admin_get_record_by_nip(UserHelp::admin_get_logged_nip());
-			$usulan_pkm = UsulanPkm::wherehas('reviewer', function (Builder $query) use ($reviewer) {
-				$query->where('reviewer.id', $reviewer->id);
-			})->get();
+			$usulan_pkm = UsulanPkm::where('tahun', $tahun)
+						->wherehas('reviewer', function (Builder $query) use ($reviewer) {
+							$query->where('reviewer.id', $reviewer->id);
+						})->get();
 		}
+
+		if(UserHelp::is_admin()){
+			$pegawai = UserHelp::admin_get_record_by_nip(UserHelp::admin_get_logged_nip());
+			$this->_data['pegawai'] = $pegawai;
+		}
+
 		$this->_data['usulan_pkm'] = $usulan_pkm;
 
 		// echo '<pre>';
@@ -429,10 +514,69 @@ class PendaftaranController extends Controller
 		return view('pendaftaran.form', $this->_data);
 	}
 
+	public function create(Request $request, Mhs $mhs)
+	{
+		$jenis_pkm = JenisPkm::all()->sortBy("id");
+		$kategori_kegiatan_list = KategoriKegiatan::all()->sortBy("id");
+		$status_usulan = StatusUsulan::all()->sortBy("id");
+		$nim = $request->input('nim');
+		if(!empty($nim)){
+			$mhs = Mhs::findOrFail($nim);
+		}
+
+		// try {
+		// 	$client = new Client(['verify' => false]);
+		// 	$post_data = [
+		// 		'auth' =>  json_encode(['user' => 'sempak', 'pass' => 'teles']),
+		// 		'kode_fakultas' => $mhs->kode_fakultas,
+		// 		'get' => json_encode(["kodeF", "nama_fak_ijazah"])
+		// 	];
+		// 	$req = new GuzzleRequest('POST', env('API_SIAP') . '/get_data_fakultas');
+		// 	$res = $client->send($req, ['form_params' => $post_data]);
+		// 	$return = json_decode($res->getBody()->getContents());
+		// 	if (empty($return)) {
+		// 		throw new BadResponseException('Data kosong.', $req);
+		// 	}
+		// } catch (BadResponseException $exception) {
+		// 	//	        dd($exception->getMessage());
+		// 	abort(403, substr($exception->getMessage(), 0, 25));
+		// }
+
+		// $mhs->kode_fakultas = $return->nama_fak_ijazah;
+
+		// try {
+		// 	$client = new Client();
+		// 	$post_data = [
+		// 		'auth' =>  json_encode(['user' => 'sempak', 'pass' => 'teles']),
+		// 		'kode_prodi' => $mhs->kode_prodi,
+		// 		'get' => json_encode(["kode_prodi_pdpt", "nama_ps"])
+		// 	];
+		// 	$req = new GuzzleRequest('POST', env('API_SIAP') . '/get_data_prodi');
+		// 	$res = $client->send($req, ['form_params' => $post_data]);
+		// 	$return = json_decode($res->getBody()->getContents());
+		// 	if (empty($return)) {
+		// 		throw new BadResponseException('Data kosong.', $req);
+		// 	}
+		// } catch (BadResponseException $exception) {
+		// 	//	        dd($exception->getMessage());
+		// 	abort(403, substr($exception->getMessage(), 0, 25));
+		// }
+
+		// $mhs->kode_prodi = $return->nama_ps;
+
+		$this->_data['jenis_pkm'] = $jenis_pkm;
+		$this->_data['kategori_kegiatan_list'] = $kategori_kegiatan_list;
+		$this->_data['status_usulan'] = $status_usulan;
+		$this->_data['mhs'] = $mhs;
+		return view('pendaftaran.create', $this->_data);
+	}
+
 	public function hapus($uuid)
 	{
-		$id = UsulanPkm::where('uuid', $uuid)->first()->id;
-		$usulan_pkm = UsulanPkm::findOrFail($id);
+		$usulan_pkm = UsulanPkm::where('uuid', $uuid)->firstOrFail();
+		if($usulan_pkm->created_by != UserHelp::admin_get_logged_nip()){
+			return redirect()->route('share.pendaftaran.list')->with('message', 'Dilarang menghapus usulan.');
+		}
 
 		if ($usulan_pkm->usulan_pkm_dokumen->count() > 0) {
 			foreach ($usulan_pkm->usulan_pkm_dokumen as $usulan_pkm_dokumen) {
@@ -463,6 +607,7 @@ class PendaftaranController extends Controller
 		$kategori_kegiatan_list = KategoriKegiatan::all()->sortBy("id");
 		$jenis_pkm = JenisPkm::all()->sortBy("id");
 		$status_usulan = StatusUsulan::all()->sortBy("id");
+		$pegawai = UserHelp::admin_get_record_by_nip(UserHelp::admin_get_logged_nip());
 		// $mhs = Mhs::findOrFail(UserHelp::mhs_get_logged_nim());
 
 		$mhs = $usulan_pkm->anggota_pkm()->where('sebagai', 0)->first()->mhs;
@@ -529,15 +674,15 @@ class PendaftaranController extends Controller
 		$this->_data['jenis_pkm'] = $jenis_pkm;
 		$this->_data['status_usulan'] = $status_usulan;
 		$this->_data['mhs'] = $mhs;
+		$this->_data['pegawai'] = $pegawai;
 
 		return view('pendaftaran.read', $this->_data);
 	}
 
 	public function approval(Request $request, $uuid)
 	{
-		$id = UsulanPkm::where('uuid', $uuid)->first()->id;
+		$usulan_pkm = UsulanPkm::where('uuid', $uuid)->firstOrFail();
 
-		$usulan_pkm = UsulanPkm::findOrFail($id);
 		$status_usulan = StatusUsulan::where('keterangan', $request->approval)->firstOrFail();
 
 		if (UserHelp::get_selected_role() == "PEMBIMBING") {
@@ -561,10 +706,43 @@ class PendaftaranController extends Controller
 			$review->save();
 		}
 
+		if (UserHelp::get_selected_role() == "ADMIN") {
+			if ($request->approval == "SUDAH_DINILAI") {
+				$nilai_total = 0;
+				$penilaian_reviewer = PenilaianReviewer::where('usulan_pkm_id', $usulan_pkm->id)->get();
+				$jml_reviewer = ReviewerUsulanPkm::where('usulan_pkm_id', $usulan_pkm->id)->count();
+				foreach ($penilaian_reviewer as $penilaian) {
+					$nilai_total += $penilaian->nilai;
+				}
+				$nilai_total = $nilai_total / $jml_reviewer;
+				$usulan_pkm->nilai_total = $nilai_total;
+			}
+		}
+
 		$usulan_pkm->status_usulan_id = $status_usulan->id;
 		$usulan_pkm->save();
 
 		return redirect()->back()->with('message', 'Data berhasil di-simpan.');
+	}
+
+	private function _bulk_approval(Request $request)
+	{
+
+		$ids = $request->ids;
+		$daftar_usulan_pkm = UsulanPkm::whereIn('id', $ids)->get();
+		$status_usulan = StatusUsulan::where('keterangan', $request->approval)->firstOrFail();
+
+		try{
+			foreach ($daftar_usulan_pkm as $usulan_pkm) {
+				$usulan_pkm->status_usulan_id = $status_usulan->id;
+				$usulan_pkm->save();
+			}
+			$request->session()->flash('message', 'Data berhasil di-simpan.');
+			return ['status' => 'ok'];
+		}catch(\Exception $e){
+			return ['status' => 'error', 'message' => $e->getMessage()];
+		}
+
 	}
 
 	public function ploting_reviewer()
@@ -588,10 +766,12 @@ class PendaftaranController extends Controller
 		if (!empty($list_id)) {
 			$list_id = array_column($request->list_id, 'id');
 			if (!empty($list_id[0])) {
-				foreach ($list_id as $id) {
+				$max_urutan = ReviewerUsulanPkm::where('usulan_pkm_id', $usulan_pkm->id)->max('urutan');
+				foreach ($list_id as $urutan => $id) {
 					$reviewer_usulan_pkm = new ReviewerUsulanPkm;
 					$reviewer_usulan_pkm->usulan_pkm_id = $usulan_pkm->id;
 					$reviewer_usulan_pkm->reviewer_id = $id;
+					$reviewer_usulan_pkm->urutan = $max_urutan + 1;
 					$reviewer_usulan_pkm->save();
 				}
 				return redirect()->back()->with('message', 'Data berhasil di-simpan.');

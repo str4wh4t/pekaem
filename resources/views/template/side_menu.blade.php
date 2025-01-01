@@ -15,7 +15,7 @@
 			</li>
 			@endif
 
-			@if(UserHelp::get_selected_role() == 'ADMIN' || UserHelp::get_selected_role() == 'WD1-TASKFORCE' || UserHelp::get_selected_role() == 'SUPER')
+			@if(UserHelp::get_selected_role() == 'ADMINFAKULTAS' || UserHelp::get_selected_role() == 'ADMIN' || UserHelp::get_selected_role() == 'WD1' || UserHelp::get_selected_role() == 'SUPER')
 			<li class=" nav-item small">
 				<a class="p-0 mt-1" href="{{ route('share.pendaftaran') }}"><i class="icon-note"></i><span class="menu-title" data-i18n="nav.templates.main">Pendaftaran</span></a>
 				<ul class="menu-content">

@@ -59,9 +59,9 @@
 	                            <div class="col-md-6 col-12 float-sm-left text-center text-sm-right"><a href="recover-password.html" class="card-link"><i class="ft-unlock"></i> Forgot Password?</a></div>
 	                        </div> -->
                             @forelse($roles_avail as $role_avail)
-							<a href="{{ route('admin.choose_role') }}?choose={{ $role_avail->id }}" class="btn btn-outline-primary btn-lg btn-block">{{ $role_avail->keterangan }}</a>
+							              <a href="{{ route('admin.choose_role') }}?choose={{ $role_avail->id }}" class="btn btn-outline-primary btn-lg btn-block">{{ $role_avail->keterangan }}</a>
                             @empty
-                            <div class="alert alert-info"><b>Perhatian :</b> Anda hanya memiliki 1 (satu) role</div>
+                            <div class="alert alert-info"><b>Perhatian :</b> Anda hanya tidak memiliki role</div>
                             <a href="{{ route('home') }}" class="btn btn-outline-warning btn-lg btn-block">Kembali</a>
                             @endforelse
 						<!-- </form> -->

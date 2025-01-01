@@ -24,7 +24,7 @@ class RolesSeeder extends Seeder
             [
                 'id' => 2,
                 'role' => 'ADMIN',
-                'keterangan' => 'Untuk user admin atau pengelola PKM',
+                'keterangan' => 'Untuk user admin universitas',
                 'created_at' => '2020-02-06 21:05:31',
                 'updated_at' => '2020-02-06 21:05:32',
             ],
@@ -44,10 +44,17 @@ class RolesSeeder extends Seeder
             ],
             [
                 'id' => 5,
-                'role' => 'WD1-TASKFORCE',
-                'keterangan' => 'Untuk user wd1 atau taskforce',
+                'role' => 'WD1',
+                'keterangan' => 'Untuk user wd1',
                 'created_at' => '2020-02-10 03:38:55',
                 'updated_at' => '2020-02-10 03:38:55',
+            ],
+            [
+                'id' => 6,
+                'role' => 'ADMINFAKULTAS',
+                'keterangan' => 'Untuk user admin fakultas',
+                'created_at' => '2020-02-06 21:05:31',
+                'updated_at' => '2020-02-06 21:05:32',
             ],
         ]);
     }

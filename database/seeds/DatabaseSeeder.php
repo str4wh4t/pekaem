@@ -1,5 +1,6 @@
 <?php
 
+use App\MappingFakultas;
 use Beta\Microsoft\Graph\Model\Status;
 use Illuminate\Database\Seeder;
 
@@ -14,5 +15,6 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(StatusUsulanSeeder::class);
         $this->call(RolesSeeder::class);
+        $this->call(MappingFakultas::class);
     }
 }

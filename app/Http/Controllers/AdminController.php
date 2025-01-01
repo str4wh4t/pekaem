@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Fakultas;
 use App\Helpers\User as UserHelp;
 use App\PegawaiRoles;
 use App\Roles;
@@ -14,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
@@ -22,7 +24,7 @@ class AdminController extends Controller
     {
         // $pegawai_roles = PegawaiRoles::all()->sortBy("pegawai_id");
         $roles = Roles::all()->where('id', '!=', 1)->where('id', '!=', 3)->sortBy("id"); /// EXCEPT SUPER
-        $pegawai_has_role = Pegawai::has('roles')->get();
+        $pegawai_has_role = Pegawai::wherehas('roles')->with('pegawai_roles.roles')->get();
         // dd($pegawai_has_role);
         $this->_data['roles'] = $roles;
         $this->_data['pegawai_has_role'] = $pegawai_has_role;
@@ -32,9 +34,22 @@ class AdminController extends Controller
 
     private function _asign(Request $request)
     {
+        $request->validate([
+            'pegawai_id' => 'required|integer|exists:pegawai,id',
+            'roles_id' => 'required|integer|exists:roles,id',
+            'fakultas_id' => [
+                'string',
+                'nullable',
+                'exists:fakultas,kodeF',
+                Rule::requiredIf(function () use ($request) {
+                    return in_array($request->input('roles_id'), [5, 6]); // 5: WD1, 6: ADMINFAKULTAS
+                }),
+            ],
+        ]);
         $pegawai_roles = new PegawaiRoles;
-        $pegawai_roles->pegawai_id = $request->id;
-        $pegawai_roles->roles_id = $request->role;
+        $pegawai_roles->pegawai_id = $request->pegawai_id;
+        $pegawai_roles->roles_id = $request->roles_id;
+        $pegawai_roles->fakultas_id = $request->fakultas_id;
         $pegawai_roles->status_role = '1'; // OTOMATIS AKTIF
         $pegawai_roles->save();
 
@@ -71,9 +86,21 @@ class AdminController extends Controller
             ->whereDoesntHave('roles', function (Builder $query) use ($request) {
                 $query->where('roles.id', $request->role);
             })
-            ->get(['id', DB::raw('CONCAT(glr_dpn," ",nama," ",glr_blkg) as text')]);
+            ->get(['id', DB::raw('CONCAT(glr_dpn," ",nama," ",glr_blkg, " - ", nip) as text')]);
 
         $this->_data['items'] = $pegawai;
+
+        return $this->_data;
+    }
+
+    private function _cari_fakultas(Request $request)
+    {
+        // dd($request->role);
+        $fakultas = Fakultas::where(function ($query) use ($request) {
+            $query->where('nama_fak_ijazah', 'LIKE', '%' . $request->text . '%');
+        })->get([DB::raw('kodeF as id'), DB::raw('nama_fak_ijazah as text')]);
+
+        $this->_data['items'] = $fakultas;
 
         return $this->_data;
     }
@@ -81,17 +108,23 @@ class AdminController extends Controller
     private function _cari_pembimbing(Request $request)
     {
         // dd($request->role);
+        $tahun = date('Y');
         $pembimbing = Pegawai::where(function ($query) use ($request) {
-            $query->where('nip', 'LIKE', '%' . $request->text . '%')
-                ->orWhere('nama', 'LIKE', '%' . $request->text . '%')
-                ->orWhere('nidn', 'LIKE', '%' . $request->text . '%');
-        })
+                $query->where('nip', 'LIKE', '%' . $request->text . '%')
+                    ->orWhere('nama', 'LIKE', '%' . $request->text . '%')
+                    ->orWhere('nidn', 'LIKE', '%' . $request->text . '%');
+            })
             ->where('jnspeg', '1') // HANYA DOSEN
             ->where('status', '1') // HANYA AKTIF
-            ->whereNotNull('nidn')->where('nidn', '!=', '0')->where('nidn', '!=', '') // HANYA YANG MEMILIKI NIDN
+            ->whereNotNull('nidn')->where('nidn', '!=', '0')
+            ->where('nidn', '!=', '') // HANYA YANG MEMILIKI NIDN
             // ->whereHas('roles', function (Builder $query) use ($request) {
             //     $query->where('roles.role', 'PEMBIMBING');
             // })
+            ->whereDoesntHave('usulan_pkm', function (Builder $query) use ($request, $tahun) {
+                $query->where('tahun', $tahun)
+                    ->havingRaw('COUNT(*) > 1'); 
+            })
             ->get(['id', DB::raw('CONCAT(glr_dpn," ",nama," ",glr_blkg," ","[",nip,"]"," ","[",nidn,"]") as text')]);
 
         $this->_data['items'] = $pembimbing;
@@ -146,13 +179,24 @@ class AdminController extends Controller
     private function _cari_mhs(Request $request)
     {
         // dd($request->role);
-
-        $mhs = Mhs::where(function ($query) use ($request) {
-            $query->where('nim', 'LIKE', '%' . $request->text . '%')
-                ->orWhere('nama', 'LIKE', '%' . $request->text . '%');
-        })
-            ->where('status_terakhir', 'Aktif')
-            ->get(['nim AS id', DB::raw('CONCAT(nama," ","[",nim,"]"," ","[",nama_forlap,"]"," ","[",nama_fak_ijazah,"]") as text')]);
+        $mhs = [];
+        $tahun = date('Y');
+        if (UserHelp::get_selected_role() == "ADMINFAKULTAS") {
+            $kode_fakultas = UserHelp::get_selected_kode_fakultas();
+            $mhs = Mhs::where(function ($query) use ($request, $kode_fakultas) {
+                $query->where('nim', 'LIKE', '%' . $request->text . '%')
+                    ->orWhere('nama', 'LIKE', '%' . $request->text . '%');
+                    
+            })
+                ->where('kode_fakultas', $kode_fakultas)
+                ->where('status_terakhir', 'Aktif')
+                ->whereDoesntHave('anggota_pkm', function (Builder $query) use ($request, $tahun) {
+                    $query->whereHas('usulan_pkm', function (Builder $query) use ($request, $tahun) {
+                        $query->where('usulan_pkm.tahun', $tahun);
+                    }); 
+                })
+                ->get(['nim AS id', DB::raw('CONCAT(nama," ","[",nim,"]"," ","[",nama_forlap,"]"," ","[",nama_fak_ijazah,"]") as text')]);
+        }
 
         $this->_data['items'] = $mhs;
 

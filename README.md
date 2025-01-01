@@ -22,16 +22,14 @@ Todo List :
 8. - manajemen menu yang tidak untuk mahasiswa dihapus
 9. - caption pilihan pembimbing pkm (dosen nidn)
 10. - pada pencarian msh ditampilkan nama - nim - prodi - fakultas
-11. download hasil penilaian
-12. tgl 24 demo akhir, 31 launcing
 
 Todo list (24/12/2024)
 
-1. menghapus role mhs, pembimbing, taskforce menjadi satu role yaitu operator_fakultas
-2. dari operator_fakultas masuk ke approval wd1 fakultas (dibuat bulk approval)
-3. dari wd1 fakultas masuk ke reviewer universitas
-4. mhs yang sudah dipilih tidak bisa diikutkan lagi menjadi ketua atau anggota
-5. dosen pembimbing dibatasi hanya bisa 10 bimbingan
-6. tambah caption reviewer 1 dan 2
-7. skor penilian di isi dengan model dropdown dengan nilai (1-3) dan (5-7)
-8. penilaian pasangan reviewer ditampilkan di entri nilai reviewer
+1. - menghapus role mhs, pembimbing, taskforce menjadi satu role yaitu operator_fakultas
+2. - dari operator_fakultas masuk ke approval wd1 fakultas (dibuat bulk approval)
+3. - dari wd1 fakultas masuk ke reviewer universitas
+4. - mhs yang sudah dipilih tidak bisa diikutkan lagi menjadi ketua atau anggota
+5. - dosen pembimbing dibatasi hanya bisa 10 bimbingan
+6. - tambah caption reviewer 1 dan 2
+7. - skor penilian di isi dengan model dropdown dengan nilai (1-3) dan (5-7)
+8. - penilaian pasangan reviewer ditampilkan di entri nilai reviewer

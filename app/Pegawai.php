@@ -31,4 +31,9 @@ class Pegawai extends Model
         return $this->hasMany('App\Revisi');
     }
 
+    public function mapping_fakultas()
+    {
+        return $this->belongsTo('App\MappingFakultas', 'unit_id', 'unit_id');
+    }   
+
 }

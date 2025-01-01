@@ -19,4 +19,9 @@ class PegawaiRoles extends Model
     {
         return $this->belongsTo('App\Pegawai');
     }
+
+    public function fakultas()
+    {
+        return $this->belongsTo('App\Fakultas', 'fakultas_id', 'kodeF');
+    }
 }

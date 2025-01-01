@@ -18,7 +18,10 @@ class CreatePenilaianReviewerTable extends Migration
             $table->integer('usulan_pkm_id');
             $table->integer('reviewer_id');
             $table->unsignedBigInteger('kriteria_penilaian_id');
-            $table->double('score', 10, 2)->nullable();
+            $table->double('score', 10, 2);
+            $table->integer('bobot');
+            $table->double('nilai', 10, 2);
+            $table->text('komentar')->nullable();
             $table->timestamps();
             $table->foreign('usulan_pkm_id')
                 ->references('id')->on('usulan_pkm')
@@ -26,6 +29,7 @@ class CreatePenilaianReviewerTable extends Migration
             $table->foreign('kriteria_penilaian_id')
                 ->references('id')->on('kriteria_penilaian')
                 ->onDelete('restrict');
+            $table->unique(['usulan_pkm_id', 'reviewer_id', 'kriteria_penilaian_id']);
         });
     }
 
