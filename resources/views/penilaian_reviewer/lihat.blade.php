@@ -211,7 +211,7 @@ function batalkan_penilaian(){
 									</div>
                                 <div class="form-actions">
                                     
-                                        <a class="btn btn-warning" href="{{ route('penilaian-reviewer.create', ['usulan_pkm' => $usulan_pkm]) }}">
+                                        <a class="btn btn-warning" href="{{ route('share.pendaftaran.read', ['uuid' => $usulan_pkm->uuid]) }}">
                                             <i class="fa fa-undo"></i> Kembali
                                         </a>
 								</div>

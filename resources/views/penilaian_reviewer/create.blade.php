@@ -148,7 +148,7 @@ $(document).ready(function () {
                                 @php($urutan = $usulan_pkm->reviewer_usulan_pkm()->where('reviewer_id', $reviewer->id)->first()->urutan)
                                 <b>Anda sebagai : Reviewer {{ $urutan }}</b> 
                                 @if($usulan_pkm->reviewer_usulan_pkm()->count() > 1)
-                                <b class="float-right">Lihat Penilaian : <a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $usulan_pkm->reviewer_usulan_pkm()->where('urutan', $urutan == 1 ? 2 : 1)->first()->reviewer_id ]) }}">Reviewer {{ $urutan == 1 ? "2" : "1" }}</a></b>
+                                <b class="float-right">Lihat Penilaian : <a target="_blank" href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $usulan_pkm->reviewer_usulan_pkm()->where('urutan', $urutan == 1 ? 2 : 1)->first()->reviewer_id ]) }}">Reviewer {{ $urutan == 1 ? "2" : "1" }}</a></b>
                                 @endif
                             </div>
                             <form class="form" action="{{ route('penilaian-reviewer.store', ['usulan_pkm' => $usulan_pkm]) }}" method="POST">

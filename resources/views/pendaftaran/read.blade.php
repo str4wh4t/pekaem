@@ -781,7 +781,7 @@ $(document).on('click','#btn_gagal',function(){
 										<button class="btn btn-success" id="btn_lolos" type="submit">
 											<i class="fa fa-thumbs-up" ></i> Lolos
 										</button> --}}
-											@if($usulan_pkm->penilaian_reviewer()->where('reviewer_id', $pegawai->id)->count() != 0)
+											@if($usulan_pkm->penilaian_reviewer()->where('reviewer_id', $pegawai->id)->count() > 0)
 											<div class="alert alert-warning">
 												Anda telah menilai usulan ini.
 											</div>
@@ -789,10 +789,14 @@ $(document).on('click','#btn_gagal',function(){
 										<a class="btn btn-success" href="{{ route('penilaian-reviewer.create', ['usulan_pkm' => $usulan_pkm]) }}">
 											<i class="fa fa-edit" ></i> Nilai
 										</a>
-										@else
-										<a class="btn btn-success" href="{{ route('penilaian-reviewer.create', ['usulan_pkm' => $usulan_pkm]) }}">
-											<i class="fa fa-edit" ></i> Nilai
+										@elseif($usulan_pkm->status_usulan->keterangan == "SUDAH_DINILAI")
+										<a target="_blank" class="btn btn-info" href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $pegawai->id]) }}" >Lihat Penilaian</a>
+											<i class="fa fa-edit" ></i> Lihat Nilai
 										</a>
+										@else
+										{{-- <a class="btn btn-success" href="#">
+											<i class="fa fa-edit" ></i> Nilai
+										</a> --}}
 										@endif
                                 @endif
 
