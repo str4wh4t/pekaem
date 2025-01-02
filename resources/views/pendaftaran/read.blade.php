@@ -752,10 +752,12 @@ $(document).on('click','#btn_gagal',function(){
 											<button class="btn btn-success" type="submit">
 												<i class="fa fa-thumbs-up" ></i> Save
 											</button>
-											@if($usulan_pkm->penilaian_reviewer()->distinct()->count('reviewer_id') == $usulan_pkm->reviewer_usulan_pkm->count())
-											<button class="btn btn-danger" type="button" id="btn_tetapkan_penilaian">
-												<i class="fa fa-paper-plane" ></i> Tetapkan Penilaian
-											</button>
+											@if($usulan_pkm->penilaian_reviewer()->distinct()->count('reviewer_id') > 0)
+												@if($usulan_pkm->penilaian_reviewer()->distinct()->count('reviewer_id') == $usulan_pkm->reviewer_usulan_pkm->count())
+												<button class="btn btn-danger" type="button" id="btn_tetapkan_penilaian">
+													<i class="fa fa-paper-plane" ></i> Tetapkan Penilaian
+												</button>
+												@endif
 											@endif
 										@else
 										<div class="alert alert-warning">
