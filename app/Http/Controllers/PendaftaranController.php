@@ -82,6 +82,7 @@ class PendaftaranController extends Controller
 			// $usulan_pkm->mhs_nim = UserHelp::mhs_get_logged_nim();
 			$usulan_pkm->mhs_nim = $request->mhs_nim;
 			$usulan_pkm->uuid = Uuid::generate();
+			$usulan_pkm->kode_fakultas = UserHelp::get_selected_kode_fakultas();
 			$usulan_pkm->status_usulan_id = StatusUsulan::where('keterangan', 'BARU')->first()->id;
 		} else {
 			/// IF EDIT
@@ -96,7 +97,7 @@ class PendaftaranController extends Controller
 		$usulan_pkm->judul = $request->judul;
 		$usulan_pkm->kategori_kegiatan_id = $request->kategori_kegiatan_id;
 		$usulan_pkm->jenis_pkm_id = $request->jenis_pkm_id;
-		$usulan_pkm->pegawai_id = $request->pegawai_id;
+		$usulan_pkm->pegawai_id = $request->pegawai_id; // UNTUK INSERT PEMBIMBING
 		$usulan_pkm->tahun = date('Y');
 		$usulan_pkm->created_by = UserHelp::admin_get_logged_nip();
 
