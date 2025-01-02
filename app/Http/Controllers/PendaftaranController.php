@@ -76,7 +76,7 @@ class PendaftaranController extends Controller
 				'berkas.*' => 'file|mimes:pdf|max:5120', // Validasi setiap file dalam array
 				'pegawai_id'	=> 'required',
 			]);
-			
+
 			/// IF NEW
 			$usulan_pkm = new UsulanPkm;
 			// $usulan_pkm->mhs_nim = UserHelp::mhs_get_logged_nim();
@@ -87,7 +87,7 @@ class PendaftaranController extends Controller
 		} else {
 			/// IF EDIT
 			$usulan_pkm = UsulanPkm::findOrFail($id);
-			if($usulan_pkm->created_by != UserHelp::admin_get_logged_nip()){
+			if ($usulan_pkm->created_by != UserHelp::admin_get_logged_nip()) {
 				return redirect()->back()->with('message', 'Dilarang mengubah usulan.');
 			}
 			// $anggota_pkm_old = AnggotaPkm::where('usulan_pkm_id',$id);
@@ -123,7 +123,6 @@ class PendaftaranController extends Controller
 				$anggota_pkm->mhs_nim = $request->mhs_nim;
 				$anggota_pkm->sebagai = 0; // 0 : KETUA
 				UsulanPkm::find($usulan_pkm->id)->anggota_pkm()->save($anggota_pkm);
-
 			}
 
 			// SET PEGAWAI YANG DIPILIH SEBAGAI PEMBIMBING
@@ -203,7 +202,7 @@ class PendaftaranController extends Controller
 	public function edit(Request $request, $uuid)
 	{
 		$usulan_pkm = UsulanPkm::where('uuid', $uuid)->firstOrFail();
-		if($usulan_pkm->created_by != UserHelp::admin_get_logged_nip()){
+		if ($usulan_pkm->created_by != UserHelp::admin_get_logged_nip()) {
 			return redirect()->back()->with('message', 'Dilarang mengubah usulan.');
 		}
 		$jenis_pkm = JenisPkm::all()->sortBy("id");
@@ -287,7 +286,7 @@ class PendaftaranController extends Controller
 		$file = $request->file;
 		// $file = 'public/documents/' . $uuid . '_file_' . $file;
 		$usulan_pkm_dokumen = UsulanPkmDokumen::where('usulan_pkm_id', $id)->where('document_path', $file)->firstOrFail();
-		if($usulan_pkm_dokumen->usulan_pkm->created_by != UserHelp::admin_get_logged_nip()){
+		if ($usulan_pkm_dokumen->usulan_pkm->created_by != UserHelp::admin_get_logged_nip()) {
 			return redirect()->back()->with('message', 'Dilarang mengubah usulan.');
 		}
 		$file = 'public/' . $file;
@@ -299,7 +298,7 @@ class PendaftaranController extends Controller
 	private function _hapus_anggota(Request $request)
 	{
 		$anggota_pkm = AnggotaPkm::findOrFail($request->id);
-		if($anggota_pkm->usulan_pkm->created_by != UserHelp::admin_get_logged_nip()){
+		if ($anggota_pkm->usulan_pkm->created_by != UserHelp::admin_get_logged_nip()) {
 			return redirect()->back()->with('message', 'Dilarang mengubah usulan.');
 		}
 		$anggota_pkm->delete();
@@ -313,7 +312,7 @@ class PendaftaranController extends Controller
 		}
 		DB::beginTransaction();
 
-        try {
+		try {
 			$reviewer_usulan_pkm = ReviewerUsulanPkm::where('reviewer_id', $request->reviewer_id)->where('usulan_pkm_id', $request->usulan_pkm_id);
 			$reviewer_usulan_pkm->delete();
 			// urutkan ulang reviewer
@@ -336,7 +335,7 @@ class PendaftaranController extends Controller
 	private function _ajukan(Request $request)
 	{
 		$usulan_pkm = UsulanPkm::findOrFail($request->id);
-		if($usulan_pkm->created_by != UserHelp::admin_get_logged_nip()){
+		if ($usulan_pkm->created_by != UserHelp::admin_get_logged_nip()) {
 			return ['status' => 'error', 'message' => 'Dilarang mengajukan usulan.'];
 		}
 		if ($usulan_pkm->usulan_pkm_dokumen->count() == 0) {
@@ -353,9 +352,9 @@ class PendaftaranController extends Controller
 	{
 		$ids = $request->ids;
 		$daftar_usulan_pkm = UsulanPkm::whereIn('id', $ids)->get();
-		try{
+		try {
 			foreach ($daftar_usulan_pkm as $usulan_pkm) {
-				if($usulan_pkm->created_by != UserHelp::admin_get_logged_nip()){
+				if ($usulan_pkm->created_by != UserHelp::admin_get_logged_nip()) {
 					throw new \Exception('Dilarang mengajukan usulan.');
 				}
 				if ($usulan_pkm->usulan_pkm_dokumen->count() == 0) {
@@ -369,7 +368,7 @@ class PendaftaranController extends Controller
 			}
 			$request->session()->flash('message', 'Usulan telah diajukan.');
 			return ['status' => 'ok'];
-		}catch(\Exception $e){
+		} catch (\Exception $e) {
 			return ['status' => 'error', 'message' => $e->getMessage()];
 		}
 	}
@@ -422,9 +421,9 @@ class PendaftaranController extends Controller
 		if (UserHelp::get_selected_role() == "ADMIN") {
 			// $usulan_pkm = UsulanPkm::where('status_usulan_id',StatusUsulan::where('keterangan','DISETUJUI')->first()->id)
 			$usulan_pkm = UsulanPkm::where('tahun', $tahun)
-			->whereHas('status_usulan', function (Builder $query) {
-				$query->where('urutan', '>', 2);
-			})
+				->whereHas('status_usulan', function (Builder $query) {
+					$query->where('urutan', '>', 2);
+				})
 				->get();
 			if (!empty($request->jenis)) {
 				if ($request->jenis == 'pembimbing') {
@@ -441,12 +440,12 @@ class PendaftaranController extends Controller
 		if (UserHelp::get_selected_role() == "REVIEWER") {
 			$reviewer = UserHelp::admin_get_record_by_nip(UserHelp::admin_get_logged_nip());
 			$usulan_pkm = UsulanPkm::where('tahun', $tahun)
-						->wherehas('reviewer', function (Builder $query) use ($reviewer) {
-							$query->where('reviewer.id', $reviewer->id);
-						})->get();
+				->wherehas('reviewer', function (Builder $query) use ($reviewer) {
+					$query->where('reviewer.id', $reviewer->id);
+				})->get();
 		}
 
-		if(UserHelp::is_admin()){
+		if (UserHelp::is_admin()) {
 			$pegawai = UserHelp::admin_get_record_by_nip(UserHelp::admin_get_logged_nip());
 			$this->_data['pegawai'] = $pegawai;
 		}
@@ -521,7 +520,7 @@ class PendaftaranController extends Controller
 		$kategori_kegiatan_list = KategoriKegiatan::all()->sortBy("id");
 		$status_usulan = StatusUsulan::all()->sortBy("id");
 		$nim = $request->input('nim');
-		if(!empty($nim)){
+		if (!empty($nim)) {
 			$mhs = Mhs::findOrFail($nim);
 		}
 
@@ -575,7 +574,7 @@ class PendaftaranController extends Controller
 	public function hapus($uuid)
 	{
 		$usulan_pkm = UsulanPkm::where('uuid', $uuid)->firstOrFail();
-		if($usulan_pkm->created_by != UserHelp::admin_get_logged_nip()){
+		if ($usulan_pkm->created_by != UserHelp::admin_get_logged_nip()) {
 			return redirect()->route('share.pendaftaran.list')->with('message', 'Dilarang menghapus usulan.');
 		}
 
@@ -733,17 +732,16 @@ class PendaftaranController extends Controller
 		$daftar_usulan_pkm = UsulanPkm::whereIn('id', $ids)->get();
 		$status_usulan = StatusUsulan::where('keterangan', $request->approval)->firstOrFail();
 
-		try{
+		try {
 			foreach ($daftar_usulan_pkm as $usulan_pkm) {
 				$usulan_pkm->status_usulan_id = $status_usulan->id;
 				$usulan_pkm->save();
 			}
 			$request->session()->flash('message', 'Data berhasil di-simpan.');
 			return ['status' => 'ok'];
-		}catch(\Exception $e){
+		} catch (\Exception $e) {
 			return ['status' => 'error', 'message' => $e->getMessage()];
 		}
-
 	}
 
 	public function ploting_reviewer()
@@ -772,7 +770,7 @@ class PendaftaranController extends Controller
 					$reviewer_usulan_pkm = new ReviewerUsulanPkm;
 					$reviewer_usulan_pkm->usulan_pkm_id = $usulan_pkm->id;
 					$reviewer_usulan_pkm->reviewer_id = $id;
-					$reviewer_usulan_pkm->urutan = $max_urutan + 1;
+					$reviewer_usulan_pkm->urutan = $max_urutan + 1 + $urutan;
 					$reviewer_usulan_pkm->save();
 				}
 				return redirect()->back()->with('message', 'Data berhasil di-simpan.');
