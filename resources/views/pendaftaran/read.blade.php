@@ -639,6 +639,10 @@ $(document).on('click','#btn_gagal',function(){
 										<div class="col-md-2">
 											<button class="btn btn-danger btn_hapus_reviewer" type="button" data-reviewer-id="{{ $reviewer->id }}" data-usulan-pkm-id="{{ $usulan_pkm->id }}"><i class="ft-x"></i></button>
 										</div>
+										@else
+										<div class="col-md-2">
+											<a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer]) }}" >Lihat Penilaian</a>
+										</div>
                                         @endif
 									</div>
 									@endforeach
