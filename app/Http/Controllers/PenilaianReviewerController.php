@@ -70,7 +70,17 @@ class PenilaianReviewerController extends Controller
         $request->validate([
             'data.*.score' => 'required|numeric|min:0',
             'data.*.komentar' => 'nullable|string|max:255',
-            'catatan_reviewer' => 'nullable|string|max:255',
+            'catatan_reviewer' => [
+                'required',
+                'string',
+                'max:255',
+                function ($attribute, $value, $fail) {
+                    $wordCount = str_word_count($value);
+                    if ($wordCount < 40) {
+                        $fail('Isian : ' . $attribute . ' min. harus memiliki 40 kata.');
+                    }
+                },
+            ],
         ]);
 
         // buat dibawah dalam sebuah try catch dan rollback jika terjadi error
@@ -142,7 +152,8 @@ class PenilaianReviewerController extends Controller
         $reviewer = UserHelp::admin_get_record_by_nip($reviewer->nip);
         $this->_data['usulan_pkm'] = $usulan_pkm;
         $this->_data['kategori_kriteria'] = $usulan_pkm->jenis_pkm->kategori_kriteria;
-        $this->_data['kriteria_penilaian_list'] = $usulan_pkm->jenis_pkm->kategori_kriteria->kriteria_penilaian->sortBy('urutan');
+        $kriteria_penilaian_ids = $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer->id)->pluck('kriteria_penilaian_id');
+        $this->_data['kriteria_penilaian_list'] = KriteriaPenilaian::whereIn('id', $kriteria_penilaian_ids)->orderBy('urutan')->get();
         $penilaian_reviewer_list = $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer->id)->get();
         $penilaian_reviewer = [];
         foreach ($penilaian_reviewer_list as $item) {
@@ -172,7 +183,8 @@ class PenilaianReviewerController extends Controller
         $reviewer = UserHelp::admin_get_record_by_nip(UserHelp::admin_get_logged_nip());
         $this->_data['usulan_pkm'] = $usulan_pkm;
         $this->_data['kategori_kriteria'] = $usulan_pkm->jenis_pkm->kategori_kriteria;
-        $this->_data['kriteria_penilaian_list'] = $usulan_pkm->jenis_pkm->kategori_kriteria->kriteria_penilaian->sortBy('urutan');
+        $kriteria_penilaian_ids = $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer->id)->pluck('kriteria_penilaian_id');
+        $this->_data['kriteria_penilaian_list'] = KriteriaPenilaian::whereIn('id', $kriteria_penilaian_ids)->orderBy('urutan')->get();
         $penilaian_reviewer_list = $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $penilaianReviewer->reviewer_id)->get();
         $penilaian_reviewer = [];
         foreach ($penilaian_reviewer_list as $item) {
@@ -214,7 +226,17 @@ class PenilaianReviewerController extends Controller
         $request->validate([
             'data.*.score' => 'required|numeric|min:0',
             'data.*.komentar' => 'nullable|string|max:255',
-            'catatan_reviewer' => 'nullable|string|max:255',
+            'catatan_reviewer' => [
+                'required',
+                'string',
+                'max:255',
+                function ($attribute, $value, $fail) {
+                    $wordCount = str_word_count($value);
+                    if ($wordCount < 40) {
+                        $fail('Isian : ' . $attribute . ' min. harus memiliki 40 kata.');
+                    }
+                },
+            ],
         ]);
 
         // buat dibawah dalam sebuah try catch dan rollback jika terjadi error

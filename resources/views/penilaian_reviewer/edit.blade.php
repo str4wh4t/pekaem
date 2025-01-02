@@ -150,10 +150,16 @@ function batalkan_penilaian(){
                                 <b>Kategori Kriteria : </b> {{ $kategori_kriteria->nama_kategori_kriteria }}
                             </div>
                             <div class="alert alert-warning">
-                                @php($urutan = $usulan_pkm->reviewer_usulan_pkm()->where('reviewer_id', $reviewer->id)->first()->urutan)
-                                <b>Anda sebagai : Reviewer {{ $urutan }}</b> 
+                                @php
+                                    $urutan = $usulan_pkm->reviewer_usulan_pkm()->where('reviewer_id', $reviewer->id)->first()->urutan;
+                                @endphp
+                                <b>Reviewer {{ $urutan }} : {{ $reviewer->glr_dpn . " " .  $reviewer->nama . " " . $reviewer->glr_blkg }}</b>
                                 @if($usulan_pkm->reviewer_usulan_pkm()->count() > 1)
-                                <b class="float-right">Lihat Penilaian : <a target="_blank" href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $usulan_pkm->reviewer_usulan_pkm()->where('urutan', $urutan == 1 ? 2 : 1)->first()->reviewer_id ]) }}">Reviewer {{ $urutan == 1 ? "2" : "1" }}</a></b>
+                                @php
+                                    $reviewer_partner_id = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', $urutan == 1 ? 2 : 1)->first()->reviewer_id;
+                                    $reviewer_partner = \App\Reviewer::find($reviewer_partner_id);
+                                @endphp
+                                <b class="float-right">Reviewer {{ $urutan == 1 ? 2 : 1 }} : <a target="_blank" href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer_partner_id ]) }}">{{ $reviewer_partner->glr_dpn . " " .  $reviewer_partner->nama . " " . $reviewer_partner->glr_blkg }}</a></b>
                                 @endif
                             </div>
                             <form class="form" action="{{ route('penilaian-reviewer.update', ['usulan_pkm' => $usulan_pkm, 'penilaian_reviewer' => $penilaian_reviewer_edit]) }}" method="POST">

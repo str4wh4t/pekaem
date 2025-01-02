@@ -153,7 +153,7 @@ function batalkan_penilaian(){
                                                         $reviewer1 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 1)->first();
                                                         @endphp
                                                         <span class="text-danger">
-                                                            <b><a target="_blank" href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer1->reviewer_id]) }}">{{ $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer1->reviewer_id)->distinct()->sum('nilai') }}</a></b>
+                                                            <b><a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer1->reviewer_id]) }}">{{ $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer1->reviewer_id)->distinct()->sum('nilai') }}</a></b>
                                                         </span>
                                                     </td>
                                                     <td class="text-center align-middle">
@@ -162,7 +162,7 @@ function batalkan_penilaian(){
                                                         @endphp
                                                         @if(!empty($reviewer2))
                                                         <span class="text-danger">
-                                                            <b><a target="_blank" href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer2->reviewer_id]) }}">{{ $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer2->reviewer_id)->distinct()->sum('nilai') }}</a></b>
+                                                            <b><a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer2->reviewer_id]) }}">{{ $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer2->reviewer_id)->distinct()->sum('nilai') }}</a></b>
                                                         </span>
                                                         @else
                                                         <span class="text-danger"><b>0</b></span>

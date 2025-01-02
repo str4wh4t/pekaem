@@ -641,7 +641,7 @@ $(document).on('click','#btn_gagal',function(){
 										</div>
 										@else
 										<div class="col-md-2">
-											<a target="_blank" href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer]) }}" >Lihat Penilaian</a>
+											<a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer]) }}" >Lihat Penilaian</a>
 										</div>
                                         @endif
 									</div>
@@ -680,7 +680,7 @@ $(document).on('click','#btn_gagal',function(){
 										</div>
 										@else
 										<div class="col-md-2">
-											<a target="_blank" href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer]) }}" >Lihat Penilaian</a>
+											<a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer]) }}" >Lihat Penilaian</a>
 										</div>
                                         @endif
 									</div>
@@ -793,7 +793,7 @@ $(document).on('click','#btn_gagal',function(){
 										<div class="alert alert-warning">
 											Anda telah menilai usulan ini.
 										</div>
-										<a target="_blank" class="btn btn-info" href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $pegawai->id]) }}" >
+										<a class="btn btn-info" href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $pegawai->id]) }}" >
 											<i class="fa fa-edit" ></i> Lihat Nilai
 										</a>
 										@else
