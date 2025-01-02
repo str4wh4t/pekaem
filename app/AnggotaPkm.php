@@ -14,7 +14,7 @@ class AnggotaPkm extends Model
 
     public function usulan_pkm()
     {
-        return $this->belongsTo('App\UsulanPKM');
+        return $this->belongsTo('App\UsulanPkm');//
     }
 
     public function mhs()
