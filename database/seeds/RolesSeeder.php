@@ -30,7 +30,7 @@ class RolesSeeder extends Seeder
             [
                 'id' => 3,
                 'role' => 'PEMBIMBING',
-                'keterangan' => 'Untuk user dosen pembimbing PKM',
+                'keterangan' => 'Untuk user dosen pembimbing',
                 'created_at' => '2020-02-10 03:38:17',
                 'updated_at' => '2020-02-10 03:38:17',
             ],
