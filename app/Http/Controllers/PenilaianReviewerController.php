@@ -36,7 +36,7 @@ class PenilaianReviewerController extends Controller
         $penilaian_reviewer = $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer->id)->first();
 
         if ($usulan_pkm->status_usulan->keterangan == 'SUDAH_DINILAI') {
-            return route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer]);
+            return redirect()->route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer]);
         }
 
         if (!empty($penilaian_reviewer)) {
