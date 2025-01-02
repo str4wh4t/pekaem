@@ -213,7 +213,9 @@ if(confirm('Yakin akan melanjutkan ?')){
                                             @endif
 
                                             @if(Userhelp::get_selected_role() == 'ADMIN' && $u->status_usulan->keterangan == 'LANJUT')
-                                            {!! $u->penilaian_reviewer()->distinct()->count('reviewer_id') == $u->reviewer_usulan_pkm->count() ? '<small><span class="text-success"><b>(SIAP_DITETAPKAN)<b></span></small>' : '' !!}
+                                                @if($u->penilaian_reviewer()->distinct()->count('reviewer_id') > 0)
+                                                {!! $u->penilaian_reviewer()->distinct()->count('reviewer_id') == $u->reviewer_usulan_pkm->count() ? '<small><span class="text-success"><b>(SIAP_DITETAPKAN)<b></span></small>' : '' !!}
+                                                @endif
                                             @endif
 
                                             {{-- @endif --}}

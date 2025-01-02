@@ -23,6 +23,6 @@ class JenisPkm extends Model
 
     public function usulan_pkm()
     {
-        return $this->hasMany('App\UsulanPKM');
+        return $this->hasMany('App\UsulanPkm');
     }
 }
