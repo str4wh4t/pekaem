@@ -1,4 +1,5 @@
 <?php
+namespace Database\Seeders; 
 
 use App\MappingFakultas;
 use Illuminate\Database\Seeder;
@@ -14,6 +15,6 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(RolesSeeder::class);
         $this->call(MappingFakultas::class);
-        $this->call(StatusSeeder::class);
+        $this->call(StatusUsulanSeeder::class);
     }
 }

@@ -1,9 +1,10 @@
 <?php
+namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class StatusSeeder extends Seeder
+class StatusUsulanSeeder extends Seeder
 {
     /**
      * Run the database seeds.
