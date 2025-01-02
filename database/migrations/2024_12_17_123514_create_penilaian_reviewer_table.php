@@ -29,7 +29,7 @@ class CreatePenilaianReviewerTable extends Migration
             $table->foreign('kriteria_penilaian_id')
                 ->references('id')->on('kriteria_penilaian')
                 ->onDelete('restrict');
-            $table->unique(['usulan_pkm_id', 'reviewer_id', 'kriteria_penilaian_id']);
+            $table->unique(['usulan_pkm_id', 'reviewer_id', 'kriteria_penilaian_id'], 'penilaian_reviewer_unique');
         });
     }
 
