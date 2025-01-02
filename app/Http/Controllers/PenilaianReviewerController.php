@@ -34,11 +34,15 @@ class PenilaianReviewerController extends Controller
         //
         $reviewer = UserHelp::admin_get_record_by_nip(UserHelp::admin_get_logged_nip());
         $penilaian_reviewer = $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer->id)->first();
-        if(!empty($penilaian_reviewer)) {
-            return redirect()->route('penilaian-reviewer.edit', ['usulan_pkm' => $usulan_pkm, 'penilaian_reviewer' => $penilaian_reviewer]);
 
+        if ($usulan_pkm->status_usulan->keterangan == 'SUDAH_DINILAI') {
+            return route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer]);
         }
-        if(Userhelp::get_selected_role() == 'ADMIN') {
+
+        if (!empty($penilaian_reviewer)) {
+            return redirect()->route('penilaian-reviewer.edit', ['usulan_pkm' => $usulan_pkm, 'penilaian_reviewer' => $penilaian_reviewer]);
+        }
+        if (Userhelp::get_selected_role() == 'ADMIN') {
             return redirect()->route('share.pendaftaran.read', ['uuid' => $usulan_pkm->uuid]);
         }
         $this->_data['usulan_pkm'] = $usulan_pkm;
@@ -95,7 +99,7 @@ class PenilaianReviewerController extends Controller
 
             // Simpan catatan reviewer
             $catatan_reviewer = $request->input('catatan_reviewer');
-            if(trim($catatan_reviewer) != '') {
+            if (trim($catatan_reviewer) != '') {
                 $review = new Review();
                 $review->usulan_pkm_id = $usulan_pkm->id;
                 $review->pegawai_id = $reviewer->id;
@@ -103,7 +107,7 @@ class PenilaianReviewerController extends Controller
                 $review->status_usulan_id = $usulan_pkm->status_usulan_id;
                 $review->save();
             }
-            
+
 
             // Commit transaksi jika semua berhasil
             DB::commit();
@@ -120,8 +124,6 @@ class PenilaianReviewerController extends Controller
             // Redirect dengan pesan error
             return redirect()->back()->with('message', 'Terjadi kesalahan saat menyimpan data penilaian: ' . $e->getMessage());
         }
-
-        
     }
 
     /**
@@ -134,7 +136,7 @@ class PenilaianReviewerController extends Controller
     {
         //
     }
-    
+
     public function lihat(UsulanPkm $usulan_pkm, Reviewer $reviewer)
     {
         $reviewer = UserHelp::admin_get_record_by_nip($reviewer->nip);
@@ -152,7 +154,7 @@ class PenilaianReviewerController extends Controller
         $this->_data['penilaian_reviewer'] = $penilaian_reviewer;
         $this->_data['catatan_reviewer'] = "";
         $review = $usulan_pkm->review()->where('pegawai_id', $reviewer->id)->first();
-        if(!empty($review)){
+        if (!empty($review)) {
             $this->_data['catatan_reviewer'] = $review->catatan_reviewer;
         }
         $this->_data['reviewer'] = $reviewer;
@@ -182,7 +184,7 @@ class PenilaianReviewerController extends Controller
         $this->_data['penilaian_reviewer'] = $penilaian_reviewer;
         $this->_data['catatan_reviewer'] = "";
         $review = $usulan_pkm->review()->where('pegawai_id', $penilaianReviewer->reviewer_id)->first();
-        if(!empty($review)){
+        if (!empty($review)) {
             $this->_data['catatan_reviewer'] = $review->catatan_reviewer;
         }
         $this->_data['penilaian_reviewer_edit'] = $penilaianReviewer;
@@ -200,7 +202,7 @@ class PenilaianReviewerController extends Controller
     public function update(Request $request, UsulanPkm $usulan_pkm, PenilaianReviewer $penilaianReviewer)
     {
 
-        if($usulan_pkm->status_usulan->keterangan != 'LANJUT') {
+        if ($usulan_pkm->status_usulan->keterangan != 'LANJUT') {
             return redirect()->back()->with('message', 'Penilaian tidak bisa diubah karena sudah ditetapkan.');
         }
 
@@ -238,12 +240,12 @@ class PenilaianReviewerController extends Controller
 
             // Simpan catatan reviewer
             $catatan_reviewer = $request->input('catatan_reviewer');
-            if(trim($catatan_reviewer) != '') {
+            if (trim($catatan_reviewer) != '') {
                 $review = Review::where('usulan_pkm_id', $usulan_pkm->id)->where('pegawai_id', $reviewer->id)->first();
                 $review->catatan_reviewer = $catatan_reviewer;
                 $review->save();
             }
-            
+
 
             // Commit transaksi jika semua berhasil
             DB::commit();
@@ -276,7 +278,7 @@ class PenilaianReviewerController extends Controller
     public function batal(UsulanPkm $usulan_pkm, PenilaianReviewer $penilaianReviewer)
     {
         //
-        if($usulan_pkm->status_usulan->keterangan != 'LANJUT') {
+        if ($usulan_pkm->status_usulan->keterangan != 'LANJUT') {
             return redirect()->back()->with('message', 'Penilaian tidak bisa diubah karena sudah ditetapkan.');
         }
 
