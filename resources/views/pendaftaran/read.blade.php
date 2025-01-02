@@ -790,6 +790,9 @@ $(document).on('click','#btn_gagal',function(){
 											<i class="fa fa-edit" ></i> Nilai
 										</a>
 										@elseif($usulan_pkm->status_usulan->keterangan == "SUDAH_DINILAI")
+										<div class="alert alert-warning">
+											Anda telah menilai usulan ini.
+										</div>
 										<a target="_blank" class="btn btn-info" href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $pegawai->id]) }}" >
 											<i class="fa fa-edit" ></i> Lihat Nilai
 										</a>
