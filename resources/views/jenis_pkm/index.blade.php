@@ -97,7 +97,6 @@ $('.zero-configuration').DataTable();
                                         <td>{{ $jenis_pkm->score_min }}</td>
                                         <td>
                                            <a class="btn btn-info btn-sm" href="{{ route('jenis-pkm.edit', ['kategori_kegiatan' => $kategori_kegiatan, 'jenis_pkm' => $jenis_pkm]) }}"  ><i class="fa fa-pencil-square-o" ></i> Edit</a>
-                                           <a class="btn btn-success btn-sm" href="{{ route('jenis-pkm.daftar-penilaian', ['kategori_kegiatan' => $kategori_kegiatan, 'jenis_pkm' => $jenis_pkm]) }}"  ><i class="fa fa-table" ></i> Penilaian</a>
                                         </td>
                                     </tr>
                                     @endforeach

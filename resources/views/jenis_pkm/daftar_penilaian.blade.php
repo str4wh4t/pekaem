@@ -123,32 +123,56 @@ function batalkan_penilaian(){
                             <div class="alert alert-info">
                                 <b>Kategori Kriteria : </b> {{ $jenis_pkm->kategori_kriteria->nama_kategori_kriteria }}
                             </div>
+                            <div class="block mb-1">
+                                <a class="btn btn-primary" href="{{ route('jenis-pkm.daftar-penilaian-excel', ['kategori_kegiatan' => $jenis_pkm->kategori_kegiatan,'jenis_pkm' => $jenis_pkm]) }}"><i class="fa fa-file-excel-o"></i> Download Excel</a>
+                            </div>
 								<div class="form-body">
                                     
                                 <div class="table-responsive">
                                     <table class="table table-bordered table-striped table-hover">
                                         <thead class="thead-dark">
                                             <tr>
-                                                <th class="text-center align-middle">No</th>
-                                                <th class="text-center align-middle">Judul</th>
-                                                <th class="text-center align-middle">Ketua</th>
+                                                <th class="text-center align-middle" rowspan="2">No</th>
+                                                <th class="text-center align-middle" rowspan="2">Judul</th>
+                                                <th class="text-center align-middle" colspan="3">Mahasiswa</th>
+                                                <th class="text-center align-middle" rowspan="2">Fakultas</th>
+                                                <th class="text-center align-middle" colspan="2">Dosen Pendamping</th>
+                                                <th class="text-center align-middle" rowspan="2">File Proposal</th>
+                                                <th class="text-center align-middle" rowspan="2">SubmittedAt</th>
+                                                <th class="text-center align-middle" rowspan="2">Nilai1</th>
+                                                <th class="text-center align-middle" rowspan="2">Nilai2</th>
+                                                <th class="text-center align-middle" rowspan="2">NilaiAkhir</th>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-center align-middle">Nama</th>
                                                 <th class="text-center align-middle">NIM</th>
-                                                <th class="text-center align-middle">Fakultas</th>
-                                                <th class="text-center align-middle">Nilai1</th>
-                                                <th class="text-center align-middle">Nilai2</th>
-                                                <th class="text-center align-middle">NilaiAkhir</th>
+                                                <th class="text-center align-middle">Jabatan</th>
+                                                <th class="text-center align-middle">Nama</th>
+                                                <th class="text-center align-middle">NIDN</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($usulan_pkm_list as $usulan_pkm)
                                             <tr>
-                                                <td class="text-center">{{ $loop->iteration }}</td>
-                                                <td><b>{{ $usulan_pkm->judul }}</b></td>
-                                                <td><b>{{ $usulan_pkm->mhs->nama }}</b></td>
-                                                <td><b>{{ $usulan_pkm->mhs->nim }}</b></td>
-                                                <td><b>{{ $usulan_pkm->mhs->fakultas->nama_fak_ijazah }}</b></td>
+                                                <td class="text-center" rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">{{ $loop->iteration }}</td>
+                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ $usulan_pkm->judul }}</b></td>
+                                                @php
+                                                $mhs = $usulan_pkm->anggota_pkm()->where('sebagai', 0)->first()->mhs;
+                                                @endphp
+                                                <td><b style="white-space: nowrap;">{{ $mhs->nama }}</b></td>
+                                                <td><b>{{ $mhs->nim }}</b></td>
+                                                <td><b>{{ "Ketua" }}</b></td>
+                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ $usulan_pkm->mhs->fakultas->nama_fak_ijazah }}</b></td>
+                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b style="white-space: nowrap;">{{ $usulan_pkm->pegawai->glr_dpn . ' ' . $usulan_pkm->pegawai->nama . ' ' . $usulan_pkm->pegawai->glr_blkg }}</b></td>
+                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ $usulan_pkm->pegawai->nidn }}</b></td>
+                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
+                                                    @foreach ($usulan_pkm->usulan_pkm_dokumen as $i => $usulan_pkm_dokumen)
+                                                    <b style="display:block;"><a href="{{ asset('storage/' . $usulan_pkm_dokumen->document_path ) }}" target="_blank">{{ 'dokumen('. ($i + 1) . ')' }}</a></b>
+                                                    @endforeach
+                                                </td>
+                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ $usulan_pkm->created_at }}</b></td>
                                                 @if($usulan_pkm->status_usulan_id == 8)
-                                                    <td class="text-center align-middle">
+                                                    <td class="text-center" rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
                                                         @php
                                                         $reviewer1 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 1)->first();
                                                         @endphp
@@ -156,7 +180,7 @@ function batalkan_penilaian(){
                                                             <b><a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer1->reviewer_id]) }}">{{ $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer1->reviewer_id)->distinct()->sum('nilai') }}</a></b>
                                                         </span>
                                                     </td>
-                                                    <td class="text-center align-middle">
+                                                    <td class="text-center" rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
                                                         @php
                                                         $reviewer2 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 2)->first();   
                                                         @endphp
@@ -168,21 +192,28 @@ function batalkan_penilaian(){
                                                         <span class="text-danger"><b>0</b></span>
                                                         @endif
                                                     </td>
-                                                    <td class="text-center align-middle">
+                                                    <td class="text-center" rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
                                                         <span class="text-danger"><b>{{ $usulan_pkm->nilai_total }}</b></span>
                                                     </td>
                                                 @else
-                                                    <td class="text-center align-middle">
+                                                    <td class="text-center" rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
                                                         <span class="text-danger"><b>0</b></span>
                                                     </td>
-                                                    <td class="text-center align-middle">
+                                                    <td class="text-center" rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
                                                         <span class="text-danger"><b>0</b></span>
                                                     </td>
-                                                    <td class="text-center align-middle">
+                                                    <td class="text-center" rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
                                                         <span class="text-danger"><b>0</b></span>
                                                     </td>
                                                 @endif
                                             </tr>
+                                            @foreach ($usulan_pkm->anggota_pkm()->where('sebagai', 1)->get() as $anggota_pkm)
+                                            <tr>
+                                                <td><b style="white-space: nowrap;">{{ $anggota_pkm->mhs->nama }}</b></td>
+                                                <td><b>{{ $anggota_pkm->mhs->nim }}</b></td>
+                                                <td><b>{{ "Anggota" }}</b></td>
+                                            </tr>
+                                            @endforeach
                                             @endforeach
                                         </tbody>
                                     </table>

@@ -4,7 +4,6 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: pekaem-container
-    working_dir: /var/www/html
     volumes:
       - .:/var/www/html
     networks:

@@ -491,9 +491,9 @@ $(document).on('click','#btn_gagal',function(){
 									@isset($files_to_show)
 									<div>File yang telah disimpan :</div>
 									<hr>
-									@forelse ($files_to_show as $file)
+									@forelse ($files_to_show as $d => $file)
 				                        <div class="alert alert-warning">
-											<a href="{{ asset('storage/' . $file->document_path ) }}" target="_blank">{{ $file->document_path }}</a>
+											<a href="{{ asset('storage/' . $file->document_path ) }}" target="_blank">{{ 'dokumen('. ($d + 1) . ')' }}</a>
 										</div>
 				                    @empty
 				                    	<div class="alert alert-danger">Anda belum memiliki berkas untuk diverifikasi.</div>

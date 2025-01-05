@@ -72,16 +72,36 @@
 				@if(UserHelp::get_selected_role() == 'ADMIN' || UserHelp::get_selected_role() == 'SUPER')
 				<li class=" nav-item small">
 					<a class="p-0 mt-1" href="{{ route('kategori-kriteria.index') }}">
-						<i class="fa fa-pencil-square"></i>
+						<i class="fa fa-clone"></i>
 						<span class="menu-title" data-i18n="nav.category.general">Kriteria</span>
 					</a>
 				</li>
 
 				<li class=" nav-item small">
 					<a class="p-0 mt-1" href="{{ route('kategori-kegiatan.index') }}">
-						<i class="fa fa-pencil-square"></i>
+						<i class="fa fa-cubes"></i>
 						<span class="menu-title" data-i18n="nav.category.general">Kegiatan</span>
 					</a>
+				</li>
+
+				<li class=" nav-item small">
+					<a class="p-0 mt-1" href="#">
+						<i class="fa fa-pencil-square"></i>
+						<span class="menu-title" data-i18n="nav.category.general">Penilaian</span>
+					</a>
+					<ul class="menu-content" style="">
+						@foreach (\App\KategoriKegiatan::all() as $kategori_kegiatan)
+						<li class="has-sub">
+							<a class="menu-item" href="#" data-i18n="nav.navbars.nav_hide_on_scroll.main">{{ $kategori_kegiatan->nama_kategori_kegiatan }}</a>
+							<ul class="menu-content" style="">
+								@foreach ($kategori_kegiatan->jenis_pkm as $jenis_pkm)
+								<li><a class="menu-item" href="{{ route('jenis-pkm.daftar-penilaian', ['kategori_kegiatan' => $kategori_kegiatan, 'jenis_pkm' => $jenis_pkm]) }}" data-i18n="nav.navbars.nav_hide_on_scroll.nav_hide_on_scroll_top">{{ $jenis_pkm->nama_pkm }}</a>
+								</li>
+								@endforeach
+							</ul>
+						</li>
+						@endforeach
+					</ul>
 				</li>
 
 				<li class=" nav-item small">

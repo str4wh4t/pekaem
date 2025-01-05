@@ -19,10 +19,10 @@ COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 
 # Copy application files
-COPY . /var/www/html
+COPY . .
 
 # Install dependensi Laravel menggunakan Composer
-# RUN composer install
+# RUN composer install # INI TIDAK DI-IJINKAN
 
 # Set permissions
 # RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache

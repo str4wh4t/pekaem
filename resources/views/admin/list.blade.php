@@ -291,6 +291,7 @@ $("#fakultas").select2({
                                         {{-- <th>Jns Pegawai</th>
                                         <th>Unit</th> --}}
                                         <th>Role</th>
+                                        <th>Login</th>
                                         {{-- <th>Status</th> --}}
                                         {{-- <th>Aksi</th> --}}
                                     </tr>
@@ -314,6 +315,9 @@ $("#fakultas").select2({
                                                 @endif
                                             @endforeach
                                         </td>
+                                        <td>
+                                            <a class="btn btn-info" href="{{ route('admin.login-as', ['pegawai' => $pegawai]) }}" onclick="return confirm('Yakin akan buka?')"><i class="fa fa-unlock"></i></a>
+                                            </td>
                                         {{-- <td>{{ UserHelp::admin_status_role_text("") }}</td> --}}
                                         {{-- <td>
                                             <a class="btn btn-danger btn-sm btn_hapus" href="{{ route('admin.users.hapus', ['id' => $pegawai->id]) }}"  ><i class="fa fa-times" ></i> Hapus</a>
@@ -329,6 +333,7 @@ $("#fakultas").select2({
                                         {{-- <th>Jns Pegawai</th>
                                         <th>Unit</th> --}}
                                         <th>Role</th>
+                                        <th>Aksi</th>
                                         {{-- <th>Status</th> --}}
                                         {{-- <th>Aksi</th> --}}
                                     </tr>

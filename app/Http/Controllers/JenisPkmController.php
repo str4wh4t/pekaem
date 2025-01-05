@@ -6,6 +6,7 @@ use App\Http\Requests\JenisPkmRequest;
 use App\JenisPkm;
 use App\KategoriKegiatan;
 use App\KategoriKriteria;
+use App\UsulanPkm;
 use Illuminate\Http\Request;
 
 class JenisPkmController extends Controller
@@ -116,10 +117,29 @@ class JenisPkmController extends Controller
     public function daftar_penilaian(KategoriKegiatan $kategoriKegiatan, JenisPkm $jenisPkm)
     {
         $tahun = date('Y');
-        $this->_data['usulan_pkm_list'] = $jenisPkm->usulan_pkm()->where('tahun', $tahun)->orderBy('nilai_total', 'desc')->get();
+        $usulan_pkm_list =  UsulanPkm::where('jenis_pkm_id', $jenisPkm->id)
+                                                ->where('tahun', $tahun)
+                                                ->with(['anggota_pkm.mhs','usulan_pkm_dokumen'])
+                                                ->orderBy('nilai_total', 'desc')->get();
+        $this->_data['usulan_pkm_list'] = $usulan_pkm_list;
         $this->_data['kategori_kegiatan'] = $kategoriKegiatan;
         $this->_data['jenis_pkm'] = $jenisPkm;
         return view('jenis_pkm.daftar_penilaian', $this->_data);
+
+	}
+
+    public function daftar_penilaian_excel(KategoriKegiatan $kategoriKegiatan, JenisPkm $jenisPkm)
+    {
+        $tahun = date('Y');
+        $usulan_pkm_list =  UsulanPkm::where('jenis_pkm_id', $jenisPkm->id)
+                                                ->where('tahun', $tahun)
+                                                ->with(['anggota_pkm.mhs','usulan_pkm_dokumen'])
+                                                ->orderBy('nilai_total', 'desc')->get();
+        $this->_data['usulan_pkm_list'] = $usulan_pkm_list;
+        $this->_data['kategori_kegiatan'] = $kategoriKegiatan;
+        $this->_data['jenis_pkm'] = $jenisPkm;
+        $this->_data['tahun'] = $tahun;
+        return view('jenis_pkm.daftar_penilaian_excel', $this->_data);
 
 	}
 }

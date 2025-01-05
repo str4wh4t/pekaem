@@ -75,6 +75,7 @@ Route::prefix('admin')->group(function () {
 Route::prefix('admin/kategori-kegiatan/{kategori_kegiatan}')->group(function () {
     Route::resource('jenis-pkm', 'JenisPkmController');
     Route::get('jenis-pkm/{jenis_pkm}/daftar-penilaian', 'JenisPkmController@daftar_penilaian')->name('jenis-pkm.daftar-penilaian');
+    Route::get('jenis-pkm/{jenis_pkm}/daftar-penilaian-excel', 'JenisPkmController@daftar_penilaian_excel')->name('jenis-pkm.daftar-penilaian-excel');
 });
 
 Route::prefix('admin/usulan-pkm/{usulan_pkm}')->group(function () {
@@ -82,6 +83,8 @@ Route::prefix('admin/usulan-pkm/{usulan_pkm}')->group(function () {
     Route::get('penilaian-reviewer/{penilaian_reviewer}/batal', 'PenilaianReviewerController@batal')->name('penilaian-reviewer.batal');
     Route::get('penilaian-reviewer/{reviewer}/lihat', 'PenilaianReviewerController@lihat')->name('penilaian-reviewer.lihat');
 });
+
+Route::get('admin/login-as/{pegawai}', 'PagesController@login_as')->name('admin.login-as');
 
 // Route::resource('sso','SsoController');
 // Route::resource('crud','CrudsController');

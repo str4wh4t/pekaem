@@ -8,6 +8,7 @@ use App\StatusUsulan;
 use App\JenisPkm;
 use Illuminate\Http\Request;
 use App\Helpers\User as UserHelp;
+use App\Pegawai;
 
 class PagesController extends Controller
 {
@@ -135,5 +136,26 @@ class PagesController extends Controller
             $request->session()->put('session_data', $session_data);
         }
         return ['status' => $status];
+    }
+
+    public function login_as(Request $request, Pegawai $pegawai)
+    {
+        $roles = UserHelp::admin_get_roles_by_nip($pegawai->nip);
+        if (!empty($roles)) {
+            $session_data = [
+                'username'          => $pegawai->nip,
+                'nama_lengkap'      => $pegawai->glr_dpn . ' ' . $pegawai->nama . ' ' . $pegawai->glr_blkg,
+                'kodeF' =>          null, // $pegawai->mapping_fakultas->fakultas->kodeF,
+                'login_at'          => date('Y-m-d H:i:s'),
+                'login_as'          => 'ADMIN',
+                'role_as'           => null,
+                'kode_fakultas_as'           => null,
+            ];
+        }
+        if (!empty($session_data)) {
+            $request->session()->flush();
+            $request->session()->put('session_data', $session_data);
+        }
+        return redirect('dashboard');
     }
 }
