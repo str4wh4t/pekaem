@@ -404,7 +404,8 @@ $('#kategori_kegiatan').trigger('change');
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <label id="file" class="file center-block">
-                                                            <input type="file" class="form-control" id="file" name="berkas[]" multiple>
+                                                            <!-- <input type="file" class="form-control" id="file" name="berkas[]" multiple> -->
+															<input type="file" class="form-control" id="file" name="berkas[]">
                                                             <span class="file-custom"></span>
                                                         </label>
                                                     </div>
