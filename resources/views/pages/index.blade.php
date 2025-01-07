@@ -40,7 +40,7 @@
          </div>
          <!-- project-info -->
          <div id="project-info" class="card-body row">
-            <div class="project-info-count col-lg-4 col-md-12">
+            <div class="project-info-count col-lg-3 col-md-12">
                <div class="project-info-icon">
                   <h2><?= $usulan_pkm_total ?></h2>
                   <div class="project-info-sub-icon">
@@ -48,21 +48,21 @@
                   </div>
                </div>
                <div class="project-info-text pt-1">
-                  <h5>Total Proposal Masuk</h5>
+                  <h5>Proposal Masuk</h5>
                </div>
             </div>
-            <div class="project-info-count col-lg-4 col-md-12">
-               <div class="project-info-icon bg-success">
-                  <h2 style="color: #fff"><?= $usulan_pkm_sudah_dinilai ?></h2>
+            <div class="project-info-count col-lg-3 col-md-12">
+               <div class="project-info-icon bg-warning">
+                  <h2 style="color: #fff"><?= $usulan_pkm_proses ?></h2>
                   <div class="project-info-sub-icon">
                      <span class="fa fa-files-o"></span>
                   </div>
                </div>
                <div class="project-info-text pt-1">
-                  <h5>Total Proposal Sudah Dinilai</h5>
+                  <h5>Proposal Proses</h5>
                </div>
             </div>
-            <div class="project-info-count col-lg-4 col-md-12">
+            <div class="project-info-count col-lg-3 col-md-12">
                <div class="project-info-icon bg-danger">
                   <h2 style="color: #fff"><?= $usulan_pkm_belum_dinilai ?></h2>
                   <div class="project-info-sub-icon">
@@ -70,7 +70,18 @@
                   </div>
                </div>
                <div class="project-info-text pt-1">
-                  <h5>Total Proposal Belum Dinilai</h5>
+                  <h5>Proposal Belum Dinilai</h5>
+               </div>
+            </div>
+            <div class="project-info-count col-lg-3 col-md-12">
+               <div class="project-info-icon bg-success">
+                  <h2 style="color: #fff"><?= $usulan_pkm_sudah_dinilai ?></h2>
+                  <div class="project-info-sub-icon">
+                     <span class="fa fa-files-o"></span>
+                  </div>
+               </div>
+               <div class="project-info-text pt-1">
+                  <h5>Proposal Sudah Dinilai</h5>
                </div>
             </div>
          </div>
