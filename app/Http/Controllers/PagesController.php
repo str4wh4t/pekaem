@@ -46,12 +46,24 @@ class PagesController extends Controller
         }
 
         // $this->_data['usulan_pkm_total'] = count(UsulanPkm::where('status_usulan_id',StatusUsulan::where('keterangan','DISETUJUI')->first()->id)->get());
-        $this->_data['usulan_pkm_total'] = count(UsulanPkm::all());
-        $this->_data['usulan_pkm_sudah_dinilai'] = count(UsulanPkm::where('status_usulan_id', StatusUsulan::where('keterangan', 'SUDAH_DINILAI')->first()->id)->get());
-        $this->_data['usulan_pkm_belum_dinilai'] = count(UsulanPkm::where('status_usulan_id', StatusUsulan::where('keterangan', 'BELUM_DINILAI')->first()->id)->get());
+
+        $kode_fakultas = UserHelp::get_selected_kode_fakultas();
+
+        if(empty($kode_fakultas)){
+            $this->_data['usulan_pkm_total'] = UsulanPkm::count();
+            $this->_data['usulan_pkm_sudah_dinilai'] = count(UsulanPkm::where('status_usulan_id', StatusUsulan::where('keterangan', 'SUDAH_DINILAI')->first()->id)->get());
+            $this->_data['usulan_pkm_belum_dinilai'] = count(UsulanPkm::where('status_usulan_id', StatusUsulan::where('keterangan', 'LANJUT')->first()->id)->get());
+            $this->_data['usulan_pkm'] = UsulanPkm::all();
+        }else{
+            $this->_data['usulan_pkm_total'] = UsulanPkm::where('kode_fakultas', $kode_fakultas)->count();
+            $this->_data['usulan_pkm_sudah_dinilai'] = count(UsulanPkm::where('kode_fakultas', $kode_fakultas)->where('status_usulan_id', StatusUsulan::where('keterangan', 'SUDAH_DINILAI')->first()->id)->get());
+            $this->_data['usulan_pkm_belum_dinilai'] = count(UsulanPkm::where('kode_fakultas', $kode_fakultas)->where('status_usulan_id', StatusUsulan::where('keterangan', 'LANJUT')->first()->id)->get());
+            $this->_data['usulan_pkm'] = UsulanPkm::where('kode_fakultas', $kode_fakultas)->get();
+        }
+
+        // dd($this->_data);
 
         $this->_data['kategori_kegiatan_list'] = KategoriKegiatan::all();
-        $this->_data['usulan_pkm'] = UsulanPkm::all();
 
         return view('pages.index', $this->_data);
     }
