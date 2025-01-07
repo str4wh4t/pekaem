@@ -264,31 +264,35 @@ if(confirm('Yakin akan menetapkan ?')){
                                     <tr>
                                         <td>
                                             @if(Userhelp::get_selected_role() == 'ADMINFAKULTAS')
-                                            @if($u->status_usulan->keterangan == 'BARU')
-                                            <input type="checkbox" class="checkbox-item select-item" name="ids[]" value="{{ $u->id }}" />
-                                            @else
-                                            <input type="checkbox" disabled />
-                                            @endif
-                                            @endif
-                                            @if(Userhelp::get_selected_role() == 'WD1')
-                                            @if($u->status_usulan->keterangan == 'DISETUJUI')
-                                            <input type="checkbox" class="checkbox-item select-item" name="ids[]" value="{{ $u->id }}" />
-                                            @else
-                                            <input type="checkbox" disabled />
-                                            @endif
-                                            @endif
-                                            @if(Userhelp::get_selected_role() == 'ADMIN' && $u->status_usulan->keterangan == 'LANJUT')
-                                            @if($u->penilaian_reviewer()->distinct()->count('reviewer_id') > 0)
-                                                @if($u->penilaian_reviewer()->distinct()->count('reviewer_id') == $u->reviewer_usulan_pkm->count())
+                                                @if($u->status_usulan->keterangan == 'BARU')
                                                 <input type="checkbox" class="checkbox-item select-item" name="ids[]" value="{{ $u->id }}" />
                                                 @else
                                                 <input type="checkbox" disabled />
                                                 @endif
-                                            @else
-                                            <input type="checkbox" disabled />
                                             @endif
-                                            @else
-                                            <input type="checkbox" disabled />
+
+                                            @if(Userhelp::get_selected_role() == 'WD1')
+                                                @if($u->status_usulan->keterangan == 'DISETUJUI')
+                                                <input type="checkbox" class="checkbox-item select-item" name="ids[]" value="{{ $u->id }}" />
+                                                @else
+                                                <input type="checkbox" disabled />
+                                                @endif
+                                            @endif
+
+                                            @if(Userhelp::get_selected_role() == 'ADMIN')
+                                                @if($u->status_usulan->keterangan == 'LANJUT')
+                                                    @if($u->penilaian_reviewer()->distinct()->count('reviewer_id') > 0)
+                                                        @if($u->penilaian_reviewer()->distinct()->count('reviewer_id') == $u->reviewer_usulan_pkm->count())
+                                                        <input type="checkbox" class="checkbox-item select-item" name="ids[]" value="{{ $u->id }}" />
+                                                        @else
+                                                        <input type="checkbox" disabled />
+                                                        @endif
+                                                    @else
+                                                    <input type="checkbox" disabled />
+                                                    @endif
+                                                @else
+                                                <input type="checkbox" disabled />
+                                                @endif
                                             @endif
                                         </td>
                                         <td>{{ $loop->iteration }}</td>
