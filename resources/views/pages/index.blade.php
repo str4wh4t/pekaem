@@ -3,14 +3,27 @@
 @push('page_level_css')
 <!-- BEGIN PAGE LEVEL JS-->
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/template/robust/app-assets/css/pages/project.css') }}">
-
+<style type="text/css">
+   .project-info-sub-icon:hover {
+       background-color: #007bff !important; /* Biru Bootstrap */
+       color: white; /* Opsional: Ubah warna teks atau ikon */
+       cursor: pointer; /* Opsional: Tampilkan kursor pointer */
+   }
+   </style>
 <!-- END PAGE LEVEL JS-->
 @endpush
 
 @push('page_level_js')
 <!-- BEGIN PAGE LEVEL JS-->
+<script type="text/javascript">
 
+   function openlink(url) {
+      console.log(url);
+       window.location = url;
+       return false;
+   }
 
+</script>
 <!-- END PAGE LEVEL JS-->
 @endpush
 
@@ -39,15 +52,18 @@
             </div> --}}
          </div>
          <!-- project-info -->
+         <div class="card-subtitle line-on-side text-muted text-center font-small-3 mx-2 my-2">
+            <span><b>Rekap Usulan Proposal</b></span>
+         </div>
          <div id="project-info" class="card-body row p-0">
             <div class="project-info-count col-lg-3 col-md-12">
-               <div class="project-info-icon">
+               <div class="project-info-icon" onclick="return openlink('{{ route('dashboard') }}')">
                   <h2><?= $usulan_pkm_total ?></h2>
                   <div class="project-info-sub-icon">
                      <span class="fa fa-files-o"></span>
                   </div>
                </div>
-               <div class="project-info-text pt-1">
+               <div class="project-info-text">
                   <h5>Proposal Masuk</h5>
                </div>
             </div>
@@ -58,7 +74,7 @@
                      <span class="fa fa-files-o"></span>
                   </div>
                </div>
-               <div class="project-info-text pt-1">
+               <div class="project-info-text">
                   <h5>Proposal Proses</h5>
                </div>
             </div>
@@ -69,7 +85,7 @@
                      <span class="fa fa-files-o"></span>
                   </div>
                </div>
-               <div class="project-info-text pt-1">
+               <div class="project-info-text">
                   <h5>Proposal Belum Dinilai</h5>
                </div>
             </div>
@@ -80,7 +96,7 @@
                      <span class="fa fa-files-o"></span>
                   </div>
                </div>
-               <div class="project-info-text pt-1">
+               <div class="project-info-text">
                   <h5>Proposal Sudah Dinilai</h5>
                </div>
             </div>
