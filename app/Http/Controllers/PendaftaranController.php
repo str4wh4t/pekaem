@@ -810,6 +810,37 @@ class PendaftaranController extends Controller
 		}
 	}
 
+	private function _bulk_tetapkan_nilai(Request $request)
+	{
+
+		$ids = $request->ids;
+		$daftar_usulan_pkm = UsulanPkm::whereIn('id', $ids)->get();
+		$status_usulan = StatusUsulan::where('keterangan', $request->approval)->firstOrFail();
+
+		try {
+			foreach ($daftar_usulan_pkm as $usulan_pkm) {
+				$usulan_pkm->status_usulan_id = $status_usulan->id;
+
+				if ($request->approval == "SUDAH_DINILAI") {
+					$nilai_total = 0;
+					$penilaian_reviewer = PenilaianReviewer::where('usulan_pkm_id', $usulan_pkm->id)->get();
+					$jml_reviewer = ReviewerUsulanPkm::where('usulan_pkm_id', $usulan_pkm->id)->count();
+					foreach ($penilaian_reviewer as $penilaian) {
+						$nilai_total += $penilaian->nilai;
+					}
+					$nilai_total = $nilai_total / $jml_reviewer;
+					$usulan_pkm->nilai_total = $nilai_total;
+				}
+				
+				$usulan_pkm->save();
+			}
+			$request->session()->flash('message', 'Data berhasil di-simpan.');
+			return ['status' => 'ok'];
+		} catch (\Exception $e) {
+			return ['status' => 'error', 'message' => $e->getMessage()];
+		}
+	}
+
 	public function ploting_reviewer()
 	{
 		$usulan_pkm = UsulanPkm::all()->sortBy("judul");

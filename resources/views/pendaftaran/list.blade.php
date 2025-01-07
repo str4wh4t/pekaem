@@ -21,7 +21,8 @@
 @if(count($usulan_pkm) > 0)
 $('.zero-configuration').DataTable(
     {
-        scrollX: true
+        scrollX: true,
+        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]], 
     }
 );
 @endif
@@ -34,39 +35,69 @@ $(document).on('click','.btn_hapus',function(){
     }
 });
 
+function toggleButtonState() {
+    const isAnyChecked = $('.select-item:checked').length > 0;
+    $('#usulkanButton').prop('disabled', !isAnyChecked);
+    $('#lanjutkanButton').prop('disabled', !isAnyChecked);
+    $('#tetapkanNilaiButton').prop('disabled', !isAnyChecked);
+}
+
 $(document).ready(function () {
-    const $usulkanButton = $('#usulkanButton');
-    const $lanjutkanButton = $('#lanjutkanButton');
-    const $checkboxes = $('.select-item');
+    // const $usulkanButton = $('#usulkanButton');
+    // const $lanjutkanButton = $('#lanjutkanButton');
+    // const $checkboxes = $('.select-item');
 
-    // Fungsi untuk memeriksa apakah ada checkbox yang dipilih
-    function toggleButtonState() {
-        const anyChecked = $checkboxes.is(':checked');
-        $usulkanButton.attr('disabled', !anyChecked);
-        $lanjutkanButton.attr('disabled', !anyChecked);
-    }
+    // // Fungsi untuk memeriksa apakah ada checkbox yang dipilih
+    // function toggleButtonState() {
+    //     const anyChecked = $checkboxes.is(':checked');
+    //     $usulkanButton.attr('disabled', !anyChecked);
+    //     $lanjutkanButton.attr('disabled', !anyChecked);
+    // }
 
-    // Tambahkan event listener ke semua checkbox
-    $checkboxes.on('change', toggleButtonState);
+    // // Tambahkan event listener ke semua checkbox
+    // $checkboxes.on('change', toggleButtonState);
 
-    // Panggil fungsi untuk memeriksa status awal
-    toggleButtonState();
+    // // Panggil fungsi untuk memeriksa status awal
+    // toggleButtonState();
 
+    // Event listener untuk checkbox "Select All"
     $('.select-all').on('change', function () {
-        // Set semua checkbox berdasarkan status Select All
-        $('.select-item').prop('checked', $(this).prop('checked'));
+        // Set semua .select-item berdasarkan status .select-all
+        const isChecked = $(this).prop('checked');
+        $('.select-item').prop('checked', isChecked);
     });
 
     // Event listener untuk checkbox individual
     $('.select-item').on('change', function () {
-        // Jika salah satu checkbox tidak tercentang, uncheck Select All
-        if (!$('.select-item').is(':checked')) {
-            $('.select-all').prop('checked', false);
-        } else if ($('.select-item:checked').length === $('.select-item').length) {
-            // Jika semua checkbox individual tercentang, check Select All
+        const totalItems = $('.select-item').length;
+        const checkedItems = $('.select-item:checked').length;
+
+        if (checkedItems === totalItems) {
+            // Jika semua checkbox individual tercentang, centang Select All
             $('.select-all').prop('checked', true);
+        } else {
+            // Jika ada checkbox yang tidak tercentang, uncheck Select All
+            $('.select-all').prop('checked', false);
         }
     });
+
+    // Event listener untuk perubahan status checkbox individual
+    $('.select-item').on('change', function () {
+        toggleButtonState();
+    });
+
+    // Event listener untuk Select All
+    $('.select-all').on('change', function () {
+        // Check/uncheck semua checkbox individual
+        const isChecked = $(this).prop('checked');
+        $('.select-item').prop('checked', isChecked);
+
+        // Perbarui status tombol
+        toggleButtonState();
+    });
+
+    // Panggil fungsi saat halaman dimuat
+    toggleButtonState();
 });
 
 $(document).on('click','#usulkanButton',function(){
@@ -91,7 +122,28 @@ $(document).on('click','#usulkanButton',function(){
 
 $(document).on('click','#lanjutkanButton',function(){
 
-if(confirm('Yakin akan melanjutkan ?')){
+    if(confirm('Yakin akan melanjutkan ?')){
+        var ids = [];
+        $('.select-item').each(function(){
+            if($(this).is(':checked')){
+                ids.push($(this).val());
+            }
+        });
+        var csrf = '{{ csrf_token() }}';
+        let approval = 'LANJUT';
+        $.post('{{ route('share.pendaftaran.ajax', ['method' => 'bulk_approval']) }}',{'_token':csrf, ids, approval},function(result){
+            if(result.status === 'ok'){
+                location.href = "{{ url()->current() }}";
+            }else{
+                alert('Maaf,terjadi kesalahan!');
+            }
+        });
+    }
+});
+
+$(document).on('click','#tetapkanNilaiButton',function(){
+
+if(confirm('Yakin akan menetapkan ?')){
     var ids = [];
     $('.select-item').each(function(){
         if($(this).is(':checked')){
@@ -99,8 +151,8 @@ if(confirm('Yakin akan melanjutkan ?')){
         }
     });
     var csrf = '{{ csrf_token() }}';
-    let approval = 'LANJUT';
-    $.post('{{ route('share.pendaftaran.ajax', ['method' => 'bulk_approval']) }}',{'_token':csrf, ids, approval},function(result){
+    let approval = 'SUDAH_DINILAI';
+    $.post('{{ route('share.pendaftaran.ajax', ['method' => 'bulk_tetapkan_nilai']) }}',{'_token':csrf, ids, approval},function(result){
         if(result.status === 'ok'){
             location.href = "{{ url()->current() }}";
         }else{
@@ -179,6 +231,9 @@ if(confirm('Yakin akan melanjutkan ?')){
                             <hr>
                             @endif
                             @if(UserHelp::get_selected_role() == 'ADMIN')
+                            <button class="btn btn-success" id="tetapkanNilaiButton" type="button">
+                                <i class="fa fa-paper-plane"></i> Tetapkan Nilai
+                            </button>
                             <a class="btn btn-secondary" href="{{ route('admin.pendaftaran.report')  }}"><i class="fa fa-file"></i> Laporan LR-1</a>
                             <hr>
                             @endif
@@ -221,6 +276,19 @@ if(confirm('Yakin akan melanjutkan ?')){
                                             @else
                                             <input type="checkbox" disabled />
                                             @endif
+                                            @endif
+                                            @if(Userhelp::get_selected_role() == 'ADMIN' && $u->status_usulan->keterangan == 'LANJUT')
+                                            @if($u->penilaian_reviewer()->distinct()->count('reviewer_id') > 0)
+                                                @if($u->penilaian_reviewer()->distinct()->count('reviewer_id') == $u->reviewer_usulan_pkm->count())
+                                                <input type="checkbox" class="checkbox-item select-item" name="ids[]" value="{{ $u->id }}" />
+                                                @else
+                                                <input type="checkbox" disabled />
+                                                @endif
+                                            @else
+                                            <input type="checkbox" disabled />
+                                            @endif
+                                            @else
+                                            <input type="checkbox" disabled />
                                             @endif
                                         </td>
                                         <td>{{ $loop->iteration }}</td>
