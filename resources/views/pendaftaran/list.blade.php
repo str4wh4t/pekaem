@@ -37,7 +37,7 @@ $(document).on('click','.btn_hapus',function(){
 $(document).ready(function () {
     const $usulkanButton = $('#usulkanButton');
     const $lanjutkanButton = $('#lanjutkanButton');
-    const $checkboxes = $('.checkbox-item');
+    const $checkboxes = $('.select-item');
 
     // Fungsi untuk memeriksa apakah ada checkbox yang dipilih
     function toggleButtonState() {
@@ -53,17 +53,17 @@ $(document).ready(function () {
     toggleButtonState();
 
     $('.select-all').on('change', function () {
-        // Check/uncheck semua checkbox berdasarkan status Select All
-        $('.checkbox-item').prop('checked', $(this).prop('checked'));
+        // Set semua checkbox berdasarkan status Select All
+        $('.select-item').prop('checked', $(this).prop('checked'));
     });
 
     // Event listener untuk checkbox individual
-    $('.checkbox-item').not('.select-all').on('change', function () {
-        // Jika ada checkbox yang tidak ter-check, uncheck Select All
-        if (!$('.checkbox-item').not('.select-all').is(':checked')) {
+    $('.select-item').on('change', function () {
+        // Jika salah satu checkbox tidak tercentang, uncheck Select All
+        if (!$('.select-item').is(':checked')) {
             $('.select-all').prop('checked', false);
-        } else if ($('.checkbox-item').not('.select-all:checked').length === $('.checkbox-item').not('.select-all').length) {
-            // Jika semua checkbox ter-check, check Select All
+        } else if ($('.select-item:checked').length === $('.select-item').length) {
+            // Jika semua checkbox individual tercentang, check Select All
             $('.select-all').prop('checked', true);
         }
     });
@@ -73,7 +73,7 @@ $(document).on('click','#usulkanButton',function(){
 
     if(confirm('Yakin akan mengajukan ?')){
         var ids = [];
-        $('.checkbox-item').each(function(){
+        $('.select-item').each(function(){
             if($(this).is(':checked')){
                 ids.push($(this).val());
             }
@@ -93,7 +93,7 @@ $(document).on('click','#lanjutkanButton',function(){
 
 if(confirm('Yakin akan melanjutkan ?')){
     var ids = [];
-    $('.checkbox-item').each(function(){
+    $('.select-item').each(function(){
         if($(this).is(':checked')){
             ids.push($(this).val());
         }
@@ -187,7 +187,7 @@ if(confirm('Yakin akan melanjutkan ?')){
                                     <tr>
                                         <th>
                                             @if(Userhelp::get_selected_role() == 'WD1')
-                                            <input type="checkbox" class="checkbox-item" name="selectAll" value="" />
+                                            <input type="checkbox" class="checkbox-item select-all" name="selectAll" value="" />
                                             @else
                                             &nbsp;
                                             @endif
@@ -210,14 +210,14 @@ if(confirm('Yakin akan melanjutkan ?')){
                                         <td>
                                             @if(Userhelp::get_selected_role() == 'ADMINFAKULTAS')
                                             @if($u->status_usulan->keterangan == 'BARU')
-                                            <input type="checkbox" class="checkbox-item" name="ids[]" value="{{ $u->id }}" />
+                                            <input type="checkbox" class="checkbox-item select-item" name="ids[]" value="{{ $u->id }}" />
                                             @else
                                             <input type="checkbox" disabled />
                                             @endif
                                             @endif
                                             @if(Userhelp::get_selected_role() == 'WD1')
                                             @if($u->status_usulan->keterangan == 'DISETUJUI')
-                                            <input type="checkbox" class="checkbox-item" name="ids[]" value="{{ $u->id }}" />
+                                            <input type="checkbox" class="checkbox-item select-item" name="ids[]" value="{{ $u->id }}" />
                                             @else
                                             <input type="checkbox" disabled />
                                             @endif
