@@ -20,9 +20,9 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm.xls\"");
             <th rowspan="2">No</th>
             <th rowspan="2">Judul</th>
             <th colspan="5">Mahasiswa</th>
-            <th colspan="2">Dosen Pendamping</th>
             <th rowspan="2">Kegiatan</th>
             <th rowspan="2">SubKegiatan</th>
+            <th colspan="2">Dosen Pendamping</th>
             <th rowspan="2">File Proposal</th>
             <th rowspan="2">SubmittedAt</th>
         </tr>
@@ -44,15 +44,15 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm.xls\"");
             @php
             $mhs = $usulan_pkm->anggota_pkm()->where('sebagai', 0)->first()->mhs;
             @endphp
-            <td><b style="white-space: nowrap;">{{ $mhs->nama }}</span></td>
+            <td><span style="white-space: nowrap;">{{ $mhs->nama }}</span></td>
             <td><span>{{ "'". $mhs->nim }}</span></td>
             <td><span>{{ "Ketua" }}</span></td>
             <td><span>{{ $mhs->nama_fak_ijazah }}</span></td>
             <td><span>{{ $mhs->nama_forlap }}</span></td>
-            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span style="white-space: nowrap;">{{ $usulan_pkm->pegawai->glr_dpn . ' ' . $usulan_pkm->pegawai->nama . ' ' . $usulan_pkm->pegawai->glr_blkg }}</span></td>
-            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ "'". $usulan_pkm->pegawai->nidn }}</span></td>
             <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ $usulan_pkm->jenis_pkm->kategori_kegiatan->nama_kategori_kegiatan }}</span></td>
             <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ $usulan_pkm->jenis_pkm->nama_pkm }}</span></td>
+            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span style="white-space: nowrap;">{{ $usulan_pkm->pegawai->glr_dpn . ' ' . $usulan_pkm->pegawai->nama . ' ' . $usulan_pkm->pegawai->glr_blkg }}</span></td>
+            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ "'". $usulan_pkm->pegawai->nidn }}</span></td>
             <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
                 @foreach ($usulan_pkm->usulan_pkm_dokumen()->take(1)->get() as $i => $usulan_pkm_dokumen)
                 <b style="display:block;"><a href="{{ asset('storage/' . $usulan_pkm_dokumen->document_path ) }}" target="_blank">{{ 'dokumen('. ($i + 1) . ')' }}</a></span>, 
