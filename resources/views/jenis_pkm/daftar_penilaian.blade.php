@@ -137,12 +137,12 @@ function batalkan_penilaian(){
                                                 <th class="text-center align-middle" colspan="5">Mahasiswa</th>
                                                 <th class="text-center align-middle" colspan="2">Dosen Pendamping</th>
                                                 <th class="text-center align-middle" rowspan="2">File Proposal</th>
-                                                <th class="text-center align-middle" rowspan="2">SubmittedAt</th>
+                                                <th class="text-center align-middle" rowspan="2">Submitted At</th>
                                                 <th class="text-center align-middle" rowspan="2">Reviewer1</th>
                                                 <th class="text-center align-middle" rowspan="2">Reviewer2</th>
-                                                <th class="text-center align-middle" >NilaiRev1</th>
-                                                <th class="text-center align-middle" >NilaiRev2</th>
-                                                <th class="text-center align-middle" >NilaiAkhir</th>
+                                                <th class="text-center align-middle" >Nilai Rev1</th>
+                                                <th class="text-center align-middle" >Nilai Rev2</th>
+                                                <th class="text-center align-middle" >Nilai Akhir</th>
                                             </tr>
                                             <tr>
                                                 <th class="text-center align-middle">Nama</th>

@@ -152,16 +152,18 @@ if(confirm('Yakin akan melanjutkan ?')){
                             <button class="btn btn-success" id="usulkanButton" type="button">
                                 <i class="fa fa-paper-plane"></i> Usulkan
                             </button>
+                            <a class="btn btn-secondary" href="{{ route('admin.pendaftaran.report')  }}"><i class="fa fa-file"></i> Laporan LR-1</a>
                             <hr>
                             @endif
                             @if(UserHelp::get_selected_role() == 'WD1')
                             <button class="btn btn-success" id="lanjutkanButton" type="button">
                                 <i class="fa fa-paper-plane"></i> Lanjutkan
                             </button>
+                            <a class="btn btn-secondary" href="{{ route('admin.pendaftaran.report')  }}"><i class="fa fa-file"></i> Laporan LR-1</a>
                             <hr>
                             @endif
                             @if(UserHelp::get_selected_role() == 'ADMIN')
-                            <a class="btn btn-primary" href="{{ route('admin.pendaftaran.report')  }}"><i class="fa fa-file"></i> Laporan LR-1</a>
+                            <a class="btn btn-secondary" href="{{ route('admin.pendaftaran.report')  }}"><i class="fa fa-file"></i> Laporan LR-1</a>
                             <hr>
                             @endif
                             <table class="table table-striped table-bordered zero-configuration">
@@ -175,6 +177,7 @@ if(confirm('Yakin akan melanjutkan ?')){
                                         <th>Subkeg</th>
                                         <th>Pendamping</th>
                                         <th>Tgl Ajuan</th>
+                                        <th>Created By</th>
                                         <th>Status</th>
                                         <th>Aksi</th>
                                     </tr>
@@ -206,6 +209,7 @@ if(confirm('Yakin akan melanjutkan ?')){
                                         {{-- <td>{{ $u->anggota_pkm[0]->mhs->nama }}</td> --}}
                                         <td>{{ $u->pegawai->glr_dpn . " " . $u->pegawai->nama . " " . $u->pegawai->glr_blkg }}</td>
                                         <td>{{ $u->created_at->locale('id')->isoFormat('LL') }}</td>
+                                        <td>{{ $u->created_by }}</td>
                                         <td>
                                             {{-- @if(Userhelp::get_selected_role() == 'ADMIN') --}}
                                             {{-- {{ empty($u->has('reviewer')->first())?'A':'B' }} --}}

@@ -404,8 +404,7 @@ class PendaftaranController extends Controller
 		}
 		if (UserHelp::get_selected_role() == "ADMINFAKULTAS") {
 			$kode_fakultas = UserHelp::get_selected_kode_fakultas();
-			$usulan_pkm = UsulanPkm::where('created_by', UserHelp::admin_get_logged_nip())
-				->where('kode_fakultas', $kode_fakultas)
+			$usulan_pkm = UsulanPkm::where('kode_fakultas', $kode_fakultas)
 				->where('tahun', $tahun)
 				->get();
 		}
@@ -800,18 +799,33 @@ class PendaftaranController extends Controller
 	public function report(Request $request)
     {
         $tahun = date('Y');
-        
-        $jenis_pkm = JenisPkm::whereHas('usulan_pkm', function($query) use($tahun) {
+        if(UserHelp::get_selected_role() == 'ADMINFAKULTAS' || UserHelp::get_selected_role() == 'WD1'){
+			$kode_fakultas = UserHelp::get_selected_kode_fakultas();
+			$jenis_pkm = JenisPkm::whereHas('usulan_pkm', function($query) use($tahun, $kode_fakultas) {
+				$query->where('tahun', date('Y'))->where('kode_fakultas', $kode_fakultas);
+			})->orderBy('kategori_kegiatan_id')->get();
+		}else{
+			$jenis_pkm = JenisPkm::whereHas('usulan_pkm', function($query) use($tahun) {
 				$query->where('tahun', date('Y'));
 			})->orderBy('kategori_kegiatan_id')->get();
+		}
 		$usulan_pkm_list = collect(); // Inisialisasi koleksi kosong
 
 		foreach ($jenis_pkm as $jenis) { // Gunakan variabel berbeda untuk elemen loop
-			$usulan_data = UsulanPkm::where('jenis_pkm_id', $jenis->id)
-				->where('tahun', $tahun)
-				->with(['anggota_pkm.mhs', 'usulan_pkm_dokumen'])
-				->orderBy('created_at')
-				->get();
+			if(UserHelp::get_selected_role() == 'ADMINFAKULTAS' || UserHelp::get_selected_role() == 'WD1'){
+				$usulan_data = UsulanPkm::where('jenis_pkm_id', $jenis->id)
+					->where('tahun', $tahun)
+					->with(['anggota_pkm.mhs', 'usulan_pkm_dokumen'])
+					->where('kode_fakultas', $kode_fakultas)
+					->orderBy('created_at')
+					->get();
+			}else{
+				$usulan_data = UsulanPkm::where('jenis_pkm_id', $jenis->id)
+					->where('tahun', $tahun)
+					->with(['anggota_pkm.mhs', 'usulan_pkm_dokumen'])
+					->orderBy('created_at')
+					->get();
+			}
 		
 			$usulan_pkm_list = $usulan_pkm_list->merge($usulan_data); // Gabungkan data ke dalam koleksi utama
 		}
