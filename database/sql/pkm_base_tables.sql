@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS `perbaikan` (
 CREATE TABLE IF NOT EXISTS `review` (
   `id` int NOT NULL AUTO_INCREMENT,
   `usulan_pkm_id` int NOT NULL,
-  `catatan_reviewer` tinytext NOT NULL,
+  `catatan_reviewer` text NOT NULL,
   `pegawai_id` int NOT NULL,
   `status_usulan_id` int NOT NULL,
   `created_at` datetime NOT NULL,

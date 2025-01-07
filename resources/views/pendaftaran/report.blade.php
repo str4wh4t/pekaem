@@ -62,7 +62,7 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm.xls\"");
         </tr>
         @foreach ($usulan_pkm->anggota_pkm()->where('sebagai', 1)->get() as $anggota_pkm)
         <tr>
-            <td><b style="white-space: nowrap;">{{ $anggota_pkm->mhs->nama }}</span></td>
+            <td><span style="white-space: nowrap;">{{ $anggota_pkm->mhs->nama }}</span></td>
             <td><span>{{ "'". $anggota_pkm->mhs->nim }}</span></td>
             <td><span>{{ "Anggota" }}</span></td>
             <td><span>{{ $anggota_pkm->mhs->nama_fak_ijazah }}</span></td>
