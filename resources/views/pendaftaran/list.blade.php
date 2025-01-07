@@ -51,6 +51,22 @@ $(document).ready(function () {
 
     // Panggil fungsi untuk memeriksa status awal
     toggleButtonState();
+
+    $('.select-all').on('change', function () {
+        // Check/uncheck semua checkbox berdasarkan status Select All
+        $('.checkbox-item').prop('checked', $(this).prop('checked'));
+    });
+
+    // Event listener untuk checkbox individual
+    $('.checkbox-item').not('.select-all').on('change', function () {
+        // Jika ada checkbox yang tidak ter-check, uncheck Select All
+        if (!$('.checkbox-item').not('.select-all').is(':checked')) {
+            $('.select-all').prop('checked', false);
+        } else if ($('.checkbox-item').not('.select-all:checked').length === $('.checkbox-item').not('.select-all').length) {
+            // Jika semua checkbox ter-check, check Select All
+            $('.select-all').prop('checked', true);
+        }
+    });
 });
 
 $(document).on('click','#usulkanButton',function(){
@@ -169,7 +185,13 @@ if(confirm('Yakin akan melanjutkan ?')){
                             <table class="table table-striped table-bordered zero-configuration">
                                 <thead>
                                     <tr>
-                                        <th>&nbsp;</th>
+                                        <th>
+                                            @if(Userhelp::get_selected_role() == 'WD1')
+                                            <input type="checkbox" class="checkbox-item" name="selectAll" value="" />
+                                            @else
+                                            &nbsp;
+                                            @endif
+                                        </th>
                                         <th>No</th>
                                         <th>Mhs</th>
                                         <th>Judul</th>
@@ -284,6 +306,7 @@ if(confirm('Yakin akan melanjutkan ?')){
                                         <th>Subkeg</th>
                                         <th>Pendamping</th>
                                         <th>Tgl Ajuan</th>
+                                        <th>Created By</th>
                                         <th>Status</th>
                                         <th>Aksi</th>
                                     </tr>
