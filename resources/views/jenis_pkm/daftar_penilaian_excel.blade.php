@@ -63,7 +63,7 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm.xls\"");
                 @endforeach
             </td>
             <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ $usulan_pkm->created_at }}</span></td>
-            @if($usulan_pkm->status_usulan_id == 8)
+            @if($usulan_pkm->reviewer_usulan_pkm->count() > 0)
             @php
             $reviewer1 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 1)->first();
             @endphp
