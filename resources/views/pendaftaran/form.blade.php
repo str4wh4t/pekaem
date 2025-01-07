@@ -19,13 +19,39 @@
 
 let csrf = $('meta[name=csrf-token]').attr("content");
 // Default
+const countAnggotaPkm = {{ $usulan_pkm->anggota_pkm->count() }}; // Jumlah elemen awal
+const maxAnggotaPkm = 4 - countAnggotaPkm; // Maksimal jumlah elemen
 let $repeater = $('.repeater-default').repeater({
 	// isFirstItemUndeletable: true,
 	show:function(){
 		init_select();
 		$(this).show();
+		updateLabels();
+		toggleAddButton();
+	},
+	hide: function (deleteElement) {
+		$(this).remove(); 
+		updateLabels();
+		toggleAddButton();
 	}
 });
+
+// Fungsi untuk memperbarui label Reviewer
+function updateLabels() {
+	$repeater.find('[data-repeater-item]').each(function (index) {
+		$(this).find('.label-control').text('Anggota ' + (index + countAnggotaPkm));
+	});
+}
+
+// Fungsi untuk menampilkan/menyembunyikan tombol "Tambah Reviewer"
+function toggleAddButton() {
+	const itemCount = $repeater.find('[data-repeater-item]').length;
+	if (itemCount > maxAnggotaPkm) {
+		$('#add-anggotapkm').hide();
+	} else {
+		$('#add-anggotapkm').show();
+	}
+}
 
 @isset($usulan_pkm->jenis_pkm_id)
 $('#jenis').val('{{ $usulan_pkm->jenis_pkm_id }}');
@@ -129,6 +155,31 @@ function init_select(){
 			}
 	  	}
 	});
+
+	$(".cari_mhs_anggota").select2({
+		placeholder: 'Cari mhs',
+		minimumInputLength: 3,
+		width: '100%',
+	 	ajax: {
+		    url: "{{ route('admin.users.ajax', ['method' => 'cari_mhs_anggota']) }}",
+		    dataType: 'json',
+		    data: function (params){
+	      			var query = {
+	        			'text' : params.term,
+						'jenis_pkm_id' : $('#jenis_pkm').val(),
+		            	'_token' :csrf,
+	      			}
+	      		return query;
+		    },
+		    method:'POST',
+	        processResults: function (data){
+				// Transforms the top-level key of the response object from 'items' to 'results'
+				return {
+					results: data.items
+				};
+			}
+	  	}
+	});
 }
 
 $(document).on('click','#btn_ajukan',function(){
@@ -152,7 +203,13 @@ function hapus_pendaftaran(){
     return false;
 }
 
-$(document).on('change', '#kategori_kegiatan',{'_token':csrf}, function () {
+$(document).on('change', '#jenis_pkm', function () {
+	$('.cari_mhs_anggota').each(function(){
+		$(this).val(null).trigger('change');
+	});
+});
+
+$(document).on('change', '#kategori_kegiatan', {'_token':csrf}, function () {
     const kategori_kegiatan_id = $(this).val();
 	$('#jenis_pkm').empty().append('<option value="" disabled selected>Pilih Subkategori</option>');
 
@@ -161,7 +218,9 @@ $(document).on('change', '#kategori_kegiatan',{'_token':csrf}, function () {
         url: ("{{ route('share.pendaftaran.ajax', ['method' => 'get_jenis_pkm']) }}"), // Endpoint untuk mendapatkan data
 		method: 'POST', // Gunakan POST jika Anda mengirimkan data
 		data: {
-			'kategori_kegiatan_id': kategori_kegiatan_id, // Data yang dikirim
+			'kategori_kegiatan_id': kategori_kegiatan_id,
+			'mhs_nim': '{{ $mhs->nim }}', // Data yang dikirim
+			'usulan_pkm_id': '{{ @$usulan_pkm->id }}',
 			'_token': csrf // Token CSRF untuk validasi Laravel
 		},
 		method:'POST',
@@ -178,7 +237,7 @@ $(document).on('change', '#kategori_kegiatan',{'_token':csrf}, function () {
 
 			const valueToCheck = "{{ old('jenis_pkm_id', @$usulan_pkm->jenis_pkm_id) }}";
 			const isValueExists = $('#jenis_pkm option[value="'+ valueToCheck +'"]').length > 0;
-
+			
 			if (isValueExists) {
 				$('#jenis_pkm').val(valueToCheck);
 				$('#jenis_pkm').trigger('change');
@@ -189,6 +248,10 @@ $(document).on('change', '#kategori_kegiatan',{'_token':csrf}, function () {
 			@endif
         }
     });
+
+	$('.cari_mhs_anggota').each(function(){
+		$(this).val(null).trigger('change');
+	});
 });
 
 @if( old('kategori_kegiatan_id', @$usulan_pkm->kategori_kegiatan_id) != null )
@@ -336,6 +399,9 @@ $('#kategori_kegiatan').trigger('change');
 										<div class="col-md-6">
 											<div class="form-group">
 												<label for="kategori_kegiatan">Kategori</label>
+												<input type="text" id="kategori_kegiatan_text" name="kategori_kegiatan_text_id" class="form-control" value="{{ $usulan_pkm->jenis_pkm->kategori_kegiatan->nama_kategori_kegiatan }}" readonly="readonly" />
+												<input type="hidden" id="kategori_kegiatan" name="kategori_kegiatan_id" />
+												{{-- 
 												<select id="kategori_kegiatan" name="kategori_kegiatan_id" class="form-control">
 													<option value="" disabled {{ old('kategori_kegiatan_id', @$usulan_pkm->kategori_kegiatan_id ?? '') == null ? 'selected' : '' }}>Pilih kategori</option>
 													@foreach($kategori_kegiatan_list as $kategori_kegiatan)
@@ -344,6 +410,7 @@ $('#kategori_kegiatan').trigger('change');
 													</option>
 													@endforeach
 												</select>
+												--}}
 											</div>
 										</div>
 									</div>
@@ -352,9 +419,13 @@ $('#kategori_kegiatan').trigger('change');
 										<div class="col-md-6">
 											<div class="form-group">
 												<label for="jenis_pkm">Jenis</label>
+												<input type="text" id="jenis_pkm_text" name="jenis_pkm_text_id" class="form-control" value="{{ $usulan_pkm->jenis_pkm->nama_pkm }}" readonly="readonly" >
+												<input type="hidden" id="jenis_pkm" name="jenis_pkm_id" />
+												{{--
 												<select id="jenis_pkm" name="jenis_pkm_id" class="form-control">
 													<option value="" disabled selected>Pilih subkategori</option>
 												</select>
+												--}}
 											</div>
 										</div>
 									</div>
@@ -373,11 +444,12 @@ $('#kategori_kegiatan').trigger('change');
 									</div>
 
 									@isset($usulan_pkm->anggota_pkm)
+										@php($j = 1)
 										@forelse($usulan_pkm->anggota_pkm as $anggota)
 										@continue($anggota->sebagai == 0)
 										<div class="row">
 											<div class="col-md-3">
-												<label class="label-control" for="nim">Anggota</label>
+												<label class="label-control" for="nim">Anggota {{ $j }}</label>
 											</div>
 											<div class="col-md-7">
 												<div class="form-group">
@@ -393,33 +465,35 @@ $('#kategori_kegiatan').trigger('change');
 											</div>
 											@endif
 										</div>
+										@php($j++)
 										@empty
 
 										@endforelse
 									@endisset
 
+									@if($usulan_pkm->anggota_pkm->count() < 5)
 									<div class="form-group repeater-default">
-
+										<input type="hidden" name="list_nim" value="" />
 		                                <div data-repeater-list="list_nim">
 		                                    <div class="row" data-repeater-item>
 												<div class="col-md-3">
-													<label class="label-control" for="nim">Anggota</label>
+													<label class="label-control" for="nim">Anggota {{ $usulan_pkm->anggota_pkm->count() }}</label>
 												</div>
 												<div class="col-md-7">
 													<div class="form-group">
-														<select id="" class="form-control cari_mhs" placeholder="Cari mhs" name="nim"></select>
+														<select id="" class="form-control cari_mhs_anggota" placeholder="Cari mhs" name="nim"></select>
 													</div>
 												</div>
 												<div class="col-md-2">
 													<button class="btn btn-danger" type="button" data-repeater-delete><i class="ft-x"></i></button>
 												</div>
 											</div>
-
 		                                </div>
-		                                <button type="button" data-repeater-create class="btn btn-primary">
+		                                <button type="button" data-repeater-create id="add-anggotapkm" style="{{ $usulan_pkm->anggota_pkm->count() > 3 ? 'display: none' : ''}}" class="btn btn-primary">
 		                                    <i class="ft-plus"></i> Tambah Anggota
 		                                </button>
 		                            </div>
+									@endif
 
 									<h4 class="form-section"><i class="ft-file"></i> Berkas Proposal</h4>
 
@@ -542,11 +616,11 @@ $('#kategori_kegiatan').trigger('change');
 								<div class="form-actions">
 									@isset($usulan_pkm->status_usulan->keterangan)
 										@if(@$usulan_pkm->status_usulan->keterangan == "BARU")
-											<button type="button" class="btn btn-success" id="btn_ajukan" data-id="{{ $usulan_pkm->id }}">
-												<i class="fa fa-share-square-o"></i> Ajukan
-											</button>
                                             <button type="submit" class="btn btn-primary">
 												<i class="fa fa-check-square-o"></i> Save
+											</button>
+											<button type="button" class="btn btn-success" id="btn_ajukan" data-id="{{ $usulan_pkm->id }}">
+												<i class="fa fa-share-square-o"></i> Ajukan
 											</button>
                                             <a class="btn btn-danger" onclick="return hapus_pendaftaran()" href="{{ route('admin.pendaftaran.hapus',['uuid' => $usulan_pkm->uuid])  }}">
 												<i class="fa fa-trash-o"></i> Hapus

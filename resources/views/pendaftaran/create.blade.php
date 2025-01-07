@@ -21,13 +21,38 @@
 
 let csrf = $('meta[name=csrf-token]').attr("content");
 // Default
+const maxAnggotaPkm = 4; // Maksimal jumlah elemen
 let $repeater = $('.repeater-default').repeater({
 	// isFirstItemUndeletable: true,
 	show:function(){
 		init_select();
 		$(this).show();
+		updateLabels();
+		toggleAddButton();
+	},
+	hide: function (deleteElement) {
+		$(this).remove(); 
+		updateLabels();
+		toggleAddButton();
 	}
 });
+
+// Fungsi untuk memperbarui label Reviewer
+function updateLabels() {
+	$repeater.find('[data-repeater-item]').each(function (index) {
+		$(this).find('.label-control').text('Anggota ' + (index + 1));
+	});
+}
+
+// Fungsi untuk menampilkan/menyembunyikan tombol "Tambah Reviewer"
+function toggleAddButton() {
+	const itemCount = $repeater.find('[data-repeater-item]').length;
+	if (itemCount >= maxAnggotaPkm) {
+		$('#add-anggotapkm').hide();
+	} else {
+		$('#add-anggotapkm').show();
+	}
+}
 
 @isset($usulan_pkm->jenis_pkm_id)
 $('#jenis').val('{{ $usulan_pkm->jenis_pkm_id }}');
@@ -131,6 +156,31 @@ function init_select(){
 	  	}
 	});
 
+	$(".cari_mhs_anggota").select2({
+		placeholder: 'Cari mhs',
+		minimumInputLength: 3,
+		width: '100%',
+	 	ajax: {
+		    url: "{{ route('admin.users.ajax', ['method' => 'cari_mhs_anggota']) }}",
+		    dataType: 'json',
+		    data: function (params){
+	      			var query = {
+	        			'text' : params.term,
+						'jenis_pkm_id' : $('#jenis_pkm').val(),
+		            	'_token' :csrf,
+	      			}
+	      		return query;
+		    },
+		    method:'POST',
+	        processResults: function (data){
+				// Transforms the top-level key of the response object from 'items' to 'results'
+				return {
+					results: data.items
+				};
+			}
+	  	}
+	});
+
 	$(".cari_mhs_modal").select2({
 		dropdownParent: $('#modalPilih'),
 		placeholder: 'Cari...',
@@ -178,6 +228,12 @@ function hapus_pendaftaran(){
     return false;
 }
 
+$(document).on('change', '#jenis_pkm', function () {
+	$('.cari_mhs_anggota').each(function(){
+		$(this).val(null).trigger('change');
+	});
+});
+
 $(document).on('change', '#kategori_kegiatan',{'_token':csrf}, function () {
     const kategori_kegiatan_id = $(this).val();
 	$('#jenis_pkm').empty().append('<option value="" disabled selected>Pilih Subkategori</option>');
@@ -188,6 +244,7 @@ $(document).on('change', '#kategori_kegiatan',{'_token':csrf}, function () {
 		method: 'POST', // Gunakan POST jika Anda mengirimkan data
 		data: {
 			'kategori_kegiatan_id': kategori_kegiatan_id, // Data yang dikirim
+			'mhs_nim': '{{ $mhs->nim }}', // Data yang dikirim
 			'_token': csrf // Token CSRF untuk validasi Laravel
 		},
 		method:'POST',
@@ -215,6 +272,10 @@ $(document).on('change', '#kategori_kegiatan',{'_token':csrf}, function () {
 			@endif
         }
     });
+
+	$('.cari_mhs_anggota').each(function(){
+		$(this).val(null).trigger('change');
+	});
 });
 
 $(document).ready(function () {
@@ -227,8 +288,8 @@ $(document).ready(function () {
 
 @if( old('kategori_kegiatan_id', @$usulan_pkm->kategori_kegiatan_id) != null )
 $('#kategori_kegiatan').val("{{ old('kategori_kegiatan_id', @$usulan_pkm->kategori_kegiatan_id) }}");
-$('#kategori_kegiatan').trigger('change');
 @endif
+$('#kategori_kegiatan').trigger('change');
 
 </script>
 <!-- END PAGE LEVEL JS-->
@@ -406,7 +467,7 @@ $('#kategori_kegiatan').trigger('change');
 											</div>
 										</div>
 									</div>
-
+									{{--
 									@isset($usulan_pkm->anggota_pkm)
 										@forelse($usulan_pkm->anggota_pkm as $anggota)
 										@continue($anggota->sebagai == 0)
@@ -432,17 +493,18 @@ $('#kategori_kegiatan').trigger('change');
 
 										@endforelse
 									@endisset
+									--}}
 
 									<div class="form-group repeater-default">
-
+										<input type="hidden" name="list_nim" value="" />
 		                                <div data-repeater-list="list_nim">
 		                                    <div class="row" data-repeater-item>
 												<div class="col-md-3">
-													<label class="label-control" for="nim">Anggota</label>
+													<label class="label-control" for="nim">Anggota 1</label>
 												</div>
 												<div class="col-md-7">
 													<div class="form-group">
-														<select id="" class="form-control cari_mhs" placeholder="Cari mhs" name="nim"></select>
+														<select id="" class="form-control cari_mhs_anggota" placeholder="Cari mhs" name="nim"></select>
 													</div>
 												</div>
 												<div class="col-md-2">
@@ -451,7 +513,7 @@ $('#kategori_kegiatan').trigger('change');
 											</div>
 
 		                                </div>
-		                                <button type="button" data-repeater-create class="btn btn-primary">
+		                                <button type="button" data-repeater-create id="add-anggotapkm" class="btn btn-primary">
 		                                    <i class="ft-plus"></i> Tambah Anggota
 		                                </button>
 		                            </div>

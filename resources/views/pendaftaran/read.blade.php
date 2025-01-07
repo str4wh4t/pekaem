@@ -31,8 +31,8 @@ let $repeater = $('.repeater-default').repeater({
 	},
 	hide: function (deleteElement) {
 		$(this).remove(); 
+		updateLabels();
 		toggleAddButton();
-		console.log('hide');
 	}
 });
 

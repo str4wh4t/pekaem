@@ -56,17 +56,46 @@ class PendaftaranController extends Controller
 
 		// $usulan_pkm->save();
 		$id = '';
+		$usulan_pkm = null;
 		if (!empty($request->id)) {
+			// IF EDIT
+			$usulan_pkm = UsulanPkm::where('uuid', $request->id)->first();
+			$id = $usulan_pkm->id;
+
+			$anggota_pkm_existing = $usulan_pkm->anggota_pkm->count() - 1;
+
+			$max_anggota = 4;
+			$max_anggota_valid = $max_anggota - $anggota_pkm_existing;
+
+			$min_anggota = 2;
+			$min_anggota_valid = $anggota_pkm_existing > $min_anggota ? 0 : $min_anggota - $anggota_pkm_existing;
+
+			$required = '';
+			if($usulan_pkm->anggota_pkm->count() == 1){
+				$required = 'required|array';
+			}
+
 			$request->validate([
 				'judul'	=> 'required|min:5|max:500',
 				'kategori_kegiatan_id'	=> 'required|exists:kategori_kegiatan,id',
 				'jenis_pkm_id'	=> 'required|exists:jenis_pkm,id',
 				'berkas.*' => 'file|mimes:pdf|max:5120', // Validasi setiap file dalam array
 				'pegawai_id'	=> 'required',
+				'list_nim' => $required . '|min:'. $min_anggota_valid .'|max:' . $max_anggota_valid,
+				'list_nim.*.nim' => 'required|distinct',
+			], [
+				'list_nim.required' => 'Anggota harus ditambahkan.',
+				'list_nim.min' => 'Min. 2 anggota yang ditambahkan.',
+				'list_nim.max' => 'Max. 4 anggota yang ditambahkan.',
+				'list_nim.*.nim.distinct' => 'Setiap anggota harus memiliki NIM yang unik.', // Pesan error kustom
+				'list_nim.*.nim.required' => 'NIM wajib diisi untuk setiap anggota.',
 			]);
-			$id = UsulanPkm::where('uuid', $request->id)->first()->id;
-		}
-		if (empty($id)) {
+
+			if ($usulan_pkm->created_by != UserHelp::admin_get_logged_nip()) {
+				return redirect()->back()->with('message', 'Dilarang mengubah usulan.');
+			}
+		}else{
+			// IF NEW
 			$request->validate([
 				'mhs_nim'	=> 'required',
 				'judul'	=> 'required|min:5|max:500',
@@ -75,23 +104,23 @@ class PendaftaranController extends Controller
 				'berkas' => 'required|array', // Pastikan 'berkas' adalah array
 				'berkas.*' => 'file|mimes:pdf|max:5120', // Validasi setiap file dalam array
 				'pegawai_id'	=> 'required',
+				'list_nim' => 'required|array|min:2|max:4',
+				'list_nim.*.nim' => 'required|distinct',
+			], [
+				'list_nim.required' => 'Anggota harus ditambahkan.',
+				'list_nim.min' => 'Min. 2 anggota yang ditambahkan.',
+				'list_nim.max' => 'Max. 4 anggota yang ditambahkan.',
+				'list_nim.*.nim.distinct' => 'Setiap anggota harus memiliki NIM yang unik.', // Pesan error kustom
+				'list_nim.*.nim.required' => 'NIM wajib diisi untuk setiap anggota.',
 			]);
 
-			/// IF NEW
+			// IF NEW
 			$usulan_pkm = new UsulanPkm;
 			// $usulan_pkm->mhs_nim = UserHelp::mhs_get_logged_nim();
 			$usulan_pkm->mhs_nim = $request->mhs_nim;
 			$usulan_pkm->uuid = Uuid::generate();
 			$usulan_pkm->kode_fakultas = UserHelp::get_selected_kode_fakultas();
 			$usulan_pkm->status_usulan_id = StatusUsulan::where('keterangan', 'BARU')->first()->id;
-		} else {
-			/// IF EDIT
-			$usulan_pkm = UsulanPkm::findOrFail($id);
-			if ($usulan_pkm->created_by != UserHelp::admin_get_logged_nip()) {
-				return redirect()->back()->with('message', 'Dilarang mengubah usulan.');
-			}
-			// $anggota_pkm_old = AnggotaPkm::where('usulan_pkm_id',$id);
-			// $anggota_pkm_old->delete();
 		}
 
 		$usulan_pkm->judul = $request->judul;
@@ -375,7 +404,44 @@ class PendaftaranController extends Controller
 
 	private function _get_jenis_pkm(Request $request)
 	{
-		$jenis_pkm_list = JenisPkm::where('kategori_kegiatan_id', $request->kategori_kegiatan_id)->get();
+		$tahun = date('Y');
+		$usulan_pkm_id = $request->usulan_pkm_id;
+		$usulan_pkm_selected = null;
+		if($usulan_pkm_id){
+			$kamar_taken = JenisPkm::whereHas('usulan_pkm', function (Builder $query) use ($request, $tahun) {
+									$query->where('mhs_nim', $request->mhs_nim)
+										->where('tahun', $tahun);
+								})->where('kategori_kegiatan_id', $request->kategori_kegiatan_id)
+								->distinct('kamar') // Membuat hasil distinct berdasarkan kolom 'kamar'
+								->pluck('kamar');
+			$usulan_pkm_selected = UsulanPkm::where('id', $usulan_pkm_id)->firstOrFail();
+		}else{
+			$kamar_taken = JenisPkm::whereHas('usulan_pkm', function (Builder $query) use ($request, $tahun) {
+									$query->where('mhs_nim', $request->mhs_nim)
+										->where('tahun', $tahun);
+								})->where('kategori_kegiatan_id', $request->kategori_kegiatan_id)
+								->distinct('kamar') // Membuat hasil distinct berdasarkan kolom 'kamar'
+								->pluck('kamar');
+		}
+		$jenis_pkm_list = JenisPkm::where('kategori_kegiatan_id', $request->kategori_kegiatan_id)
+										->whereNotIn('kamar', $kamar_taken)
+										->get();
+		
+		if(!empty($usulan_pkm_selected)){
+			if($usulan_pkm_selected->jenis_pkm->kategori_kegiatan_id == $request->kategori_kegiatan_id){
+				$jenis_pkm_list = $jenis_pkm_list instanceof Illuminate\Support\Collection
+								? $jenis_pkm_list
+								: collect($jenis_pkm_list);
+
+				// Tambahkan $jenis_pkm ke dalam $jenis_pkm_list
+				$jenis_pkm_list = $jenis_pkm_list->merge([$usulan_pkm_selected->jenis_pkm]);
+
+				// Hapus item duplikat jika diperlukan
+				$jenis_pkm_list = $jenis_pkm_list->unique('id');
+			}
+			
+
+		}
 		$this->_data['jenis_pkm_list'] = $jenis_pkm_list;
 
 		return $this->_data;
@@ -461,6 +527,7 @@ class PendaftaranController extends Controller
 
 	public function add()
 	{
+		return redirect()->route('share.pendaftaran.list')->with('message', 'Fitur ini ditutup.');
 		$jenis_pkm = JenisPkm::all()->sortBy("id");
 		$kategori_kegiatan_list = KategoriKegiatan::all()->sortBy("id");
 		$status_usulan = StatusUsulan::all()->sortBy("id");

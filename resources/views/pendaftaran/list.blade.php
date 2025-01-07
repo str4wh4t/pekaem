@@ -186,7 +186,7 @@ if(confirm('Yakin akan melanjutkan ?')){
                                 <thead>
                                     <tr>
                                         <th>
-                                            @if(Userhelp::get_selected_role() == 'WD1')
+                                            @if(Userhelp::get_selected_role() == 'ADMINFAKULTAS' || Userhelp::get_selected_role() == 'WD1' || Userhelp::get_selected_role() == 'ADMIN')
                                             <input type="checkbox" class="checkbox-item select-all" name="selectAll" value="" />
                                             @else
                                             &nbsp;

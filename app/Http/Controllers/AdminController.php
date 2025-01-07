@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Fakultas;
 use App\Helpers\User as UserHelp;
 use App\PegawaiRoles;
+use App\AnggotaPkm;
 use App\Roles;
 use App\Pegawai;
 use App\Reviewer;
 use App\JenisPkm;
+use App\UsulanPkm;
 use App\Mhs;
 use App\Http\Controllers\Controller;
 use App\KriteriaPenilaian;
@@ -191,20 +193,60 @@ class AdminController extends Controller
                 $query->where('nim', 'LIKE', '%' . $request->text . '%')
                     ->orWhere('nama', 'LIKE', '%' . $request->text . '%');
                     
-            })
+                })
                 ->where('kode_fakultas', $kode_fakultas)
                 ->where('status_terakhir', 'Aktif')
-                ->whereDoesntHave('anggota_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
-                    $query->whereHas('usulan_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
-                        $query->where('usulan_pkm.tahun', $tahun)
-                            ->whereHas('jenis_pkm', function (Builder $query) use ($request, $jenis_pkm) {
-                                if(!empty($jenis_pkm)){
-                                    $query->where('jenis_pkm.kamar', '!=', $jenis_pkm->kamar);
-                                }
-                            });
-                    }); 
-                })
+                // ->whereDoesntHave('anggota_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
+                //     $query->whereHas('usulan_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
+                //         $query->where('usulan_pkm.tahun', $tahun)
+                //             ->whereHas('jenis_pkm', function (Builder $query) use ($request, $jenis_pkm) {
+                //                 if(!empty($jenis_pkm)){
+                //                     $query->where('jenis_pkm.kamar', '!=', $jenis_pkm->kamar);
+                //                 }
+                //             });
+                //     }); 
+                // })
                 ->get(['nim AS id', DB::raw('CONCAT(nama," ","[",nim,"]"," ","[",nama_forlap,"]"," ","[",nama_fak_ijazah,"]") as text')]);
+        }
+
+        $this->_data['items'] = $mhs;
+
+        return $this->_data;
+    }
+
+    private function _cari_mhs_anggota(Request $request)
+    {
+        // dd($request->role);
+        $mhs = [];
+        $tahun = date('Y');
+        $usulan_pkm_id = $request->usulan_pkm_id;
+        $jenis_pkm = JenisPkm::find($request->jenis_pkm_id);
+        $mhs = [];
+        if(!empty($jenis_pkm)){
+            if (UserHelp::get_selected_role() == "ADMINFAKULTAS") {
+                $kode_fakultas = UserHelp::get_selected_kode_fakultas();
+                if($usulan_pkm_id){
+    
+                }else{
+
+                    $mhs = Mhs::where(function ($query) use ($request, $kode_fakultas) {
+                        $query->where('nim', 'LIKE', '%' . $request->text . '%')
+                            ->orWhere('nama', 'LIKE', '%' . $request->text . '%');
+                        })
+                        ->where('kode_fakultas', $kode_fakultas)
+                        ->where('status_terakhir', 'Aktif')
+                        ->whereDoesntHave('anggota_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
+                            $query->whereHas('usulan_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
+                                $query->where('usulan_pkm.tahun', $tahun)
+                                    ->whereHas('jenis_pkm', function (Builder $query) use ($request, $jenis_pkm) {
+                                        $query->where('jenis_pkm.kamar', $jenis_pkm->kamar)
+                                            ->where('jenis_pkm.kategori_kegiatan_id', $jenis_pkm->kategori_kegiatan_id);
+                                    });
+                            }); 
+                        })
+                        ->get(['nim AS id', DB::raw('CONCAT(nama," ","[",nim,"]"," ","[",nama_forlap,"]"," ","[",nama_fak_ijazah,"]") as text')]);
+                }
+            }
         }
 
         $this->_data['items'] = $mhs;
