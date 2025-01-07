@@ -39,7 +39,7 @@
             </div> --}}
          </div>
          <!-- project-info -->
-         <div id="project-info" class="card-body row">
+         <div id="project-info" class="card-body row p-0">
             <div class="project-info-count col-lg-3 col-md-12">
                <div class="project-info-icon">
                   <h2><?= $usulan_pkm_total ?></h2>
