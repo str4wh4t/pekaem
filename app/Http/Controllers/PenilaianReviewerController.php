@@ -228,7 +228,6 @@ class PenilaianReviewerController extends Controller
             'catatan_reviewer' => [
                 'required',
                 'string',
-                'max:255',
                 function ($attribute, $value, $fail) {
                     $wordCount = str_word_count($value);
                     if ($wordCount < 40) {
