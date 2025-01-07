@@ -307,6 +307,9 @@ $("#fakultas").select2({
                                         <td>
                                             @foreach($pegawai->pegawai_roles as $pegawai_role)
                                                 @if($pegawai_role->roles->role == 'PEMBIMBING')
+                                                @php
+                                                    continue;
+                                                @endphp
                                                 {!! '[ ' . $pegawai_role->roles->role . ' ] ' !!}
                                                 @elseif($pegawai_role->roles->role == 'ADMINFAKULTAS' || $pegawai_role->roles->role == 'WD1')
                                                 {!! '[ ' . $pegawai_role->roles->role . ' <small>('. $pegawai_role->fakultas->nama_fak_ijazah .')</small> <a href="#" class="del_role" data-pegawai="'. $pegawai->id .'" data-role="'. $pegawai_role->roles->id .'"><i class="fa fa-times" ></i></a> ] ' !!}

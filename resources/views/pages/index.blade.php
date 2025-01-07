@@ -76,14 +76,15 @@
          </div>
          <!-- project-info -->
          <div class="card-body">
+            @foreach($kategori_kegiatan_list as $kategori_kegiatan)
             <div class="card-subtitle line-on-side text-muted text-center font-small-3 mx-2 my-1">
-               <span>Rasio Usulan PKM</span>
+               <span>Rasio Usulan {{ $kategori_kegiatan->nama_kategori_kegiatan }}</span>
             </div>
             <div class="row py-2">
-               @foreach($jenis_pkm as $jenis_pkm_row)
-               <div class="col-lg-3 col-md-12 py-2">
+               @foreach($kategori_kegiatan->jenis_pkm as $jenis_pkm_row)
+               <div class="col-lg-2 col-md-6">
                   <div class="insights px-2">
-                     <div><span class="text-info h3">{{ count($usulan_pkm->where('jenis_pkm_id',$jenis_pkm_row->id)) }}</span> <span class="float-right">{{ $jenis_pkm_row->nama_pkm }}</span></div>
+                     <div><span class="text-info h3 ">{{ count($usulan_pkm->where('jenis_pkm_id',$jenis_pkm_row->id)) }}</span> <span class="float-right">{{ $jenis_pkm_row->nama_pkm }}</span></div>
                      <div class="progress progress-md mt-1 mb-0">
                          @if(!empty($usulan_pkm_total))
                          <div class="progress-bar bg-info" role="progressbar" style="width: {{ round((count($usulan_pkm->where('jenis_pkm_id',$jenis_pkm_row->id))/$usulan_pkm_total)*100,2) }}%" aria-valuenow="{{ round((count($usulan_pkm->where('jenis_pkm_id',$jenis_pkm_row->id))/$usulan_pkm_total)*100,2) }}" aria-valuemin="0" aria-valuemax="100">
@@ -97,6 +98,7 @@
                </div>
                @endforeach
             </div>
+            @endforeach
          </div>
       </div>
    </div>

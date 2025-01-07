@@ -8,6 +8,7 @@ use App\StatusUsulan;
 use App\JenisPkm;
 use Illuminate\Http\Request;
 use App\Helpers\User as UserHelp;
+use App\KategoriKegiatan;
 use App\Pegawai;
 
 class PagesController extends Controller
@@ -49,7 +50,7 @@ class PagesController extends Controller
         $this->_data['usulan_pkm_sudah_dinilai'] = count(UsulanPkm::where('status_usulan_id', StatusUsulan::where('keterangan', 'SUDAH_DINILAI')->first()->id)->get());
         $this->_data['usulan_pkm_belum_dinilai'] = count(UsulanPkm::where('status_usulan_id', StatusUsulan::where('keterangan', 'BELUM_DINILAI')->first()->id)->get());
 
-        $this->_data['jenis_pkm'] = JenisPkm::all();
+        $this->_data['kategori_kegiatan_list'] = KategoriKegiatan::all();
         $this->_data['usulan_pkm'] = UsulanPkm::all();
 
         return view('pages.index', $this->_data);

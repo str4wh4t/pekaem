@@ -480,26 +480,6 @@ $(document).on('click','#btn_gagal',function(){
 
 									</div>
 
-									{{-- <div class="form-group">
-										<label>Upload Files</label>
-										<label id="file" class="file center-block">
-											<input type="file" id="file" name="berkas[]" multiple>
-											<span class="file-custom"></span>
-										</label>
-									</div> --}}
-
-									@isset($files_to_show)
-									<div>File yang telah disimpan :</div>
-									<hr>
-									@forelse ($files_to_show as $d => $file)
-				                        <div class="alert alert-warning">
-											<a href="{{ asset('storage/' . $file->document_path ) }}" target="_blank">{{ 'dokumen('. ($d + 1) . ')' }}</a>
-										</div>
-				                    @empty
-				                    	<div class="alert alert-danger">Anda belum memiliki berkas untuk diverifikasi.</div>
-				                    @endforelse
-				                    @endisset
-
 									<h4 class="form-section"><i class="ft-user"></i> Anggota PKM</h4>
 
 									<div class="row">
@@ -558,7 +538,29 @@ $(document).on('click','#btn_gagal',function(){
 		                                </button>
 		                            </div> --}}
 
-		                            <h4 class="form-section"><i class="ft-user"></i> Pembimbing PKM</h4>
+									<h4 class="form-section"><i class="ft-file"></i> Berkas Proposal</h4>
+
+									{{-- <div class="form-group">
+										<label>Upload Files</label>
+										<label id="file" class="file center-block">
+											<input type="file" id="file" name="berkas[]" multiple>
+											<span class="file-custom"></span>
+										</label>
+									</div> --}}
+
+									@isset($files_to_show)
+									<div>File yang telah disimpan :</div>
+									<hr>
+									@forelse ($files_to_show as $d => $file)
+										<div class="alert alert-warning">
+											<a href="{{ asset('storage/' . $file->document_path ) }}" target="_blank">{{ 'dokumen('. ($d + 1) . ')' }}</a>
+										</div>
+									@empty
+										<div class="alert alert-danger">Anda belum memiliki berkas untuk diverifikasi.</div>
+									@endforelse
+									@endisset
+
+		                            <h4 class="form-section"><i class="ft-user"></i> Pendamping</h4>
 									<div class="input-group">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="ft-search"></i></span>
@@ -569,7 +571,7 @@ $(document).on('click','#btn_gagal',function(){
 
 									<br>
 									{{--
-                                    <h4 class="form-section"><i class="fa fa-pencil"></i> Catatan Pembimbing</h4>
+                                    <h4 class="form-section"><i class="fa fa-pencil"></i> Catatan Pendamping</h4>
                                     @forelse ($usulan_pkm->revisi as $revisi)
 				                        <div class="alert {{ $revisi->status_usulan->keterangan == "DITOLAK" ? "alert-warning" : "alert-success" }}">
 				                        	{!! '<b>STATUS :</b> '. $revisi->status_usulan->keterangan .' , <b>Catatan :</b> '.  $revisi->catatan_pembimbing .' <b>[ Pada : '. $revisi->created_at .' ]</b>' !!}
@@ -739,7 +741,7 @@ $(document).on('click','#btn_gagal',function(){
 											<i class="fa fa-thumbs-up" ></i> Lanjutkan
 										</button>
 										<button class="btn btn-danger" id="btn_gagal_lanjut" type="button">
-											<i class="fa fa-thumbs-down" ></i> Kebalikan
+											<i class="fa fa-thumbs-down" ></i> Kembalikan
 										</button>
 										@else
 										<div class="alert alert-warning">

@@ -49,6 +49,7 @@ Route::get('admin/pendaftaran/ploting/reviewer', 'PendaftaranController@ploting_
 Route::get('admin/pendaftaran/ploting/list', 'PendaftaranController@ploting_reviewer')->name('admin.pendaftaran.ploting.list');
 Route::get('admin/pembimbing/list', 'AdminController@list_pembimbing')->name('admin.pembimbing.list');
 Route::get('admin/reviewer/list', 'AdminController@list_reviewer')->name('admin.reviewer.list');
+Route::get('admin/pendaftaran/report', 'PendaftaranController@report')->name('admin.pendaftaran.report');
 
 Route::get('sso/login', 'SsoController@login')->name('sso.login');
 Route::get('sso/logout', 'SsoController@logout')->name('sso.logout');

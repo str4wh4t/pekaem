@@ -8,6 +8,7 @@ use App\PegawaiRoles;
 use App\Roles;
 use App\Pegawai;
 use App\Reviewer;
+use App\JenisPkm;
 use App\Mhs;
 use App\Http\Controllers\Controller;
 use App\KriteriaPenilaian;
@@ -24,7 +25,9 @@ class AdminController extends Controller
     {
         // $pegawai_roles = PegawaiRoles::all()->sortBy("pegawai_id");
         $roles = Roles::all()->where('id', '!=', 1)->where('id', '!=', 3)->sortBy("id"); /// EXCEPT SUPER
-        $pegawai_has_role = Pegawai::wherehas('roles')->with('pegawai_roles.roles')->get();
+        $pegawai_has_role = Pegawai::whereHas('roles', function ($query) {
+                                    $query->where('role', '!=', 'PEMBIMBING'); // Kondisi untuk mengecualikan role "PEMBIMBING"
+                                })->with('pegawai_roles.roles')->get();
         // dd($pegawai_has_role);
         $this->_data['roles'] = $roles;
         $this->_data['pegawai_has_role'] = $pegawai_has_role;
@@ -181,6 +184,7 @@ class AdminController extends Controller
         // dd($request->role);
         $mhs = [];
         $tahun = date('Y');
+        $jenis_pkm = JenisPkm::find($request->jenis_pkm_id);
         if (UserHelp::get_selected_role() == "ADMINFAKULTAS") {
             $kode_fakultas = UserHelp::get_selected_kode_fakultas();
             $mhs = Mhs::where(function ($query) use ($request, $kode_fakultas) {
@@ -190,9 +194,14 @@ class AdminController extends Controller
             })
                 ->where('kode_fakultas', $kode_fakultas)
                 ->where('status_terakhir', 'Aktif')
-                ->whereDoesntHave('anggota_pkm', function (Builder $query) use ($request, $tahun) {
-                    $query->whereHas('usulan_pkm', function (Builder $query) use ($request, $tahun) {
-                        $query->where('usulan_pkm.tahun', $tahun);
+                ->whereDoesntHave('anggota_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
+                    $query->whereHas('usulan_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
+                        $query->where('usulan_pkm.tahun', $tahun)
+                            ->whereHas('jenis_pkm', function (Builder $query) use ($request, $jenis_pkm) {
+                                if(!empty($jenis_pkm)){
+                                    $query->where('jenis_pkm.kamar', '!=', $jenis_pkm->kamar);
+                                }
+                            });
                     }); 
                 })
                 ->get(['nim AS id', DB::raw('CONCAT(nama," ","[",nim,"]"," ","[",nama_forlap,"]"," ","[",nama_fak_ijazah,"]") as text')]);
@@ -234,6 +243,7 @@ class AdminController extends Controller
     //
     public function list_pembimbing()
     {
+        $tahun = date('Y');
         // $pegawai_roles = PegawaiRoles::all()->sortBy("pegawai_id");
         if (UserHelp::get_selected_role() == 'PEMBIMBING') {
             $pembimbing = Pegawai::where('nip', UserHelp::admin_get_logged_nip())->get();
@@ -242,6 +252,9 @@ class AdminController extends Controller
                 ->where('status', '1') // HANYA AKTIF
                 ->whereHas('roles', function (Builder $query) {
                     $query->where('roles.role', 'PEMBIMBING');
+                })
+                ->whereHas('usulan_pkm', function (Builder $query) use ($tahun) {
+                    $query->where('usulan_pkm.tahun', $tahun);
                 })
                 ->get();
         }
@@ -254,8 +267,11 @@ class AdminController extends Controller
 
     public function list_reviewer()
     {
+        $tahun = date('Y');
         // $pegawai_roles = PegawaiRoles::all()->sortBy("pegawai_id");
-        $reviewer = Reviewer::whereHas('usulan_pkm')
+        $reviewer = Reviewer::whereHas('usulan_pkm', function (Builder $query) use ($tahun) {
+            $query->where('usulan_pkm.tahun', $tahun);
+        })
             ->get();
 
         $this->_data['reviewer'] = $reviewer;

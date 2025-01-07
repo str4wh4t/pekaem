@@ -124,7 +124,7 @@ function batalkan_penilaian(){
                                 <b>Kategori Kriteria : </b> {{ $jenis_pkm->kategori_kriteria->nama_kategori_kriteria }}
                             </div>
                             <div class="block mb-1">
-                                <a class="btn btn-primary" href="{{ route('jenis-pkm.daftar-penilaian-excel', ['kategori_kegiatan' => $jenis_pkm->kategori_kegiatan,'jenis_pkm' => $jenis_pkm]) }}"><i class="fa fa-file-excel-o"></i> Download Excel</a>
+                                <a class="btn btn-primary" href="{{ route('jenis-pkm.daftar-penilaian-excel', ['kategori_kegiatan' => $jenis_pkm->kategori_kegiatan,'jenis_pkm' => $jenis_pkm]) }}"><i class="fa fa-file"></i> Laporan LR-2</a>
                             </div>
 								<div class="form-body">
                                     
@@ -134,21 +134,27 @@ function batalkan_penilaian(){
                                             <tr>
                                                 <th class="text-center align-middle" rowspan="2">No</th>
                                                 <th class="text-center align-middle" rowspan="2">Judul</th>
-                                                <th class="text-center align-middle" colspan="3">Mahasiswa</th>
-                                                <th class="text-center align-middle" rowspan="2">Fakultas</th>
+                                                <th class="text-center align-middle" colspan="5">Mahasiswa</th>
                                                 <th class="text-center align-middle" colspan="2">Dosen Pendamping</th>
                                                 <th class="text-center align-middle" rowspan="2">File Proposal</th>
                                                 <th class="text-center align-middle" rowspan="2">SubmittedAt</th>
-                                                <th class="text-center align-middle" rowspan="2">Nilai1</th>
-                                                <th class="text-center align-middle" rowspan="2">Nilai2</th>
-                                                <th class="text-center align-middle" rowspan="2">NilaiAkhir</th>
+                                                <th class="text-center align-middle" rowspan="2">Reviewer1</th>
+                                                <th class="text-center align-middle" rowspan="2">Reviewer2</th>
+                                                <th class="text-center align-middle" >NilaiRev1</th>
+                                                <th class="text-center align-middle" >NilaiRev2</th>
+                                                <th class="text-center align-middle" >NilaiAkhir</th>
                                             </tr>
                                             <tr>
                                                 <th class="text-center align-middle">Nama</th>
                                                 <th class="text-center align-middle">NIM</th>
                                                 <th class="text-center align-middle">Jabatan</th>
+                                                <th class="text-center align-middle" >Fakultas</th>
+                                                <th class="text-center align-middle" >Prodi</th>
                                                 <th class="text-center align-middle">Nama</th>
                                                 <th class="text-center align-middle">NIDN</th>
+                                                <th class="text-center align-middle">a</th>
+                                                <th class="text-center align-middle">b</th>
+                                                <th class="text-center align-middle">(a+b)/2</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -162,7 +168,8 @@ function batalkan_penilaian(){
                                                 <td><b style="white-space: nowrap;">{{ $mhs->nama }}</b></td>
                                                 <td><b>{{ $mhs->nim }}</b></td>
                                                 <td><b>{{ "Ketua" }}</b></td>
-                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ $usulan_pkm->mhs->fakultas->nama_fak_ijazah }}</b></td>
+                                                <td><b>{{ $mhs->nama_fak_ijazah }}</b></td>
+                                                <td><b>{{ $mhs->nama_forlap }}</b></td>
                                                 <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b style="white-space: nowrap;">{{ $usulan_pkm->pegawai->glr_dpn . ' ' . $usulan_pkm->pegawai->nama . ' ' . $usulan_pkm->pegawai->glr_blkg }}</b></td>
                                                 <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ $usulan_pkm->pegawai->nidn }}</b></td>
                                                 <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
@@ -172,18 +179,29 @@ function batalkan_penilaian(){
                                                 </td>
                                                 <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ $usulan_pkm->created_at }}</b></td>
                                                 @if($usulan_pkm->status_usulan_id == 8)
+                                                @php
+                                                $reviewer1 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 1)->first();
+                                                @endphp
+                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b style="white-space: nowrap;">{{ $reviewer1->reviewer->glr_dpn . ' ' . $reviewer1->reviewer->nama . ' ' . $reviewer1->reviewer->glr_blkg }}</b></td>
+                                                    @php
+                                                    $reviewer2 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 2)->first();   
+                                                    @endphp
+                                                    @if(!empty($reviewer2))
+                                                    <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b style="white-space: nowrap;">{{ $reviewer2->reviewer->glr_dpn . ' ' . $reviewer2->reviewer->nama . ' ' . $reviewer2->reviewer->glr_blkg }}</b></td>
+                                                    @else
+                                                    <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ "" }}</b></td>
+                                                    @endif
+                                                @else
+                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ "" }}</b></td>
+                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ "" }}</b></td>
+                                                @endif
+                                                @if($usulan_pkm->status_usulan_id == 8)
                                                     <td class="text-center" rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
-                                                        @php
-                                                        $reviewer1 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 1)->first();
-                                                        @endphp
                                                         <span class="text-danger">
                                                             <b><a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer1->reviewer_id]) }}">{{ $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer1->reviewer_id)->distinct()->sum('nilai') }}</a></b>
                                                         </span>
                                                     </td>
                                                     <td class="text-center" rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
-                                                        @php
-                                                        $reviewer2 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 2)->first();   
-                                                        @endphp
                                                         @if(!empty($reviewer2))
                                                         <span class="text-danger">
                                                             <b><a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer2->reviewer_id]) }}">{{ $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer2->reviewer_id)->distinct()->sum('nilai') }}</a></b>
@@ -212,6 +230,8 @@ function batalkan_penilaian(){
                                                 <td><b style="white-space: nowrap;">{{ $anggota_pkm->mhs->nama }}</b></td>
                                                 <td><b>{{ $anggota_pkm->mhs->nim }}</b></td>
                                                 <td><b>{{ "Anggota" }}</b></td>
+                                                <td><b>{{ $anggota_pkm->mhs->nama_fak_ijazah }}</b></td>
+                                                <td><b>{{ $anggota_pkm->mhs->nama_forlap }}</b></td>
                                             </tr>
                                             @endforeach
                                             @endforeach

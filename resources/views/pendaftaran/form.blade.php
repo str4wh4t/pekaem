@@ -115,6 +115,7 @@ function init_select(){
 		    data: function (params){
 	      			var query = {
 	        			'text' : params.term,
+						'jenis_pkm_id' : $('#jenis_pkm').val(),
 		            	'_token' :csrf,
 	      			}
 	      		return query;
@@ -358,38 +359,6 @@ $('#kategori_kegiatan').trigger('change');
 										</div>
 									</div>
 
-									<div class="form-group">
-										<label>Upload Files (MAKS. 5 MB)</label>
-{{--										<label id="file" class="file center-block">--}}
-{{--											<input type="file" id="file" name="berkas[]" multiple>--}}
-{{--											<span class="file-custom"></span>--}}
-{{--										</label>--}}
-                                        <fieldset class="form-group">
-                                                <div class="row">
-                                                    <div class="col-md-6">
-                                                        <label id="file" class="file center-block">
-                                                            <input type="file" class="form-control" id="file" name="berkas[]" multiple>
-                                                            <span class="file-custom"></span>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </fieldset>
-									</div>
-
-									@isset($files_to_show)
-										<div>File yang telah disimpan :</div>
-										<hr>
-										@forelse ($files_to_show as $file)
-					                        <div class="alert alert-warning">
-					                        	@if(($usulan_pkm->status_usulan->keterangan == "BARU")||($usulan_pkm->status_usulan->keterangan == "DITOLAK"))
-					                        	<button class="btn btn-danger btn-sm btn_hapus_document" type="button" data-repeater-delete="" data-id="{{ $usulan_pkm->id }}" data-file="{{ $file->document_path }}"><i class="ft-x"></i></button>
-					                        	@endif
-					                        	<a href="{{ asset('storage/' . $file->document_path ) }}" target="_blank">{{ $file->document_path }}</a></div>
-					                    @empty
-					                    	<div class="alert alert-danger">Anda belum memiliki berkas untuk diverifikasi.</div>
-					                    @endforelse
-				                    @endisset
-
 									<h4 class="form-section"><i class="ft-user"></i> Anggota</h4>
 
 									<div class="row">
@@ -452,7 +421,41 @@ $('#kategori_kegiatan').trigger('change');
 		                                </button>
 		                            </div>
 
-		                            <h4 class="form-section"><i class="ft-user"></i> Pembimbing</h4>
+									<h4 class="form-section"><i class="ft-file"></i> Berkas Proposal</h4>
+
+									<div class="form-group">
+										<label>Upload Files (MAKS. 5 MB)</label>
+									{{--										<label id="file" class="file center-block">--}}
+									{{--											<input type="file" id="file" name="berkas[]" multiple>--}}
+									{{--											<span class="file-custom"></span>--}}
+									{{--										</label>--}}
+										<fieldset class="form-group">
+												<div class="row">
+													<div class="col-md-6">
+														<label id="file" class="file center-block">
+															<input type="file" class="form-control" id="file" name="berkas[]" multiple>
+															<span class="file-custom"></span>
+														</label>
+													</div>
+												</div>
+											</fieldset>
+									</div>
+
+									@isset($files_to_show)
+										<div>File yang telah disimpan :</div>
+										<hr>
+										@forelse ($files_to_show as $file)
+											<div class="alert alert-warning">
+												@if(($usulan_pkm->status_usulan->keterangan == "BARU")||($usulan_pkm->status_usulan->keterangan == "DITOLAK"))
+												<button class="btn btn-danger btn-sm btn_hapus_document" type="button" data-repeater-delete="" data-id="{{ $usulan_pkm->id }}" data-file="{{ $file->document_path }}"><i class="ft-x"></i></button>
+												@endif
+												<a href="{{ asset('storage/' . $file->document_path ) }}" target="_blank">{{ $file->document_path }}</a></div>
+										@empty
+											<div class="alert alert-danger">Anda belum memiliki berkas untuk diverifikasi.</div>
+										@endforelse
+									@endisset
+
+		                            <h4 class="form-section"><i class="ft-user"></i> Pendamping</h4>
 		                            @isset($usulan_pkm->status_usulan->keterangan)
 			                            @if($usulan_pkm->status_usulan->keterangan == 'BARU')
 										<div class="input-group">
@@ -485,7 +488,7 @@ $('#kategori_kegiatan').trigger('change');
 									@isset($usulan_pkm->status_usulan->keterangan)
 										{{--
 										@if(@$usulan_pkm->status_usulan->keterangan != "BARU")
-		                                    <h4 class="form-section"><i class="fa fa-pencil"></i> Catatan Pembimbing</h4>
+		                                    <h4 class="form-section"><i class="fa fa-pencil"></i> Catatan Pendamping</h4>
 		                                    @forelse ($usulan_pkm->revisi as $revisi)
 						                        <div class="alert {{ $revisi->status_usulan->keterangan == "DITOLAK" ? "alert-warning" : "alert-success" }}">
 						                        	{!! '<b>STATUS :</b> '. $revisi->status_usulan->keterangan .' , <b>Catatan :</b> '.  $revisi->catatan_pembimbing .' <b>[ Pada : '. $revisi->created_at .' ]</b>' !!}

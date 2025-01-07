@@ -61,7 +61,7 @@ $('.zero-configuration').DataTable();
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Daftar Pembimbing</h4>
+                        <h4 class="card-title">Daftar Pendamping</h4>
                         <a class="heading-elements-toggle"><i class="fa fa-ellipsis-v font-medium-3"></i></a>
                         <div class="heading-elements">
                             <ul class="list-inline mb-0">
@@ -88,7 +88,7 @@ $('.zero-configuration').DataTable();
                                         <th>Nip</th>
                                         {{-- <th>Jns Pegawai</th>
                                         <th>Unit</th> --}}
-                                        <th>Jumlah Bimbgn</th>
+                                        <th>Jumlah Pendampgn</th>
                                         {{-- <th>Status</th> --}}
                                          <th>Aksi</th>
                                     </tr>

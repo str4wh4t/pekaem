@@ -25,4 +25,9 @@ class Mhs extends Model
     {
         return $this->belongsTo('App\Fakultas', 'kode_fakultas', 'kodeF');
     }
+
+    public function prodi()
+    {
+        return $this->belongsTo('App\Prodi', 'kode_prodi', 'kode_prodi_pdpt');
+    }
 }

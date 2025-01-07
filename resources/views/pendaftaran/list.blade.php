@@ -160,6 +160,10 @@ if(confirm('Yakin akan melanjutkan ?')){
                             </button>
                             <hr>
                             @endif
+                            @if(UserHelp::get_selected_role() == 'ADMIN')
+                            <a class="btn btn-primary" href="{{ route('admin.pendaftaran.report')  }}"><i class="fa fa-file"></i> Laporan LR-1</a>
+                            <hr>
+                            @endif
                             <table class="table table-striped table-bordered zero-configuration">
                                 <thead>
                                     <tr>
@@ -169,7 +173,7 @@ if(confirm('Yakin akan melanjutkan ?')){
                                         <th>Judul</th>
                                         <th>Keg</th>
                                         <th>Subkeg</th>
-                                        <th>Pembimbing</th>
+                                        <th>Pendamping</th>
                                         <th>Tgl Ajuan</th>
                                         <th>Status</th>
                                         <th>Aksi</th>
@@ -274,7 +278,7 @@ if(confirm('Yakin akan melanjutkan ?')){
                                         <th>Judul</th>
                                         <th>Keg</th>
                                         <th>Subkeg</th>
-                                        <th>Pembimbing</th>
+                                        <th>Pendamping</th>
                                         <th>Tgl Ajuan</th>
                                         <th>Status</th>
                                         <th>Aksi</th>

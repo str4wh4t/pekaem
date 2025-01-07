@@ -49,6 +49,7 @@ class JenisPkmController extends Controller
         $jenis_pkm->kategori_kriteria_id = $request->kategori_kriteria_id;
         $jenis_pkm->nama_pkm = $request->nama_pkm;
         $jenis_pkm->keterangan = $request->keterangan;
+        $jenis_pkm->kamar = $request->kamar;
         $jenis_pkm->score_min = $request->score_min;
         $jenis_pkm->save();
         return redirect()->route('jenis-pkm.index', ['kategori_kegiatan' => $kategoriKegiatan])->with('message', 'Data berhasil di-simpan.');
@@ -94,6 +95,7 @@ class JenisPkmController extends Controller
         $jenis_pkm->nama_pkm = $request->nama_pkm;
         $jenis_pkm->keterangan = $request->keterangan;
         $jenis_pkm->score_min = $request->score_min;
+        $jenis_pkm->kamar = $request->kamar;
         $jenis_pkm->save();
         return redirect()->route('jenis-pkm.index', ['kategori_kegiatan' => $kategoriKegiatan])->with('message', 'Data berhasil di-update.');
     }

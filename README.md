@@ -33,3 +33,10 @@ Todo list (24/12/2024)
 6. - tambah caption reviewer 1 dan 2
 7. - skor penilian di isi dengan model dropdown dengan nilai (1-3) dan (5-7)
 8. - penilaian pasangan reviewer ditampilkan di entri nilai reviewer
+
+Todo list (06/01/2024)
+
+1. - Membuat capiltaize nama role
+2. - membuat pilihan anggota diatas, dibawah pilihan jenis pkm
+3. Buat kamar untuk jenis_pkm untuk mendeteksi dobel data
+4. anggota maks 4 , min 2

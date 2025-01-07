@@ -82,6 +82,7 @@ $('.zero-configuration').DataTable();
                                         <th>No</th>
                                         <th>Nama Subkegiatan</th>
                                         <th>Keterangan</th>
+                                        <th>Kamar</th>
                                         <th>Kriteria Penilaian</th>
                                         <th>Score Min</th>
                                         <th>Aksi</th>
@@ -93,6 +94,7 @@ $('.zero-configuration').DataTable();
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $jenis_pkm->nama_pkm }}</td>
                                         <td>{{ $jenis_pkm->keterangan }}</td>
+                                        <td>{{ $jenis_pkm->kamar }}</td>
                                         <td>{{ $jenis_pkm->kategori_kriteria->nama_kategori_kriteria ?? null }}</td>
                                         <td>{{ $jenis_pkm->score_min }}</td>
                                         <td>
@@ -106,6 +108,7 @@ $('.zero-configuration').DataTable();
                                         <th>No</th>
                                         <th>Nama Subkegiatan</th>
                                         <th>Keterangan</th>
+                                        <th>Kamar</th>
                                         <th>Kriteria Penilaian</th>
                                         <th>Score Min</th>
                                          <th>Aksi</th>

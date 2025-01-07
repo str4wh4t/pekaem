@@ -105,6 +105,12 @@ $('.zero-configuration').DataTable();
 												<input type="text" id="score_min" class="form-control" placeholder="Score Min" name="score_min" value="{{ old('score_min') }}" >
 											</div>
 										</div>
+                                        <div class="col-md-2">
+											<div class="form-group">
+												<label for="kamar">Kamar</label>
+												<input type="number" id="kamar" class="form-control" placeholder="Kamar" name="kamar" value="{{ old('kamar') }}" >
+											</div>
+										</div>
 									</div>
                                     <div class="row">
 										<div class="col-md-6">

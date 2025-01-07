@@ -1,39 +1,45 @@
 @php
 header("Content-Type: application/vnd.ms-excel");
- header("Content-Disposition: attachment; filename=\"usulan_pkm.xls\"");
+header("Content-Disposition: attachment; filename=\"usulan_pkm.xls\"");
 @endphp
 <table border="1">
     <thead>
         <tr>
-            <th colspan="13">Laporan Pengajuan PKM</th>
+            <th colspan="16">Laporan Pengajuan PKM</th>
         </tr>
         <tr>
-            <th colspan="13">Universitas Diponegoro</th>
+            <th colspan="16">Universitas Diponegoro</th>
         </tr>
         <tr>
-            <th colspan="13">Tahun {{ $tahun }}</th>
+            <th colspan="16">Tahun {{ $tahun }}</th>
         </tr>
         <tr>
-            <th colspan="13">&nbsp;</th>
+            <th colspan="16">&nbsp;</th>
         </tr>
         <tr>
             <th rowspan="2">No</th>
             <th rowspan="2">Judul</th>
-            <th colspan="3">Mahasiswa</th>
-            <th rowspan="2">Fakultas</th>
+            <th colspan="5">Mahasiswa</th>
             <th colspan="2">Dosen Pendamping</th>
             <th rowspan="2">File Proposal</th>
             <th rowspan="2">SubmittedAt</th>
-            <th rowspan="2">Nilai1</th>
-            <th rowspan="2">Nilai2</th>
-            <th rowspan="2">NilaiAkhir</th>
+            <th rowspan="2">Reviewer1</th>
+            <th rowspan="2">Reviewer2</th>
+            <th>NilaiRev1</th>
+            <th>NilaiRev2</th>
+            <th>NilaiAkhir</th>
         </tr>
         <tr>
             <th>Nama</th>
             <th>NIM</th>
             <th>Jabatan</th>
+            <th>Fakultas</th>
+            <th>Prodi</th>
             <th>Nama</th>
             <th>NIDN</th>
+            <th>a</th>
+            <th>b</th>
+            <th>(a+b)/2</th>
         </tr>
     </thead>
     <tbody>
@@ -47,7 +53,8 @@ header("Content-Type: application/vnd.ms-excel");
             <td><b style="white-space: nowrap;">{{ $mhs->nama }}</b></td>
             <td><b>{{ "'". $mhs->nim }}</b></td>
             <td><b>{{ "Ketua" }}</b></td>
-            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ $usulan_pkm->mhs->fakultas->nama_fak_ijazah }}</b></td>
+            <td><b>{{ $mhs->nama_fak_ijazah }}</b></td>
+            <td><b>{{ $mhs->nama_forlap }}</b></td>
             <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b style="white-space: nowrap;">{{ $usulan_pkm->pegawai->glr_dpn . ' ' . $usulan_pkm->pegawai->nama . ' ' . $usulan_pkm->pegawai->glr_blkg }}</b></td>
             <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ "'". $usulan_pkm->pegawai->nidn }}</b></td>
             <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
@@ -56,6 +63,23 @@ header("Content-Type: application/vnd.ms-excel");
                 @endforeach
             </td>
             <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ $usulan_pkm->created_at }}</b></td>
+            @if($usulan_pkm->status_usulan_id == 8)
+            @php
+            $reviewer1 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 1)->first();
+            @endphp
+            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b style="white-space: nowrap;">{{ $reviewer1->reviewer->glr_dpn . ' ' . $reviewer1->reviewer->nama . ' ' . $reviewer1->reviewer->glr_blkg }}</b></td>
+                @php
+                $reviewer2 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 2)->first();   
+                @endphp
+                @if(!empty($reviewer2))
+                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b style="white-space: nowrap;">{{ $reviewer2->reviewer->glr_dpn . ' ' . $reviewer2->reviewer->nama . ' ' . $reviewer2->reviewer->glr_blkg }}</b></td>
+                @else
+                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ "" }}</b></td>
+                @endif
+            @else
+            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ "" }}</b></td>
+            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ "" }}</b></td>
+            @endif
             @if($usulan_pkm->status_usulan_id == 8)
                 <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
                     @php
@@ -78,7 +102,7 @@ header("Content-Type: application/vnd.ms-excel");
                     @endif
                 </td>
                 <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
-                    <span><b>{{ $usulan_pkm->nilai_total }}</b></span>
+                    <span><b>{{ "'" . $usulan_pkm->nilai_total }}</b></span>
                 </td>
             @else
                 <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
@@ -97,6 +121,8 @@ header("Content-Type: application/vnd.ms-excel");
             <td><b style="white-space: nowrap;">{{ $anggota_pkm->mhs->nama }}</b></td>
             <td><b>{{ "'". $anggota_pkm->mhs->nim }}</b></td>
             <td><b>{{ "Anggota" }}</b></td>
+            <td><b>{{ $anggota_pkm->mhs->nama_fak_ijazah }}</b></td>
+            <td><b>{{ $anggota_pkm->mhs->nama_forlap }}</b></td>
         </tr>
         @endforeach
         @endforeach

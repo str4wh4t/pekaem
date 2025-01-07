@@ -31,7 +31,7 @@
             <li class=" nav-item small">
                 <a class="p-0 mt-1" href="{{ route('admin.pembimbing.list') }}">
                     <i class="fa fa-street-view"></i>
-                    <span class="menu-title" data-i18n="nav.category.general">Pembimbing</span>
+                    <span class="menu-title" data-i18n="nav.category.general">Pendamping</span>
                 </a>
 			</li>
 			@endif
@@ -42,7 +42,7 @@
 				<li class=" nav-item small">
 					<a class="p-0 mt-1" href="{{ route('share.pendaftaran.list', ['jenis' => 'pembimbing','pegawai_id' => $pegawai->id]) }}">
 						<i class="fa fa-street-view"></i>
-						<span class="menu-title" data-i18n="nav.category.general">Bimbingan</span>
+						<span class="menu-title" data-i18n="nav.category.general">Pendampgn</span>
 					</a>
 				</li>
 			@endif
@@ -95,7 +95,8 @@
 							<a class="menu-item" href="#" data-i18n="nav.navbars.nav_hide_on_scroll.main">{{ $kategori_kegiatan->nama_kategori_kegiatan }}</a>
 							<ul class="menu-content" style="">
 								@foreach ($kategori_kegiatan->jenis_pkm as $jenis_pkm)
-								<li><a class="menu-item" href="{{ route('jenis-pkm.daftar-penilaian', ['kategori_kegiatan' => $kategori_kegiatan, 'jenis_pkm' => $jenis_pkm]) }}" data-i18n="nav.navbars.nav_hide_on_scroll.nav_hide_on_scroll_top">{{ $jenis_pkm->nama_pkm }}</a>
+								<li style="background-color: #ffeecc;">
+									<a class="menu-item" href="{{ route('jenis-pkm.daftar-penilaian', ['kategori_kegiatan' => $kategori_kegiatan, 'jenis_pkm' => $jenis_pkm]) }}" data-i18n="nav.navbars.nav_hide_on_scroll.nav_hide_on_scroll_top">{{ $jenis_pkm->nama_pkm }}</a>
 								</li>
 								@endforeach
 							</ul>

@@ -17,6 +17,7 @@ class AlterJenisPkmTable extends Migration
             $table->unsignedBigInteger('kategori_kegiatan_id')->after('id'); // Foreign key ke tabel kategori
             $table->unsignedBigInteger('kategori_kriteria_id')->nullable()->after('id');
             $table->integer('score_min')->nullable()->after('nama_pkm');
+            $table->integer('kamar')->after('nama_pkm')->default(0);
             // Menambahkan foreign key
             $table->foreign('kategori_kegiatan_id')
                 ->references('id')->on('kategori_kegiatan')

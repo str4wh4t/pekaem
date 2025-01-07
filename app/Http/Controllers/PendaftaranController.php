@@ -796,4 +796,28 @@ class PendaftaranController extends Controller
 
 		// return redirect()->back()->with('message', 'Data berhasil di-simpan.');
 	}
+
+	public function report(Request $request)
+    {
+        $tahun = date('Y');
+        
+        $jenis_pkm = JenisPkm::whereHas('usulan_pkm', function($query) use($tahun) {
+				$query->where('tahun', date('Y'));
+			})->orderBy('kategori_kegiatan_id')->get();
+		$usulan_pkm_list = collect(); // Inisialisasi koleksi kosong
+
+		foreach ($jenis_pkm as $jenis) { // Gunakan variabel berbeda untuk elemen loop
+			$usulan_data = UsulanPkm::where('jenis_pkm_id', $jenis->id)
+				->where('tahun', $tahun)
+				->with(['anggota_pkm.mhs', 'usulan_pkm_dokumen'])
+				->orderBy('created_at')
+				->get();
+		
+			$usulan_pkm_list = $usulan_pkm_list->merge($usulan_data); // Gabungkan data ke dalam koleksi utama
+		}
+		$this->_data['usulan_pkm_list'] = $usulan_pkm_list;
+        $this->_data['tahun'] = $tahun;
+        return view('pendaftaran.report', $this->_data);
+
+	}
 }
