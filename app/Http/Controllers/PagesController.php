@@ -51,13 +51,13 @@ class PagesController extends Controller
 
         if(empty($kode_fakultas)){
             $this->_data['usulan_pkm_total'] = UsulanPkm::count();
-            $this->_data['usulan_pkm_proses'] = UsulanPkm::where('status_usulan_id', StatusUsulan::whereIn('keterangan', ['BARU','DISETUJUI'])->first()->id)->count();
+            $this->_data['usulan_pkm_proses'] = UsulanPkm::where('status_usulan_id', StatusUsulan::whereIn('keterangan', ['BARU','DISETUJUI'])->pluck('id'))->count();
             $this->_data['usulan_pkm_belum_dinilai'] = UsulanPkm::where('status_usulan_id', StatusUsulan::where('keterangan', 'LANJUT')->first()->id)->count();
             $this->_data['usulan_pkm_sudah_dinilai'] = UsulanPkm::where('status_usulan_id', StatusUsulan::where('keterangan', 'SUDAH_DINILAI')->first()->id)->count();
             $this->_data['usulan_pkm'] = UsulanPkm::all();
         }else{
             $this->_data['usulan_pkm_total'] = UsulanPkm::where('kode_fakultas', $kode_fakultas)->count();
-            $this->_data['usulan_pkm_proses'] = UsulanPkm::where('kode_fakultas', $kode_fakultas)->where('status_usulan_id', StatusUsulan::whereIn('keterangan', ['BARU','DISETUJUI'])->first()->id)->count();
+            $this->_data['usulan_pkm_proses'] = UsulanPkm::where('kode_fakultas', $kode_fakultas)->whereIn('status_usulan_id', StatusUsulan::whereIn('keterangan', ['BARU','DISETUJUI'])->pluck('id'))->count();
             $this->_data['usulan_pkm_sudah_dinilai'] = UsulanPkm::where('kode_fakultas', $kode_fakultas)->where('status_usulan_id', StatusUsulan::where('keterangan', 'SUDAH_DINILAI')->first()->id)->count();
             $this->_data['usulan_pkm_belum_dinilai'] = UsulanPkm::where('kode_fakultas', $kode_fakultas)->where('status_usulan_id', StatusUsulan::where('keterangan', 'LANJUT')->first()->id)->count();
             $this->_data['usulan_pkm'] = UsulanPkm::where('kode_fakultas', $kode_fakultas)->get();
