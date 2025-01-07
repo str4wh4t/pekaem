@@ -82,7 +82,7 @@
             </div>
             <div class="row py-2">
                @foreach($kategori_kegiatan->jenis_pkm as $jenis_pkm_row)
-               <div class="col-lg-2 col-md-6">
+               <div class="col-lg-2 col-md-6 mb-1">
                   <div class="insights px-2">
                      <div><span class="text-info h3 ">{{ count($usulan_pkm->where('jenis_pkm_id',$jenis_pkm_row->id)) }}</span> <span class="float-right">{{ $jenis_pkm_row->nama_pkm }}</span></div>
                      <div class="progress progress-md mt-1 mb-0">
