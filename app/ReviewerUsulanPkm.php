@@ -17,6 +17,6 @@ class ReviewerUsulanPkm extends Model
 
     public function reviewer()
     {
-        return $this->belongsTo('App\reviewer');
+        return $this->belongsTo('App\Reviewer'); //
     }
 }
