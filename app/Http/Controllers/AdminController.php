@@ -87,7 +87,7 @@ class AdminController extends Controller
             $query->where('nip', 'LIKE', '%' . $request->text . '%')
                 ->orWhere('nama', 'LIKE', '%' . $request->text . '%');
         })
-            ->where('status', '1') // HANYA AKTIF
+            ->whereIn('status', ['1','20']) // AKTIF, TUGAS BELAJAT TDK MENINGGALKAN JAB
             ->whereDoesntHave('roles', function (Builder $query) use ($request) {
                 $query->where('roles.id', $request->role);
             })
@@ -233,7 +233,7 @@ class AdminController extends Controller
                         $query->where('nim', 'LIKE', '%' . $request->text . '%')
                             ->orWhere('nama', 'LIKE', '%' . $request->text . '%');
                         })
-                        ->where('kode_fakultas', $kode_fakultas)
+                        // ->where('kode_fakultas', $kode_fakultas)
                         ->where('status_terakhir', 'Aktif')
                         ->whereDoesntHave('anggota_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
                             $query->whereHas('usulan_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
