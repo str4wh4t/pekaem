@@ -112,14 +112,14 @@
 						<li><a class="menu-item" href="{{ route('admin.users.roles') }}" data-i18n="nav.templates.vert.roles">Manaj. Roles</a></li>
 					</ul>
 				</li>
+				@endif
+			@endif
 				<li class=" nav-item small">
 					<a class="p-0 mt-1" href="#"><i class="fa fa-whatsapp"></i><span class="menu-title" data-i18n="nav.category.general">Bantuan</span></a>
 					<ul class="menu-content">
 						<li><a class="menu-item" target="_blank" href="https://wa.me/6282226235238" data-i18n="nav.templates.vert.main">SPV Prestasi Mhs</a></li>
 					</ul>
 				</li>
-				@endif
-			@endif
 
 			{{-- <li class=" nav-item"><a href="{{ route('admin.pendaftaran.ploting.list') }}"><i class="fa fa-user-secret"></i><span class="menu-title" data-i18n="nav.category.general">Ploting</span></a>
 				<ul class="menu-content">

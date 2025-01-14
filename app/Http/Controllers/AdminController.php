@@ -120,7 +120,7 @@ class AdminController extends Controller
                     ->orWhere('nidn', 'LIKE', '%' . $request->text . '%');
             })
             ->where('jnspeg', '1') // HANYA DOSEN
-            ->where('status', '1') // HANYA AKTIF
+            ->whereIn('status', ['1','20']) // AKTIF, TUGAS BELAJAT TDK MENINGGALKAN JAB
             ->whereNotNull('nidn')->where('nidn', '!=', '0')
             ->where('nidn', '!=', '') // HANYA YANG MEMILIKI NIDN
             // ->whereHas('roles', function (Builder $query) use ($request) {
@@ -225,9 +225,9 @@ class AdminController extends Controller
         if(!empty($jenis_pkm)){
             if (UserHelp::get_selected_role() == "ADMINFAKULTAS") {
                 $kode_fakultas = UserHelp::get_selected_kode_fakultas();
-                if($usulan_pkm_id){
+                // if($usulan_pkm_id){
     
-                }else{
+                // }else{
 
                     $mhs = Mhs::where(function ($query) use ($request, $kode_fakultas) {
                         $query->where('nim', 'LIKE', '%' . $request->text . '%')
@@ -245,7 +245,7 @@ class AdminController extends Controller
                             }); 
                         })
                         ->get(['nim AS id', DB::raw('CONCAT(nama," ","[",nim,"]"," ","[",nama_forlap,"]"," ","[",nama_fak_ijazah,"]") as text')]);
-                }
+                // }
             }
         }
 
