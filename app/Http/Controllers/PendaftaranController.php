@@ -318,6 +318,11 @@ class PendaftaranController extends Controller
 		if ($usulan_pkm_dokumen->usulan_pkm->created_by != UserHelp::admin_get_logged_nip()) {
 			return redirect()->back()->with('message', 'Dilarang mengubah usulan.');
 		}
+
+		if($usulan_pkm_dokumen->usulan_pkm->status_usulan->keterangan != "BARU"){
+			return redirect()->route('share.pendaftaran.list')->with('message', 'Dilarang menghapus usulan.');
+		}
+		
 		$file = 'public/' . $file;
 		Storage::delete($file);
 		$usulan_pkm_dokumen->delete();
@@ -330,6 +335,11 @@ class PendaftaranController extends Controller
 		if ($anggota_pkm->usulan_pkm->created_by != UserHelp::admin_get_logged_nip()) {
 			return redirect()->back()->with('message', 'Dilarang mengubah usulan.');
 		}
+
+		if($anggota_pkm->usulan_pkm->status_usulan->keterangan != "BARU"){
+			return redirect()->route('share.pendaftaran.list')->with('message', 'Dilarang menghapus usulan.');
+		}
+
 		$anggota_pkm->delete();
 		return ['status' => 'ok'];
 	}
@@ -339,6 +349,13 @@ class PendaftaranController extends Controller
 		if (UserHelp::get_selected_role() != "ADMIN") {
 			return ['status' => 'error'];
 		}
+
+		$usulan_pkm = UsulanPkm::findOrFail($request->usulan_pkm_id);
+
+		if($usulan_pkm->status_usulan->keterangan != "BARU"){
+			return redirect()->route('share.pendaftaran.list')->with('message', 'Dilarang menghapus usulan.');
+		}
+
 		DB::beginTransaction();
 
 		try {
@@ -429,7 +446,7 @@ class PendaftaranController extends Controller
 		
 		if(!empty($usulan_pkm_selected)){
 			if($usulan_pkm_selected->jenis_pkm->kategori_kegiatan_id == $request->kategori_kegiatan_id){
-				$jenis_pkm_list = $jenis_pkm_list instanceof Illuminate\Support\Collection
+				$jenis_pkm_list = $jenis_pkm_list instanceof \Illuminate\Support\Collection
 								? $jenis_pkm_list
 								: collect($jenis_pkm_list);
 
@@ -641,6 +658,10 @@ class PendaftaranController extends Controller
 	{
 		$usulan_pkm = UsulanPkm::where('uuid', $uuid)->firstOrFail();
 		if ($usulan_pkm->created_by != UserHelp::admin_get_logged_nip()) {
+			return redirect()->route('share.pendaftaran.list')->with('message', 'Dilarang menghapus usulan.');
+		}
+
+		if($usulan_pkm->status_usulan->keterangan != "BARU"){
 			return redirect()->route('share.pendaftaran.list')->with('message', 'Dilarang menghapus usulan.');
 		}
 

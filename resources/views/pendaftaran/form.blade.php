@@ -633,8 +633,10 @@ $('#kategori_kegiatan').trigger('change');
 					                        	<div class="alert alert-info">
 						                        	Usulan anda telah diproses [ <b>STATUS :</b> {{ $usulan_pkm->status_usulan->keterangan == 'DISETUJUI' ? 'DIUSULKAN' : $usulan_pkm->status_usulan->keterangan }} ]
 						                        </div>
+												{{--
 												<a class="btn btn-danger" onclick="return hapus_pendaftaran()" href="{{ route('admin.pendaftaran.hapus',['uuid' => $usulan_pkm->uuid])  }}">
 												<i class="fa fa-trash-o"></i> Hapus
+												--}}
 											</a>
 										@endif
 									@else
