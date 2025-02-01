@@ -50,6 +50,8 @@ Route::get('admin/pendaftaran/ploting/list', 'PendaftaranController@ploting_revi
 Route::get('admin/pembimbing/list', 'AdminController@list_pembimbing')->name('admin.pembimbing.list');
 Route::get('admin/reviewer/list', 'AdminController@list_reviewer')->name('admin.reviewer.list');
 Route::get('admin/pendaftaran/report', 'PendaftaranController@report')->name('admin.pendaftaran.report');
+Route::get('admin/setting/index', 'AdminController@setting')->name('admin.setting.index');
+Route::post('admin/setting/update-status-aplikasi', 'AdminController@setting')->name('admin.setting.update_status_aplikasi');
 
 Route::get('sso/login', 'SsoController@login')->name('sso.login');
 Route::get('sso/logout', 'SsoController@logout')->name('sso.logout');

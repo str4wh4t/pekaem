@@ -112,6 +112,9 @@
 						<li><a class="menu-item" href="{{ route('admin.users.roles') }}" data-i18n="nav.templates.vert.roles">Manaj. Roles</a></li>
 					</ul>
 				</li>
+				<li class=" nav-item small">
+					<a class="p-0 mt-1" href="{{ route('admin.setting.index') }}"><i class="fa fa-cogs"></i><span class="menu-title" data-i18n="nav.category.general">Setting</span></a>
+				</li>
 				@endif
 			@endif
 				<li class=" nav-item small">

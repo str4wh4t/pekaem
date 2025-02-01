@@ -7,6 +7,7 @@ use App\Helpers\User as UserHelp;
 use App\PegawaiRoles;
 use App\AnggotaPkm;
 use App\Roles;
+use App\Setting;
 use App\Pegawai;
 use App\Reviewer;
 use App\JenisPkm;
@@ -319,5 +320,23 @@ class AdminController extends Controller
         $this->_data['reviewer'] = $reviewer;
 
         return view('admin.list_reviewer', $this->_data);
+    }
+
+    public function setting(Request $request)
+    {
+        if(UserHelp::get_selected_role() != 'ADMIN' && UserHelp::get_selected_role() != 'SUPER'){
+            return redirect()->route('dashboard');
+        }
+        // buat listener dari ajax untuk update status aplikasi
+        $setting = Setting::where('status_aplikasi', '1')->first();
+        if ($request->post()) {
+            if (!$setting) {
+                $setting = new Setting;
+            }
+            $setting->status_aplikasi = $request->post('status_aplikasi');
+            $setting->save();
+            return ['status' => 'ok'];
+        }
+        return view('admin.setting', ['setting' => $setting]);
     }
 }

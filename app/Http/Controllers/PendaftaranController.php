@@ -9,6 +9,7 @@ use App\StatusUsulan;
 use App\Mhs;
 use App\Revisi;
 use App\Review;
+use App\Setting;
 use App\Perbaikan;
 use App\ReviewerUsulanPkm;
 use App\Http\Controllers\Controller;
@@ -599,6 +600,13 @@ class PendaftaranController extends Controller
 
 	public function create(Request $request, Mhs $mhs)
 	{
+
+		$setting = Setting::where('status_aplikasi', '1')->first();
+
+		if(empty($setting)){
+			return view('pages.closed');
+		}
+
 		$jenis_pkm = JenisPkm::all()->sortBy("id");
 		$kategori_kegiatan_list = KategoriKegiatan::all()->sortBy("id");
 		$status_usulan = StatusUsulan::all()->sortBy("id");
