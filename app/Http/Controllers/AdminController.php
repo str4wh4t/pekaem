@@ -330,6 +330,7 @@ class AdminController extends Controller
         // buat listener dari ajax untuk update status aplikasi
         $setting = Setting::where('status_aplikasi', '1')->first();
         if ($request->post()) {
+            $setting = Setting::whereIn('status_aplikasi', ['1', '0'])->first();
             if (!$setting) {
                 $setting = new Setting;
             }
