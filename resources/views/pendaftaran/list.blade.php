@@ -252,6 +252,7 @@ if(confirm('Yakin akan menetapkan ?')){
                                         <th>Judul</th>
                                         <th>Keg</th>
                                         <th>Subkeg</th>
+                                        <th>Tema</th>
                                         <th>Pendamping</th>
                                         <th>Tgl Ajuan</th>
                                         <th>Created By</th>
@@ -300,6 +301,7 @@ if(confirm('Yakin akan menetapkan ?')){
                                         <td>{{ $u->judul }}</td>
                                         <td>{{ $u->jenis_pkm->kategori_kegiatan->nama_kategori_kegiatan }}</td>
                                         <td>{{ $u->jenis_pkm->nama_pkm }}</td>
+                                        <td>{{ !empty($u->tema_usulan_pkm_id) ? $u->tema_usulan_pkm->nama_tema : "-"}}</td>
                                         {{-- <td>{{ $u->anggota_pkm[0]->mhs->nama }}</td> --}}
                                         <td>{{ $u->pegawai->glr_dpn . " " . $u->pegawai->nama . " " . $u->pegawai->glr_blkg }}</td>
                                         <td>{{ $u->created_at->locale('id')->isoFormat('LL') }}</td>

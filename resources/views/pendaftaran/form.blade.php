@@ -430,6 +430,16 @@ $('#kategori_kegiatan').trigger('change');
 										</div>
 									</div>
 
+									<div class="row">
+										<div class="col-md-6">
+											<div class="form-group">
+												<label for="tema_usulan_pkm">Tema</label>
+												<input type="text" id="tema_usulan_pkm_text" name="tema_usulan_pkm_text_id" class="form-control" value="{{ !empty($usulan_pkm->tema_usulan_pkm_id) ? $usulan_pkm->tema_usulan_pkm->nama_tema : "-"  }}" readonly="readonly" >
+												<input type="hidden" id="tema_usulan_pkm" name="tema_usulan_pkm_id" />
+											</div>
+										</div>
+									</div>
+
 									<h4 class="form-section"><i class="ft-user"></i> Anggota</h4>
 
 									<div class="row">
@@ -545,7 +555,7 @@ $('#kategori_kegiatan').trigger('change');
 	                                        </div>
 	                                        <input type="hidden" name="pegawai_id" value="{{ $usulan_pkm->pegawai_id }}">
 	                                        {{-- <select id="pembimbing" class="form-control" placeholder="Cari dosen" name="pegawai_id" style="width: 80%" disabled="disabled"></select> --}}
-											<input type="text" id="" class="form-control" placeholder="" value="{{ $usulan_pkm->pegawai->glr_dpn . " " . $usulan_pkm->pegawai->nama . " " . $usulan_pkm->pegawai->glr_blkg . " [" . $usulan_pkm->pegawai->nip . "]" . " [" . $usulan_pkm->pegawai->nidn . "]" }}" disabled="disabled" >
+											<input type="text" id="" class="form-control" placeholder="" value="{{ $usulan_pkm->pegawai->glr_dpn . " " . $usulan_pkm->pegawai->nama . " " . $usulan_pkm->pegawai->glr_blkg . " [" . $usulan_pkm->pegawai->nip . "]" . " [" . $usulan_pkm->pegawai->nuptk . "]" }}" disabled="disabled" >
 	                                    </div>
 	                                    @endif
                                     @else

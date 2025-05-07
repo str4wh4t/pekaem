@@ -10,6 +10,7 @@ use App\Mhs;
 use App\Revisi;
 use App\Review;
 use App\Setting;
+use App\TemaUsulanPkm;
 use App\Perbaikan;
 use App\ReviewerUsulanPkm;
 use App\Http\Controllers\Controller;
@@ -80,6 +81,7 @@ class PendaftaranController extends Controller
 				'judul'	=> 'required|min:5|max:500',
 				'kategori_kegiatan_id'	=> 'required|exists:kategori_kegiatan,id',
 				'jenis_pkm_id'	=> 'required|exists:jenis_pkm,id',
+				'tema_usulan_pkm_id'	=> 'required|exists:tema_usulan_pkm,id',
 				'berkas.*' => 'file|mimes:pdf|max:5120', // Validasi setiap file dalam array
 				'pegawai_id'	=> 'required',
 				'list_nim' => $required . '|min:'. $min_anggota_valid .'|max:' . $max_anggota_valid,
@@ -102,6 +104,7 @@ class PendaftaranController extends Controller
 				'judul'	=> 'required|min:5|max:500',
 				'kategori_kegiatan_id'	=> 'required|exists:kategori_kegiatan,id',
 				'jenis_pkm_id'	=> 'required|exists:jenis_pkm,id',
+				'tema_usulan_pkm_id'	=> 'required|exists:tema_usulan_pkm,id',
 				'berkas' => 'required|array', // Pastikan 'berkas' adalah array
 				'berkas.*' => 'file|mimes:pdf|max:5120', // Validasi setiap file dalam array
 				'pegawai_id'	=> 'required',
@@ -127,6 +130,7 @@ class PendaftaranController extends Controller
 		$usulan_pkm->judul = $request->judul;
 		$usulan_pkm->kategori_kegiatan_id = $request->kategori_kegiatan_id;
 		$usulan_pkm->jenis_pkm_id = $request->jenis_pkm_id;
+		$usulan_pkm->tema_usulan_pkm_id = $request->tema_usulan_pkm_id;
 		$usulan_pkm->pegawai_id = $request->pegawai_id; // UNTUK INSERT PEMBIMBING
 		$usulan_pkm->tahun = date('Y');
 		$usulan_pkm->created_by = UserHelp::admin_get_logged_nip();
@@ -354,7 +358,9 @@ class PendaftaranController extends Controller
 		$usulan_pkm = UsulanPkm::findOrFail($request->usulan_pkm_id);
 
 		if($usulan_pkm->status_usulan->keterangan != "BARU"){
-			return redirect()->route('share.pendaftaran.list')->with('message', 'Dilarang menghapus usulan.');
+		// if(!in_array($usulan_pkm->status_usulan->keterangan, ["BARU", "LANJUT"])){
+			// return redirect()->route('share.pendaftaran.list')->with('message', 'Dilarang menghapus usulan.');
+			return ['status' => 'error', 'message' => 'Dilarang menghapus usulan.'];
 		}
 
 		DB::beginTransaction();
@@ -374,8 +380,8 @@ class PendaftaranController extends Controller
 			return ['status' => 'ok'];
 		} catch (\Exception $e) {
 			DB::rollback();
-			return redirect()->back()->with('message', 'Terjadi kesalahan saat memproses: ' . $e->getMessage());
-			return ['status' => 'error'];
+			// return redirect()->back()->with('message', 'Terjadi kesalahan saat memproses: ' . $e->getMessage());
+			return ['status' => 'error', 'message' => 'Terjadi kesalahan saat memproses: ' . $e->getMessage()];
 		}
 	}
 
@@ -608,6 +614,7 @@ class PendaftaranController extends Controller
 		}
 
 		$jenis_pkm = JenisPkm::all()->sortBy("id");
+		$tema_usulan_pkm_list = TemaUsulanPkm::all()->sortBy("id");
 		$kategori_kegiatan_list = KategoriKegiatan::all()->sortBy("id");
 		$status_usulan = StatusUsulan::all()->sortBy("id");
 		$nim = $request->input('nim');
@@ -656,6 +663,7 @@ class PendaftaranController extends Controller
 		// $mhs->kode_prodi = $return->nama_ps;
 
 		$this->_data['jenis_pkm'] = $jenis_pkm;
+		$this->_data['tema_usulan_pkm_list'] = $tema_usulan_pkm_list;
 		$this->_data['kategori_kegiatan_list'] = $kategori_kegiatan_list;
 		$this->_data['status_usulan'] = $status_usulan;
 		$this->_data['mhs'] = $mhs;
@@ -701,6 +709,7 @@ class PendaftaranController extends Controller
 		$usulan_pkm = UsulanPkm::findOrFail($id);
 		$kategori_kegiatan_list = KategoriKegiatan::all()->sortBy("id");
 		$jenis_pkm = JenisPkm::all()->sortBy("id");
+		$tema_usulan_pkm_list = TemaUsulanPkm::all()->sortBy("id");
 		$status_usulan = StatusUsulan::all()->sortBy("id");
 		$pegawai = UserHelp::admin_get_record_by_nip(UserHelp::admin_get_logged_nip());
 		// $mhs = Mhs::findOrFail(UserHelp::mhs_get_logged_nim());
@@ -767,6 +776,7 @@ class PendaftaranController extends Controller
 		$this->_data['usulan_pkm'] = $usulan_pkm;
 		$this->_data['kategori_kegiatan_list'] = $kategori_kegiatan_list;
 		$this->_data['jenis_pkm'] = $jenis_pkm;
+		$this->_data['tema_usulan_pkm_list'] = $tema_usulan_pkm_list;
 		$this->_data['status_usulan'] = $status_usulan;
 		$this->_data['mhs'] = $mhs;
 		$this->_data['pegawai'] = $pegawai;

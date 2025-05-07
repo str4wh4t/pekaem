@@ -107,7 +107,7 @@ $(document).on('click','.btn_hapus_reviewer',function(){
 			if(result.status === 'ok'){
 				location.reload();
 			}else{
-				alert('Maaf,terjadi kesalahan!');
+				alert(result.message);
 			}
 		});
 	}
@@ -480,6 +480,40 @@ $(document).on('click','#btn_gagal',function(){
 
 									</div>
 
+									<div class="row">
+
+										<div class="col-md-6">
+											<div class="form-group">
+												<label for="tema_usulan_pkm">Tema</label>
+												<select id="tema_usulan_pkm" name="tema_usulan_pkm" class="form-control" disabled="disabled">
+													@foreach($tema_usulan_pkm_list as $tema_usulan_pkm)
+													@if(!empty($usulan_pkm->tema_usulan_pkm_id))
+													<option value="{{ $tema_usulan_pkm->id }}" {{ old('tema_usulan_pkm_id', @$usulan_pkm->tema_usulan_pkm_id) == $tema_usulan_pkm->id ? 'selected' : '' }}>
+														{{ $tema_usulan_pkm->nama_tema }}
+													</option>
+													@else
+													<option value="" disabled selected>Pilih tema</option>
+													@endif
+													@endforeach
+												</select>
+											</div>
+										</div>
+
+										{{-- <div class="col-md-6">
+											<div class="form-group">
+												<label for="projectinput6">Budget</label>
+												<select id="projectinput6" name="budget" class="form-control">
+													<option value="0" selected="" disabled="">Budget</option>
+													<option value="less than 5000$">less than 5000$</option>
+													<option value="5000$ - 10000$">5000$ - 10000$</option>
+													<option value="10000$ - 20000$">10000$ - 20000$</option>
+													<option value="more than 20000$">more than 20000$</option>
+												</select>
+											</div>
+										</div> --}}
+
+									</div>
+
 									<h4 class="form-section"><i class="ft-user"></i> Anggota PKM</h4>
 
 									<div class="row">
@@ -566,7 +600,7 @@ $(document).on('click','#btn_gagal',function(){
                                             <span class="input-group-text"><i class="ft-search"></i></span>
                                         </div>
                                         {{-- <select id="pembimbing" class="form-control" placeholder="Cari dosen" name="pegawai_id" disabled="disabled" style="width: 80%"></select> --}}
-										<input type="text" id="" class="form-control" placeholder="" value="{{ $usulan_pkm->pegawai->glr_dpn . " " . $usulan_pkm->pegawai->nama . " " . $usulan_pkm->pegawai->glr_blkg . " [" . $usulan_pkm->pegawai->nip . "]" . " [" . $usulan_pkm->pegawai->nidn . "]" }}" disabled="disabled" >
+										<input type="text" id="" class="form-control" placeholder="" value="{{ $usulan_pkm->pegawai->glr_dpn . " " . $usulan_pkm->pegawai->nama . " " . $usulan_pkm->pegawai->glr_blkg . " [" . $usulan_pkm->pegawai->nip . "]" . " [" . $usulan_pkm->pegawai->nuptk . "]" }}" disabled="disabled" >
 	                                </div>
 
 									<br>

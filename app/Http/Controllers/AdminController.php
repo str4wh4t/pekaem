@@ -118,12 +118,12 @@ class AdminController extends Controller
         $pembimbing = Pegawai::where(function ($query) use ($request) {
                 $query->where('nip', 'LIKE', '%' . $request->text . '%')
                     ->orWhere('nama', 'LIKE', '%' . $request->text . '%')
-                    ->orWhere('nidn', 'LIKE', '%' . $request->text . '%');
+                    ->orWhere('nuptk', 'LIKE', '%' . $request->text . '%');
             })
             ->where('jnspeg', '1') // HANYA DOSEN
             ->whereIn('status', ['1','20']) // AKTIF, TUGAS BELAJAT TDK MENINGGALKAN JAB
-            ->whereNotNull('nidn')->where('nidn', '!=', '0')
-            ->where('nidn', '!=', '') // HANYA YANG MEMILIKI NIDN
+            ->whereNotNull('nuptk')->where('nuptk', '!=', '0')
+            ->where('nuptk', '!=', '') // HANYA YANG MEMILIKI NIDN
             // ->whereHas('roles', function (Builder $query) use ($request) {
             //     $query->where('roles.role', 'PEMBIMBING');
             // })
@@ -131,7 +131,8 @@ class AdminController extends Controller
                 $query->where('tahun', $tahun)
                     ->havingRaw('COUNT(*) > 1'); 
             })
-            ->get(['id', DB::raw('CONCAT(glr_dpn," ",nama," ",glr_blkg," ","[",nip,"]"," ","[",nidn,"]") as text')]);
+            // ->get(['id', DB::raw('CONCAT(glr_dpn," ",nama," ",glr_blkg," ","[",nip,"]"," ","[",nidn,"]") as text')]);
+            ->get(['id', DB::raw('CONCAT(glr_dpn," ",nama," ",glr_blkg," ","[",nip,"]"," ","[",nuptk,"]") as text')]);
 
         $this->_data['items'] = $pembimbing;
 

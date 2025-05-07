@@ -15,5 +15,6 @@ class DatabaseSeeder extends Seeder
         $this->call(RolesSeeder::class);
         $this->call(StatusUsulanSeeder::class);
         // $this->call(MappingFakultas::class);
+        $this->call(TemaUsulanPkmSeeder::class);
     }
 }

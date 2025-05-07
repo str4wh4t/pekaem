@@ -27,6 +27,11 @@ class UsulanPkm extends Model
         return $this->belongsTo('App\JenisPkm');
     }
 
+    public function tema_usulan_pkm()
+    {
+        return $this->belongsTo('App\TemaUsulanPkm');
+    }
+
     public function status_usulan()
     {
         return $this->belongsTo('App\StatusUsulan');

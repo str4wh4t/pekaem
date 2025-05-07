@@ -455,6 +455,22 @@ $('#kategori_kegiatan').trigger('change');
 										</div>
 									</div>
 
+									<div class="row">
+										<div class="col-md-6">
+											<div class="form-group">
+												<label for="tema_usulan_pkm">Tema</label>
+												<select id="tema_usulan_pkm" name="tema_usulan_pkm_id" class="form-control">
+													<option value="" disabled selected>Pilih tema</option>
+													@foreach($tema_usulan_pkm_list as $tema_usulan_pkm)
+													<option value="{{ $tema_usulan_pkm->id }}" {{ old('tema_usulan_pkm_id', @$usulan_pkm->tema_usulan_pkm_id) == $tema_usulan_pkm->id ? 'selected' : '' }}>
+														{{ $tema_usulan_pkm->nama_tema }}
+													</option>
+													@endforeach
+												</select>
+											</div>
+										</div>
+									</div>
+
 									<h4 class="form-section"><i class="ft-user"></i> Anggota</h4>
 
 									<div class="row">
