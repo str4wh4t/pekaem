@@ -198,13 +198,13 @@ function batalkan_penilaian(){
                                                 @if($usulan_pkm->status_usulan_id == 8)
                                                     <td class="text-center" rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
                                                         <span class="text-danger">
-                                                            <b><a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer1->reviewer_id]) }}">{{ $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer1->reviewer_id)->distinct()->sum('nilai') }}</a></b>
+                                                            <b><a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer1->reviewer_id]) }}">{{ $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer1->reviewer_id)->sum('nilai') }}</a></b>
                                                         </span>
                                                     </td>
                                                     <td class="text-center" rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
                                                         @if(!empty($reviewer2))
                                                         <span class="text-danger">
-                                                            <b><a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer2->reviewer_id]) }}">{{ $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer2->reviewer_id)->distinct()->sum('nilai') }}</a></b>
+                                                            <b><a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer2->reviewer_id]) }}">{{ $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer2->reviewer_id)->sum('nilai') }}</a></b>
                                                         </span>
                                                         @else
                                                         <span class="text-danger"><b>0</b></span>
