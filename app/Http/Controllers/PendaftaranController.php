@@ -82,7 +82,7 @@ class PendaftaranController extends Controller
 				'kategori_kegiatan_id'	=> 'required|exists:kategori_kegiatan,id',
 				'jenis_pkm_id'	=> 'required|exists:jenis_pkm,id',
 				'tema_usulan_pkm_id'	=> 'required|exists:tema_usulan_pkm,id',
-				'berkas.*' => 'file|mimes:pdf|max:5120', // Validasi setiap file dalam array
+				'berkas.*' => 'file|mimes:pdf|max:9120', // Validasi setiap file dalam array
 				'pegawai_id'	=> 'required',
 				'list_nim' => $required . '|min:'. $min_anggota_valid .'|max:' . $max_anggota_valid,
 				'list_nim.*.nim' => 'required|distinct',
@@ -106,7 +106,7 @@ class PendaftaranController extends Controller
 				'jenis_pkm_id'	=> 'required|exists:jenis_pkm,id',
 				'tema_usulan_pkm_id'	=> 'required|exists:tema_usulan_pkm,id',
 				'berkas' => 'required|array', // Pastikan 'berkas' adalah array
-				'berkas.*' => 'file|mimes:pdf|max:10120', // Validasi setiap file dalam array
+				'berkas.*' => 'file|mimes:pdf|max:9120', // Validasi setiap file dalam array
 				'pegawai_id'	=> 'required',
 				'list_nim' => 'required|array|min:2|max:4',
 				'list_nim.*.nim' => 'required|distinct',
