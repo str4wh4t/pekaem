@@ -197,6 +197,7 @@ class AdminController extends Controller
                     
                 })
                 ->where('kode_fakultas', $kode_fakultas)
+                ->whereIn('strata', ['S1', 'D3'])
                 ->where('status_terakhir', 'Aktif')
                 // ->whereDoesntHave('anggota_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
                 //     $query->whereHas('usulan_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
