@@ -136,6 +136,7 @@ function batalkan_penilaian(){
                                                 <th class="text-center align-middle" rowspan="2">Judul</th>
                                                 <th class="text-center align-middle" colspan="5">Mahasiswa</th>
                                                 <th class="text-center align-middle" colspan="2">Dosen Pendamping</th>
+                                                <th class="text-center align-middle" rowspan="2">Tema</th>
                                                 <th class="text-center align-middle" rowspan="2">File Proposal</th>
                                                 <th class="text-center align-middle" rowspan="2">Submitted At</th>
                                                 <th class="text-center align-middle" rowspan="2">Reviewer1</th>
@@ -172,6 +173,7 @@ function batalkan_penilaian(){
                                                 <td><b>{{ $mhs->nama_forlap }}</b></td>
                                                 <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b style="white-space: nowrap;">{{ $usulan_pkm->pegawai->glr_dpn . ' ' . $usulan_pkm->pegawai->nama . ' ' . $usulan_pkm->pegawai->glr_blkg }}</b></td>
                                                 <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ $usulan_pkm->pegawai->nuptk }}</b></td>
+                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ !empty($usulan_pkm->tema_usulan_pkm_id) ? $usulan_pkm->tema_usulan_pkm->nama_tema : "-" }}</b></td>
                                                 <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
                                                     @foreach ($usulan_pkm->usulan_pkm_dokumen as $i => $usulan_pkm_dokumen)
                                                     <b style="display:block;"><a href="{{ asset('storage/' . $usulan_pkm_dokumen->document_path ) }}" target="_blank">{{ 'dokumen('. ($i + 1) . ')' }}</a></b>

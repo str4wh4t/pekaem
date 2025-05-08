@@ -22,6 +22,7 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm.xls\"");
             <th colspan="5">Mahasiswa</th>
             <th rowspan="2">Kegiatan</th>
             <th rowspan="2">SubKegiatan</th>
+            <th rowspan="2">Tema</th>
             <th colspan="2">Dosen Pendamping</th>
             <th rowspan="2">File Proposal</th>
             <th rowspan="2">SubmittedAt</th>
@@ -51,6 +52,7 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm.xls\"");
             <td><span>{{ $mhs->nama_forlap }}</span></td>
             <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ $usulan_pkm->jenis_pkm->kategori_kegiatan->nama_kategori_kegiatan }}</span></td>
             <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ $usulan_pkm->jenis_pkm->nama_pkm }}</span></td>
+            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ !empty($usulan_pkm->tema_usulan_pkm_id) ? $usulan_pkm->tema_usulan_pkm->nama_tema : "-" }}</span></td>
             <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span style="white-space: nowrap;">{{ $usulan_pkm->pegawai->glr_dpn . ' ' . $usulan_pkm->pegawai->nama . ' ' . $usulan_pkm->pegawai->glr_blkg }}</span></td>
             <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ "'". $usulan_pkm->pegawai->nuptk }}</span></td>
             <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
