@@ -199,25 +199,25 @@ class AdminController extends Controller
                 // ->where('kode_fakultas', $kode_fakultas)
                 ->whereNotIn('strata', ['pasca', 'Sp1', 'S3', 'PPDS I'])
                 ->where('status_terakhir', 'Aktif')
-                // ->whereDoesntHave('anggota_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
-                //     $query->whereHas('usulan_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
-                //         $query->where('usulan_pkm.tahun', $tahun)
-                //             ->whereHas('jenis_pkm', function (Builder $query) use ($request, $jenis_pkm) {
-                //                 if(!empty($jenis_pkm)){
-                //                     $query->where('jenis_pkm.kamar', '!=', $jenis_pkm->kamar);
-                //                 }
-                //             });
-                //     }); 
-                // })
                 ->whereDoesntHave('anggota_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
                     $query->whereHas('usulan_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
                         $query->where('usulan_pkm.tahun', $tahun)
                             ->whereHas('jenis_pkm', function (Builder $query) use ($request, $jenis_pkm) {
-                                $query->where('jenis_pkm.kamar', $jenis_pkm->kamar)
-                                    ->where('jenis_pkm.kategori_kegiatan_id', $jenis_pkm->kategori_kegiatan_id);
+                                if(!empty($jenis_pkm)){
+                                    $query->where('jenis_pkm.kamar', '!=', $jenis_pkm->kamar);
+                                }
                             });
                     }); 
                 })
+                // ->whereDoesntHave('anggota_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
+                //     $query->whereHas('usulan_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
+                //         $query->where('usulan_pkm.tahun', $tahun)
+                //             ->whereHas('jenis_pkm', function (Builder $query) use ($request, $jenis_pkm) {
+                //                 $query->where('jenis_pkm.kamar', $jenis_pkm->kamar)
+                //                     ->where('jenis_pkm.kategori_kegiatan_id', $jenis_pkm->kategori_kegiatan_id);
+                //             });
+                //     }); 
+                // })
                 ->get(['nim AS id', DB::raw('CONCAT(nama," ","[",nim,"]"," ","[",nama_forlap,"]"," ","[",nama_fak_ijazah,"]") as text')]);
         }
 
