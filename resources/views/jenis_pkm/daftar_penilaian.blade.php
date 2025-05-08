@@ -151,7 +151,7 @@ function batalkan_penilaian(){
                                                 <th class="text-center align-middle" >Fakultas</th>
                                                 <th class="text-center align-middle" >Prodi</th>
                                                 <th class="text-center align-middle">Nama</th>
-                                                <th class="text-center align-middle">NIDN</th>
+                                                <th class="text-center align-middle">NUPTK</th>
                                                 <th class="text-center align-middle">a</th>
                                                 <th class="text-center align-middle">b</th>
                                                 <th class="text-center align-middle">(a+b)/2</th>
@@ -171,7 +171,7 @@ function batalkan_penilaian(){
                                                 <td><b>{{ $mhs->nama_fak_ijazah }}</b></td>
                                                 <td><b>{{ $mhs->nama_forlap }}</b></td>
                                                 <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b style="white-space: nowrap;">{{ $usulan_pkm->pegawai->glr_dpn . ' ' . $usulan_pkm->pegawai->nama . ' ' . $usulan_pkm->pegawai->glr_blkg }}</b></td>
-                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ $usulan_pkm->pegawai->nidn }}</b></td>
+                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ $usulan_pkm->pegawai->nuptk }}</b></td>
                                                 <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
                                                     @foreach ($usulan_pkm->usulan_pkm_dokumen as $i => $usulan_pkm_dokumen)
                                                     <b style="display:block;"><a href="{{ asset('storage/' . $usulan_pkm_dokumen->document_path ) }}" target="_blank">{{ 'dokumen('. ($i + 1) . ')' }}</a></b>

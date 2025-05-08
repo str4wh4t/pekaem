@@ -36,7 +36,7 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm.xls\"");
             <th>Fakultas</th>
             <th>Prodi</th>
             <th>Nama</th>
-            <th>NIDN</th>
+            <th>NUPTK</th>
             <th>a</th>
             <th>b</th>
             <th>(a+b)/2</th>
@@ -56,7 +56,7 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm.xls\"");
             <td><span>{{ $mhs->nama_fak_ijazah }}</span></td>
             <td><span>{{ $mhs->nama_forlap }}</span></td>
             <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span style="white-space: nowrap;">{{ $usulan_pkm->pegawai->glr_dpn . ' ' . $usulan_pkm->pegawai->nama . ' ' . $usulan_pkm->pegawai->glr_blkg }}</span></td>
-            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ "'". $usulan_pkm->pegawai->nidn }}</span></td>
+            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ "'". $usulan_pkm->pegawai->nuptk }}</span></td>
             <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
                 @foreach ($usulan_pkm->usulan_pkm_dokumen()->take(1)->get() as $i => $usulan_pkm_dokumen)
                 <span style="display:block;"><a href="{{ asset('storage/' . $usulan_pkm_dokumen->document_path ) }}" target="_blank">{{ 'dokumen('. ($i + 1) . ')' }}</a></span>, 
@@ -86,7 +86,7 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm.xls\"");
                     $reviewer1 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 1)->first();
                     @endphp
                     <span>
-                        <span><a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer1->reviewer_id]) }}">{{ $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer1->reviewer_id)->distinct()->sum('nilai') }}</a></span>
+                        <span><a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer1->reviewer_id]) }}">{{ $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer1->reviewer_id)->sum('nilai') }}</a></span>
                     </span>
                 </td>
                 <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
@@ -95,7 +95,7 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm.xls\"");
                     @endphp
                     @if(!empty($reviewer2))
                     <span>
-                        <span><a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer2->reviewer_id]) }}">{{ $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer2->reviewer_id)->distinct()->sum('nilai') }}</a></span>
+                        <span><a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer2->reviewer_id]) }}">{{ $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer2->reviewer_id)->sum('nilai') }}</a></span>
                     </span>
                     @else
                     <span><span>0</span></span>

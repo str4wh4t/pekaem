@@ -33,7 +33,7 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm.xls\"");
             <th>Fakultas</th>
             <th>Prodi</th>
             <th>Nama</th>
-            <th>NIDN</th>
+            <th>NUPTK</th>
         </tr>
     </thead>
     <tbody>
@@ -52,7 +52,7 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm.xls\"");
             <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ $usulan_pkm->jenis_pkm->kategori_kegiatan->nama_kategori_kegiatan }}</span></td>
             <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ $usulan_pkm->jenis_pkm->nama_pkm }}</span></td>
             <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span style="white-space: nowrap;">{{ $usulan_pkm->pegawai->glr_dpn . ' ' . $usulan_pkm->pegawai->nama . ' ' . $usulan_pkm->pegawai->glr_blkg }}</span></td>
-            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ "'". $usulan_pkm->pegawai->nidn }}</span></td>
+            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ "'". $usulan_pkm->pegawai->nuptk }}</span></td>
             <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
                 @foreach ($usulan_pkm->usulan_pkm_dokumen()->take(1)->get() as $i => $usulan_pkm_dokumen)
                 <b style="display:block;"><a href="{{ asset('storage/' . $usulan_pkm_dokumen->document_path ) }}" target="_blank">{{ 'dokumen('. ($i + 1) . ')' }}</a></span>, 
