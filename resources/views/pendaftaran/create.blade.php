@@ -166,6 +166,7 @@ function init_select(){
 		    data: function (params){
 	      			var query = {
 	        			'text' : params.term,
+						'ketua_nim' : '{{ isset($mhs->nim) ? $mhs->nim : '' }}',
 						'jenis_pkm_id' : $('#jenis_pkm').val(),
 		            	'_token' :csrf,
 	      			}

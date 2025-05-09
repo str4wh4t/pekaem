@@ -233,6 +233,7 @@ class AdminController extends Controller
         $tahun = date('Y');
         $usulan_pkm_id = $request->usulan_pkm_id;
         $jenis_pkm = JenisPkm::find($request->jenis_pkm_id);
+        $ketua_nim = $request->ketua_nim;
         $mhs = [];
         if(!empty($jenis_pkm)){
             if (UserHelp::get_selected_role() == "ADMINFAKULTAS") {
@@ -241,10 +242,11 @@ class AdminController extends Controller
     
                 // }else{
 
-                    $mhs = Mhs::where(function ($query) use ($request, $kode_fakultas) {
+                    $mhs = Mhs::where(function ($query) use ($request, $kode_fakultas, $ketua_nim) {
                         $query->where('nim', 'LIKE', '%' . $request->text . '%')
                             ->orWhere('nama', 'LIKE', '%' . $request->text . '%');
                         })
+                        ->where('nim', '!=', $ketua_nim)
                         // ->where('kode_fakultas', $kode_fakultas)
                         ->where('status_terakhir', 'Aktif')
                         ->whereDoesntHave('anggota_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
