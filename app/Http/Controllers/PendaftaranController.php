@@ -713,6 +713,32 @@ class PendaftaranController extends Controller
 		return redirect()->route('share.pendaftaran.list')->with('message', 'Data berhasil di-hapus.');
 	}
 
+	public function forcedelete($uuid)
+	{
+		DB::transaction(function () use ($uuid) {
+			$usulan_pkm = UsulanPkm::where('uuid', $uuid)->with('revisi', 'penilaian_reviewer', 'review', 'perbaikan', 'reviewer_usulan_pkm', 'usulan_pkm_dokumen')->firstOrFail();
+
+			$usulan_pkm->revisi()->delete();
+			$usulan_pkm->penilaian_reviewer()->delete();
+			$usulan_pkm->review()->delete();
+			$usulan_pkm->perbaikan()->delete();
+			$usulan_pkm->reviewer_usulan_pkm()->delete();
+
+			if ($usulan_pkm->usulan_pkm_dokumen->count() > 0) {
+				foreach ($usulan_pkm->usulan_pkm_dokumen as $usulan_pkm_dokumen) {
+					$file = 'public/' . $usulan_pkm_dokumen->document_path;
+					Storage::delete($file);
+					$usulan_pkm_dokumen->delete();
+				}
+			}
+			$usulan_pkm->delete();
+		});
+
+		
+
+		return redirect()->route('share.pendaftaran.list')->with('message', 'Data berhasil di-hapus.');
+	}
+
 	public function read(Request $request, $uuid)
 	{
 		$id = UsulanPkm::where('uuid', $uuid)->first()->id;

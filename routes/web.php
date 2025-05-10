@@ -33,6 +33,7 @@ Route::get('mhs/pendaftaran/edit/{uuid}', 'PendaftaranController@edit')->name('m
 Route::get('admin/pendaftaran/edit/{uuid}', 'PendaftaranController@edit')->name('admin.pendaftaran.edit');
 Route::get('mhs/pendaftaran/hapus/{uuid}', 'PendaftaranController@hapus')->name('mhs.pendaftaran.hapus');
 Route::get('admin/pendaftaran/hapus/{uuid}', 'PendaftaranController@hapus')->name('admin.pendaftaran.hapus');
+Route::get('super/pendaftaran/forcedelete/{uuid}', 'PendaftaranController@forcedelete')->name('super.pendaftaran.forcedelete');
 Route::post('mhs/pendaftaran/simpan', 'PendaftaranController@simpan')->name('mhs.pendaftaran.simpan');
 Route::post('admin/pendaftaran/simpan', 'PendaftaranController@simpan')->name('admin.pendaftaran.simpan');
 Route::post('mhs/users/ajax/{method}', 'AdminController@ajax')->name('mhs.users.ajax');

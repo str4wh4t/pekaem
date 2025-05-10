@@ -362,6 +362,9 @@ if(confirm('Yakin akan menetapkan ?')){
 
                                             {{-- @endif --}}
                                         @endif
+                                        @if(Userhelp::get_selected_role() == 'SUPER')
+                                            <a class="btn btn-danger btn-sm btn_hapus" href="{{ route('super.pendaftaran.forcedelete', ['uuid' => $u->uuid]) }}"  ><i class="fa fa-times" ></i> Force Delete</a>
+                                        @endif
                                         </td>
                                     </tr>
                                     @empty
