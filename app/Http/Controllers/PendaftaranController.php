@@ -370,7 +370,11 @@ class PendaftaranController extends Controller
 		if($usulan_pkm->status_usulan->keterangan != "BARU"){
 		// if(!in_array($usulan_pkm->status_usulan->keterangan, ["BARU", "LANJUT"])){
 			// return redirect()->route('share.pendaftaran.list')->with('message', 'Dilarang menghapus usulan.');
-			return ['status' => 'error', 'message' => 'Dilarang menghapus usulan.'];
+			if($usulan_pkm->status_usulan->keterangan == "LANJUT"){
+				if($usulan_pkm->penilaian_reviewer->count() > 0){
+					return ['status' => 'error', 'message' => 'Dilarang menghapus usulan.'];
+				}
+			}
 		}
 
 		DB::beginTransaction();

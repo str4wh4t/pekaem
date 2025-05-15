@@ -121,7 +121,7 @@ class AdminController extends Controller
                     ->orWhere('nuptk', 'LIKE', '%' . $request->text . '%');
             })
             ->where('jnspeg', '1') // HANYA DOSEN
-            ->whereIn('status', ['1','20']) // AKTIF, TUGAS BELAJAT TDK MENINGGALKAN JAB
+            ->whereIn('status', ['1', '20', '6', '22']) // AKTIF, TUGAS BELAJAT TDK MENINGGALKAN JAB, IJIN BELAJAR
             ->whereNotNull('nuptk')->where('nuptk', '!=', '0')
             ->where('nuptk', '!=', '') // HANYA YANG MEMILIKI NIDN
             // ->whereHas('roles', function (Builder $query) use ($request) {
@@ -129,7 +129,7 @@ class AdminController extends Controller
             // })
             ->whereDoesntHave('usulan_pkm', function (Builder $query) use ($request, $tahun) {
                 $query->where('tahun', $tahun)
-                    ->havingRaw('COUNT(*) > 1'); 
+                    ->havingRaw('COUNT(*) > 9'); 
             })
             // ->get(['id', DB::raw('CONCAT(glr_dpn," ",nama," ",glr_blkg," ","[",nip,"]"," ","[",nidn,"]") as text')]);
             ->get(['id', DB::raw('CONCAT(glr_dpn," ",nama," ",glr_blkg," ","[",nip,"]"," ","[",nuptk,"]") as text')]);
