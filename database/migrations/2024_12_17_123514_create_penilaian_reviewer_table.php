@@ -21,7 +21,7 @@ class CreatePenilaianReviewerTable extends Migration
             $table->double('score', 10, 2);
             $table->integer('bobot');
             $table->double('nilai', 10, 2);
-            $table->text('komentar')->nullable();
+            $table->longText('komentar')->nullable();
             $table->timestamps();
             $table->foreign('usulan_pkm_id')
                 ->references('id')->on('usulan_pkm')
