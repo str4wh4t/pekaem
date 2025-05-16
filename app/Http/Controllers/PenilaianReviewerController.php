@@ -69,7 +69,7 @@ class PenilaianReviewerController extends Controller
         // Validasi data
         $request->validate([
             'data.*.score' => 'required|numeric|min:0',
-            'data.*.komentar' => 'nullable|string|max:255',
+            'data.*.komentar' => 'nullable|string',
             'catatan_reviewer' => [
                 'required',
                 'string',
