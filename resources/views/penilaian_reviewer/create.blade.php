@@ -244,7 +244,7 @@ $(document).ready(function () {
                                 </div>
                                 <h4 class="form-section"><i class="fa fa-pencil"></i> Catatan Reviewer</h4>
 									<div class="form-group">
-										<textarea class="form-control" placeholder="Isian catatan reviewer" name="catatan_reviewer">{{ old('catatan_reviewer') }}</textarea>
+										<textarea class="form-control" placeholder="Isian catatan reviewer" name="catatan_reviewer" rows="15">{{ old('catatan_reviewer') }}</textarea>
 									</div>
                                 <div class="form-actions">
 									
