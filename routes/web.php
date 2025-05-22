@@ -85,8 +85,10 @@ Route::prefix('admin/kategori-kegiatan/{kategori_kegiatan}')->group(function () 
 Route::prefix('admin/usulan-pkm/{usulan_pkm}')->group(function () {
     Route::resource('penilaian-reviewer', 'PenilaianReviewerController');
     Route::get('penilaian-reviewer/{penilaian_reviewer}/batal', 'PenilaianReviewerController@batal')->name('penilaian-reviewer.batal');
-    Route::get('penilaian-reviewer/{reviewer}/lihat', 'PenilaianReviewerController@lihat')->name('penilaian-reviewer.lihat');
+    // Route::get('penilaian-reviewer/{reviewer}/lihat', 'PenilaianReviewerController@lihat')->name('penilaian-reviewer.lihat');
 });
+
+ Route::get('share/usulan-pkm/{usulan_pkm}/penilaian-reviewer/{reviewer}/lihat', 'PenilaianReviewerController@lihat')->name('penilaian-reviewer.lihat');
 
 Route::get('admin/login-as/{pegawai}', 'PagesController@login_as')->name('admin.login-as');
 
