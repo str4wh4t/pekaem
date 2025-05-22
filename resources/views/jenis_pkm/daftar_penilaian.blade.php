@@ -197,7 +197,7 @@ function batalkan_penilaian(){
                                                 <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ "" }}</b></td>
                                                 <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ "" }}</b></td>
                                                 @endif
-                                                @if($usulan_pkm->status_usulan_id == 8)
+                                                @if($usulan_pkm->status_usulan_id > 4)
                                                     <td class="text-center" rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
                                                         <span class="text-danger">
                                                             <b><a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer1->reviewer_id]) }}">{{ $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer1->reviewer_id)->sum('nilai') }}</a></b>

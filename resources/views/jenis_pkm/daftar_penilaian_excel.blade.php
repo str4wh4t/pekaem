@@ -82,7 +82,7 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm.xls\"");
             <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ "" }}</span></td>
             <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ "" }}</span></td>
             @endif
-            @if($usulan_pkm->status_usulan_id == 8)
+            @if($usulan_pkm->status_usulan_id > 4)
                 <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
                     @php
                     $reviewer1 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 1)->first();
