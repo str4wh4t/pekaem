@@ -60,43 +60,43 @@ $(document).ready(function () {
     // // Panggil fungsi untuk memeriksa status awal
     // toggleButtonState();
 
-    // Event listener untuk checkbox "Select All"
-    $('.select-all').on('change', function () {
-        // Set semua .select-item berdasarkan status .select-all
-        const isChecked = $(this).prop('checked');
-        $('.select-item').prop('checked', isChecked);
-    });
-
-    // Event listener untuk checkbox individual
-    $('.select-item').on('change', function () {
-        const totalItems = $('.select-item').length;
-        const checkedItems = $('.select-item:checked').length;
-
-        if (checkedItems === totalItems) {
-            // Jika semua checkbox individual tercentang, centang Select All
-            $('.select-all').prop('checked', true);
-        } else {
-            // Jika ada checkbox yang tidak tercentang, uncheck Select All
-            $('.select-all').prop('checked', false);
-        }
-    });
-
-    // Event listener untuk perubahan status checkbox individual
-    $('.select-item').on('change', function () {
-        toggleButtonState();
-    });
-
-    // Event listener untuk Select All
-    $('.select-all').on('change', function () {
-        // Check/uncheck semua checkbox individual
-        const isChecked = $(this).prop('checked');
-        $('.select-item').prop('checked', isChecked);
-
-        // Perbarui status tombol
-        toggleButtonState();
-    });
-
     // Panggil fungsi saat halaman dimuat
+    toggleButtonState();
+});
+
+// Event listener untuk checkbox "Select All"
+$(document).on('change','.select-all', function () {
+    // Set semua .select-item berdasarkan status .select-all
+    const isChecked = $(this).prop('checked');
+    $('.select-item').prop('checked', isChecked);
+});
+
+// Event listener untuk checkbox individual
+$(document).on('change','.select-item', function () {
+    const totalItems = $('.select-item').length;
+    const checkedItems = $('.select-item:checked').length;
+
+    if (checkedItems === totalItems) {
+        // Jika semua checkbox individual tercentang, centang Select All
+        $('.select-all').prop('checked', true);
+    } else {
+        // Jika ada checkbox yang tidak tercentang, uncheck Select All
+        $('.select-all').prop('checked', false);
+    }
+});
+
+// Event listener untuk perubahan status checkbox individual
+$(document).on('change','.select-item', function () {
+    toggleButtonState();
+});
+
+// Event listener untuk Select All
+$('.select-all').on('change', function () {
+    // Check/uncheck semua checkbox individual
+    const isChecked = $(this).prop('checked');
+    $('.select-item').prop('checked', isChecked);
+
+    // Perbarui status tombol
     toggleButtonState();
 });
 
