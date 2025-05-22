@@ -217,7 +217,7 @@ function batalkan_penilaian(){
                                 </div>
                                 <h4 class="form-section"><i class="fa fa-pencil"></i> Catatan Reviewer</h4>
 									<div class="form-group">
-										<textarea readonly class="form-control" placeholder="Isian catatan reviewer" name="catatan_reviewer">{{ old('catatan_reviewer', $catatan_reviewer ) }}</textarea>
+										<textarea readonly class="form-control" placeholder="Isian catatan reviewer" name="catatan_reviewer" rows="15">{{ old('catatan_reviewer', $catatan_reviewer ) }}</textarea>
 									</div>
                                 <div class="form-actions">
                                         <a class="btn btn-warning" href="{{ url()->previous() == url()->current() ? route('share.pendaftaran.read', ['uuid' => $usulan_pkm->uuid]) : url()->previous() }}">
