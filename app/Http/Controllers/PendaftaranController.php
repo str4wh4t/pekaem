@@ -129,7 +129,7 @@ class PendaftaranController extends Controller
 			$usulan_pkm->status_usulan_id = StatusUsulan::where('keterangan', 'BARU')->first()->id;
 		}
 
-		$usulan_pkm->judul = $request->judul;
+		$usulan_pkm->judul = mb_convert_encoding($request->judul, 'UTF-8', 'UTF-8');
 		$usulan_pkm->kategori_kegiatan_id = $request->kategori_kegiatan_id;
 		$usulan_pkm->jenis_pkm_id = $request->jenis_pkm_id;
 		$usulan_pkm->tema_usulan_pkm_id = $request->tema_usulan_pkm_id;
