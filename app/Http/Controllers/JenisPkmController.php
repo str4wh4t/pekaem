@@ -159,7 +159,7 @@ class JenisPkmController extends Controller
             ->with(['anggota_pkm.mhs', 'usulan_pkm_dokumen'])
             ->orderBy('nilai_total', 'desc')
             ->get();
-            
+
         $this->_data['usulan_pkm_list'] = $usulan_pkm_list;
         $this->_data['kategori_kegiatan'] = $kategoriKegiatan;
         $this->_data['tahun'] = $tahun;

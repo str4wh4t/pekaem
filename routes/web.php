@@ -83,7 +83,7 @@ Route::prefix('admin/kategori-kegiatan/{kategori_kegiatan}')->group(function () 
 });
 
 Route::prefix('admin/kategori-kegiatan/{kategori_kegiatan}')->group(function () {
-    Route::get('daftar-penilaian-kategori-kegiatan-excel', 'JenisPkmController@daftar_penilaian_excel')->name('jenis-pkm.daftar-penilaian-kategori-kegiatan-excel');
+    Route::get('daftar-penilaian-kategori-kegiatan-excel', 'JenisPkmController@daftar_penilaian_kategori_kegiatan_excel')->name('jenis-pkm.daftar-penilaian-kategori-kegiatan-excel');
 });
 
 Route::prefix('admin/usulan-pkm/{usulan_pkm}')->group(function () {
