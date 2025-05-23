@@ -144,4 +144,26 @@ class JenisPkmController extends Controller
         return view('jenis_pkm.daftar_penilaian_excel', $this->_data);
 
 	}
+
+    public function daftar_penilaian_kategori_kegiatan_excel(KategoriKegiatan $kategoriKegiatan)
+    {
+        $tahun = date('Y');
+        $jenisPkmIds = JenisPkm::where('kategori_kegiatan_id', $kategoriKegiatan->id)->pluck('id');
+
+        if($jenisPkmIds->isEmpty()){
+            $jenisPkmIds = [0];
+        }
+
+        $usulan_pkm_list = UsulanPkm::whereIn('jenis_pkm_id', $jenisPkmIds)
+            ->where('tahun', $tahun)
+            ->with(['anggota_pkm.mhs', 'usulan_pkm_dokumen'])
+            ->orderBy('nilai_total', 'desc')
+            ->get();
+            
+        $this->_data['usulan_pkm_list'] = $usulan_pkm_list;
+        $this->_data['kategori_kegiatan'] = $kategoriKegiatan;
+        $this->_data['tahun'] = $tahun;
+        return view('jenis_pkm.daftar_penilaian_kategori_kegiatan_excel', $this->_data);
+
+	}
 }

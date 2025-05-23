@@ -91,6 +91,7 @@ $('.zero-configuration').DataTable();
                                         <td>
                                            <a class="btn btn-info btn-sm" href="{{ route('kategori-kegiatan.edit', ['kategori_kegiatan' => $kategori_kegiatan]) }}"  ><i class="fa fa-pencil-square-o" ></i> Edit</a>
                                            <a class="btn btn-success btn-sm" href="{{ route('jenis-pkm.index', ['kategori_kegiatan' => $kategori_kegiatan]) }}"  ><i class="fa fa-pencil-square-o" ></i> Subkegiatan</a>
+                                           <a class="btn btn-primary btn-sm" href="{{ route('jenis-pkm.daftar-penilaian-kategori-kegiatan-excel', ['kategori_kegiatan' => $kategori_kegiatan]) }}"  ><i class="fa fa-file"></i> Laporan LR-3</a>
                                         </td>
                                     </tr>
                                     @endforeach
