@@ -41,7 +41,7 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm.xls\"");
         @foreach ($usulan_pkm_list as $usulan_pkm)
         <tr>
             <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">{{ $loop->iteration }}</td>
-            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ $usulan_pkm->judul, 'UTF-8', 'UTF-8' }}</span></td>
+            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ $usulan_pkm->judul }}</span></td>
             @php
             $mhs = $usulan_pkm->anggota_pkm()->where('sebagai', 0)->first()->mhs;
             @endphp
