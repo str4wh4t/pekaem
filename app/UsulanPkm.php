@@ -80,7 +80,8 @@ class UsulanPkm extends Model
     public function getJudulAttribute($value)
     {
         // Bersihkan \xC2\xA0 (non-breaking space → Â)
-        $clean = str_replace("\xC2\xA0", ' ', $value);
+        // $clean = str_replace("\xC2\xA0", ' ', $value);
+        $clean = preg_replace('/[^\x00-\x7F]/', '', $value);
 
         // Rapikan spasi berlebihan
         return trim(preg_replace('/\s+/', ' ', $clean));
