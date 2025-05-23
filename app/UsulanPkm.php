@@ -76,4 +76,13 @@ class UsulanPkm extends Model
     {
         return $this->hasMany('App\UsulanPkmDokumen');
     }
+
+    public function getJudulAttribute($value)
+    {
+        // Bersihkan \xC2\xA0 (non-breaking space → Â)
+        $clean = str_replace("\xC2\xA0", ' ', $value);
+
+        // Rapikan spasi berlebihan
+        return trim(preg_replace('/\s+/', ' ', $clean));
+    }
 }
