@@ -1,5 +1,5 @@
 @php
-header("Content-Type: application/vnd.ms-excel");
+header("Content-Type: application/vnd.ms-excel; charset=UTF-8");
 header("Content-Disposition: attachment; filename=\"usulan_pkm.xls\"");
 @endphp
 <table border="1">
