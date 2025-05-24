@@ -90,9 +90,13 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm_per_kegiatan.xls\
                     @php
                     $reviewer1 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 1)->first();
                     @endphp
+                    @if(!empty($reviewer1))
                     <span>
                         <span><a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer1->reviewer_id]) }}">{{ $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer1->reviewer_id)->sum('nilai') }}</a></span>
                     </span>
+                    @else
+                    <span><span>0</span></span>
+                    @endif
                 </td>
                 <td rowspan="{{ $jml_anggota_pkm }}">
                     @php
