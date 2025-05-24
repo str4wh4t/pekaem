@@ -160,6 +160,8 @@ class JenisPkmController extends Controller
             ->orderBy('nilai_total', 'desc')
             ->get();
 
+        dd($usulan_pkm_list);
+
         $this->_data['usulan_pkm_list'] = $usulan_pkm_list;
         $this->_data['kategori_kegiatan'] = $kategoriKegiatan;
         $this->_data['tahun'] = $tahun;
