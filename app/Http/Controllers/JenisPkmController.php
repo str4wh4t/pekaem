@@ -156,7 +156,7 @@ class JenisPkmController extends Controller
 
         $usulan_pkm_list = UsulanPkm::whereIn('jenis_pkm_id', $jenisPkmIds)
             ->where('tahun', $tahun)
-            ->with(['anggota_pkm', 'anggota_pkm.mhs', 'usulan_pkm_dokumen'])
+            ->with(['anggota_pkm', 'anggota_pkm.mhs', 'usulan_pkm_dokumen', 'jenis_pkm'])
             ->orderBy('nilai_total', 'desc')
             ->get();
 
