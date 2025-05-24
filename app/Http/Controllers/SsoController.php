@@ -34,7 +34,7 @@ class SsoController extends Controller
         $this->_config = [
             'clientId'                => 'd4e33023-d86d-4234-8a41-cd60a2145e36',
             'clientSecret'            => 'HHIQsID9tD9Tyi+s9TEnpm1w8yfRnBuT78N3UQodUEA=',
-            'redirectUri'             => url('/') . '/sso/authen',
+            'redirectUri'             => 'https://pkm.apps.undip.ac.id/sso/authen',
             'urlAuthorize'            => 'https://login.microsoftonline.com/03290435-ff74-45d1-aeaa-173677221cf8/oauth2/v2.0/authorize',
             'urlAccessToken'          => 'https://login.microsoftonline.com/03290435-ff74-45d1-aeaa-173677221cf8/oauth2/v2.0/token',
             'urlResourceOwnerDetails' => '',
