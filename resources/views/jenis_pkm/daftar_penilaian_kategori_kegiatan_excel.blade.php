@@ -1,6 +1,6 @@
 @php
 header("Content-Type: application/vnd.ms-excel");
-header("Content-Disposition: attachment; filename=\"usulan_pkm.xls\"");
+header("Content-Disposition: attachment; filename=\"usulan_pkm_per_kegiatan.xls\"");
 @endphp
 <table border="1">
     <thead>
@@ -45,9 +45,12 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm.xls\"");
     </thead>
     <tbody>
         @foreach ($usulan_pkm_list as $usulan_pkm)
+        @php
+            $jml_anggota_pkm = $usulan_pkm->anggota_pkm()->count();
+        @endphp
         <tr>
-            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">{{ $loop->iteration }}</td>
-            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ $usulan_pkm->judul }}</span></td>
+            <td rowspan="{{ $jml_anggota_pkm }}">{{ $loop->iteration }}</td>
+            <td rowspan="{{ $jml_anggota_pkm }}"><span>{{ $usulan_pkm->judul }}</span></td>
             @php
             $mhs = $usulan_pkm->anggota_pkm()->where('sebagai', 0)->first()->mhs;
             @endphp
@@ -56,34 +59,34 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm.xls\"");
             <td><span>{{ "Ketua" }}</span></td>
             <td><span>{{ $mhs->nama_fak_ijazah }}</span></td>
             <td><span>{{ $mhs->nama_forlap }}</span></td>
-            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span style="white-space: nowrap;">{{ $usulan_pkm->pegawai->glr_dpn . ' ' . $usulan_pkm->pegawai->nama . ' ' . $usulan_pkm->pegawai->glr_blkg }}</span></td>
-            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ "'". $usulan_pkm->pegawai->nuptk }}</span></td>
-            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ !empty($usulan_pkm->tema_usulan_pkm_id) ? $usulan_pkm->tema_usulan_pkm->nama_tema : "-" }}</span></td>
-            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
+            <td rowspan="{{ $jml_anggota_pkm }}"><span style="white-space: nowrap;">{{ $usulan_pkm->pegawai->glr_dpn . ' ' . $usulan_pkm->pegawai->nama . ' ' . $usulan_pkm->pegawai->glr_blkg }}</span></td>
+            <td rowspan="{{ $jml_anggota_pkm }}"><span>{{ "'". $usulan_pkm->pegawai->nuptk }}</span></td>
+            <td rowspan="{{ $jml_anggota_pkm }}"><span>{{ !empty($usulan_pkm->tema_usulan_pkm_id) ? $usulan_pkm->tema_usulan_pkm->nama_tema : "-" }}</span></td>
+            <td rowspan="{{ $jml_anggota_pkm }}">
                 @foreach ($usulan_pkm->usulan_pkm_dokumen()->take(1)->get() as $i => $usulan_pkm_dokumen)
                 <span style="display:block;"><a href="{{ asset('storage/' . $usulan_pkm_dokumen->document_path ) }}" target="_blank">{{ 'dokumen('. ($i + 1) . ')' }}</a></span>, 
                 @endforeach
             </td>
-            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ $usulan_pkm->created_at }}</span></td>
+            <td rowspan="{{ $jml_anggota_pkm }}"><span>{{ $usulan_pkm->created_at }}</span></td>
             @if($usulan_pkm->reviewer_usulan_pkm->count() > 0)
             @php
             $reviewer1 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 1)->first();
             @endphp
-            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span style="white-space: nowrap;">{{ $reviewer1->reviewer->glr_dpn . ' ' . $reviewer1->reviewer->nama . ' ' . $reviewer1->reviewer->glr_blkg }}</span></td>
+            <td rowspan="{{ $jml_anggota_pkm }}"><span style="white-space: nowrap;">{{ $reviewer1->reviewer->glr_dpn . ' ' . $reviewer1->reviewer->nama . ' ' . $reviewer1->reviewer->glr_blkg }}</span></td>
                 @php
                 $reviewer2 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 2)->first();   
                 @endphp
                 @if(!empty($reviewer2))
-                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span style="white-space: nowrap;">{{ $reviewer2->reviewer->glr_dpn . ' ' . $reviewer2->reviewer->nama . ' ' . $reviewer2->reviewer->glr_blkg }}</span></td>
+                <td rowspan="{{ $jml_anggota_pkm }}"><span style="white-space: nowrap;">{{ $reviewer2->reviewer->glr_dpn . ' ' . $reviewer2->reviewer->nama . ' ' . $reviewer2->reviewer->glr_blkg }}</span></td>
                 @else
-                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ "" }}</span></td>
+                <td rowspan="{{ $jml_anggota_pkm }}"><span>{{ "" }}</span></td>
                 @endif
             @else
-            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ "" }}</span></td>
-            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ "" }}</span></td>
+            <td rowspan="{{ $jml_anggota_pkm }}"><span>{{ "" }}</span></td>
+            <td rowspan="{{ $jml_anggota_pkm }}"><span>{{ "" }}</span></td>
             @endif
             @if($usulan_pkm->status_usulan_id > 4)
-                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
+                <td rowspan="{{ $jml_anggota_pkm }}">
                     @php
                     $reviewer1 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 1)->first();
                     @endphp
@@ -91,7 +94,7 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm.xls\"");
                         <span><a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer1->reviewer_id]) }}">{{ $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer1->reviewer_id)->sum('nilai') }}</a></span>
                     </span>
                 </td>
-                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
+                <td rowspan="{{ $jml_anggota_pkm }}">
                     @php
                     $reviewer2 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 2)->first();   
                     @endphp
@@ -103,17 +106,17 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm.xls\"");
                     <span><span>0</span></span>
                     @endif
                 </td>
-                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
+                <td rowspan="{{ $jml_anggota_pkm }}">
                     <span><span>{{ "'" . $usulan_pkm->nilai_total }}</span></span>
                 </td>
             @else
-                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
+                <td rowspan="{{ $jml_anggota_pkm }}">
                     <span><span>0</span></span>
                 </td>
-                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
+                <td rowspan="{{ $jml_anggota_pkm }}">
                     <span><span>0</span></span>
                 </td>
-                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
+                <td rowspan="{{ $jml_anggota_pkm }}">
                     <span><span>0</span></span>
                 </td>
             @endif
