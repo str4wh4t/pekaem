@@ -23,6 +23,19 @@
        return false;
    }
 
+   // Handle tahun filter change
+   document.addEventListener('DOMContentLoaded', function() {
+      var tahunFilter = document.getElementById('tahun_filter');
+      if (tahunFilter) {
+         tahunFilter.addEventListener('change', function() {
+            var selectedTahun = this.value;
+            var currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('tahun', selectedTahun);
+            window.location.href = currentUrl.toString();
+         });
+      }
+   });
+
 </script>
 <!-- END PAGE LEVEL JS-->
 @endpush
@@ -36,6 +49,16 @@
             <div class="card-header">
                <h4 class="card-title">Aplikasi PKM</h4>
                <a class="heading-elements-toggle"><i class="fa fa-ellipsis-v font-medium-3"></i></a>
+               <div class="heading-elements">
+                  <div class="form-group mb-0">
+                     <label for="tahun_filter" class="mr-2" style="margin-bottom: 0;">Tahun:</label>
+                     <select id="tahun_filter" name="tahun" class="form-control form-control-sm" style="display: inline-block; width: auto; min-width: 100px;">
+                        @foreach($tahun_list as $tahun_option)
+                        <option value="{{ $tahun_option }}" {{ $tahun == $tahun_option ? 'selected' : '' }}>{{ $tahun_option }}</option>
+                        @endforeach
+                     </select>
+                  </div>
+               </div>
                {{-- <div class="heading-elements">
                   <span class="badge badge-default badge-warning">Mobile</span>
                   <span class="badge badge-default badge-success">New</span>

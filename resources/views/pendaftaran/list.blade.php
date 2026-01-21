@@ -162,6 +162,16 @@ if(confirm('Yakin akan menetapkan ?')){
 }
 });
 
+// Handle tahun filter change
+$(document).ready(function() {
+    $('#tahun_filter').on('change', function() {
+        var selectedTahun = $(this).val();
+        var currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set('tahun', selectedTahun);
+        window.location.href = currentUrl.toString();
+    });
+});
+
 </script>
 <!-- END PAGE LEVEL JS-->
 @endpush
@@ -203,6 +213,16 @@ if(confirm('Yakin akan menetapkan ?')){
                                 {{-- <li><a data-action="collapse"><i class="ft-minus"></i></a></li>
                                 <li><a data-action="reload"><i class="ft-rotate-cw"></i></a></li>
                                 <li><a data-action="close"><i class="ft-x"></i></a></li> --}}
+                                <li>
+                                    <div class="form-group mb-0">
+                                        <label for="tahun_filter" class="mr-2" style="margin-bottom: 0;">Tahun:</label>
+                                        <select id="tahun_filter" name="tahun" class="form-control form-control-sm" style="display: inline-block; width: auto; min-width: 100px;">
+                                            @foreach($tahun_list as $tahun_option)
+                                            <option value="{{ $tahun_option }}" {{ $tahun == $tahun_option ? 'selected' : '' }}>{{ $tahun_option }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </li>
                                 <li><a data-action="expand"><i class="ft-maximize"></i></a></li>
                             </ul>
                         </div>

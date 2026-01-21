@@ -33,7 +33,7 @@ class PagesController extends Controller
         return view('pages.login');
     }
 
-    public function dashboard()
+    public function dashboard(Request $request)
     {
         if (UserHelp::is_mhs()) {
             return redirect(route('sso.logout'));
@@ -49,23 +49,39 @@ class PagesController extends Controller
 
         $kode_fakultas = UserHelp::get_selected_kode_fakultas();
 
-        if(empty($kode_fakultas)){
-            $this->_data['usulan_pkm_total'] = UsulanPkm::count();
-            $this->_data['usulan_pkm_proses'] = UsulanPkm::whereIn('status_usulan_id', StatusUsulan::whereIn('keterangan', ['BARU','DISETUJUI'])->pluck('id'))->count();
-            $this->_data['usulan_pkm_belum_dinilai'] = UsulanPkm::where('status_usulan_id', StatusUsulan::where('keterangan', 'LANJUT')->first()->id)->count();
-            $this->_data['usulan_pkm_sudah_dinilai'] = UsulanPkm::where('status_usulan_id', StatusUsulan::where('keterangan', 'SUDAH_DINILAI')->first()->id)->count();
-            $this->_data['usulan_pkm'] = UsulanPkm::all();
-        }else{
-            $this->_data['usulan_pkm_total'] = UsulanPkm::where('kode_fakultas', $kode_fakultas)->count();
-            $this->_data['usulan_pkm_proses'] = UsulanPkm::where('kode_fakultas', $kode_fakultas)->whereIn('status_usulan_id', StatusUsulan::whereIn('keterangan', ['BARU','DISETUJUI'])->pluck('id'))->count();
-            $this->_data['usulan_pkm_sudah_dinilai'] = UsulanPkm::where('kode_fakultas', $kode_fakultas)->where('status_usulan_id', StatusUsulan::where('keterangan', 'SUDAH_DINILAI')->first()->id)->count();
-            $this->_data['usulan_pkm_belum_dinilai'] = UsulanPkm::where('kode_fakultas', $kode_fakultas)->where('status_usulan_id', StatusUsulan::where('keterangan', 'LANJUT')->first()->id)->count();
-            $this->_data['usulan_pkm'] = UsulanPkm::where('kode_fakultas', $kode_fakultas)->get();
+        $tahun = $request->input('tahun', date('Y'));
+
+        if (empty($kode_fakultas)) {
+            $this->_data['usulan_pkm_total'] = UsulanPkm::where('tahun', $tahun)->count();
+            $this->_data['usulan_pkm_proses'] = UsulanPkm::where('tahun', $tahun)->whereIn('status_usulan_id', StatusUsulan::whereIn('keterangan', ['BARU', 'DISETUJUI'])->pluck('id'))->count();
+            $this->_data['usulan_pkm_belum_dinilai'] = UsulanPkm::where('tahun', $tahun)->where('status_usulan_id', StatusUsulan::where('keterangan', 'LANJUT')->first()->id)->count();
+            $this->_data['usulan_pkm_sudah_dinilai'] = UsulanPkm::where('tahun', $tahun)->where('status_usulan_id', StatusUsulan::where('keterangan', 'SUDAH_DINILAI')->first()->id)->count();
+            $this->_data['usulan_pkm'] = UsulanPkm::where('tahun', $tahun)->get();
+        } else {
+            $this->_data['usulan_pkm_total'] = UsulanPkm::where('tahun', $tahun)->where('kode_fakultas', $kode_fakultas)->count();
+            $this->_data['usulan_pkm_proses'] = UsulanPkm::where('tahun', $tahun)->where('kode_fakultas', $kode_fakultas)->whereIn('status_usulan_id', StatusUsulan::whereIn('keterangan', ['BARU', 'DISETUJUI'])->pluck('id'))->count();
+            $this->_data['usulan_pkm_sudah_dinilai'] = UsulanPkm::where('tahun', $tahun)->where('kode_fakultas', $kode_fakultas)->where('status_usulan_id', StatusUsulan::where('keterangan', 'SUDAH_DINILAI')->first()->id)->count();
+            $this->_data['usulan_pkm_belum_dinilai'] = UsulanPkm::where('tahun', $tahun)->where('kode_fakultas', $kode_fakultas)->where('status_usulan_id', StatusUsulan::where('keterangan', 'LANJUT')->first()->id)->count();
+            $this->_data['usulan_pkm'] = UsulanPkm::where('tahun', $tahun)->where('kode_fakultas', $kode_fakultas)->get();
         }
 
         // dd($this->_data);
 
         $this->_data['kategori_kegiatan_list'] = KategoriKegiatan::all();
+        $this->_data['tahun'] = $tahun;
+
+        // Get list of available years from database
+        $this->_data['tahun_list'] = UsulanPkm::select('tahun')
+            ->distinct()
+            ->orderBy('tahun', 'desc')
+            ->pluck('tahun')
+            ->toArray();
+
+        // If current year is not in the list, add it
+        if (!in_array($tahun, $this->_data['tahun_list'])) {
+            $this->_data['tahun_list'][] = $tahun;
+            rsort($this->_data['tahun_list']);
+        }
 
         return view('pages.index', $this->_data);
     }
@@ -85,7 +101,7 @@ class PagesController extends Controller
             }
         }
         foreach ($pegawai_roles as $pegawai_role) {
-            if($pegawai_role->roles->role == 'PEMBIMBING')
+            if ($pegawai_role->roles->role == 'PEMBIMBING')
                 continue;
             $roles_avail[] = $pegawai_role->roles;
         }

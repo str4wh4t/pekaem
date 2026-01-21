@@ -73,7 +73,7 @@ class PendaftaranController extends Controller
 			$min_anggota_valid = $anggota_pkm_existing > $min_anggota ? 0 : $min_anggota - $anggota_pkm_existing;
 
 			$required = '';
-			if($usulan_pkm->anggota_pkm->count() == 1){
+			if ($usulan_pkm->anggota_pkm->count() == 1) {
 				$required = 'required|array';
 			}
 
@@ -86,7 +86,7 @@ class PendaftaranController extends Controller
 				'berkas' => 'required|array', // Pastikan 'berkas' adalah array
 				'berkas.*' => 'file|mimes:pdf|max:5120', // Validasi setiap file dalam array
 				'pegawai_id'	=> 'required',
-				'list_nim' => $required . '|min:'. $min_anggota_valid .'|max:' . $max_anggota_valid,
+				'list_nim' => $required . '|min:' . $min_anggota_valid . '|max:' . $max_anggota_valid,
 				'list_nim.*.nim' => 'required|distinct',
 			], [
 				'list_nim.required' => 'Anggota harus ditambahkan.',
@@ -99,7 +99,7 @@ class PendaftaranController extends Controller
 			if ($usulan_pkm->created_by != UserHelp::admin_get_logged_nip()) {
 				return redirect()->back()->with('message', 'Dilarang mengubah usulan.');
 			}
-		}else{
+		} else {
 			// IF NEW
 			$request->validate([
 				'mhs_nim'	=> 'required',
@@ -334,10 +334,10 @@ class PendaftaranController extends Controller
 			return redirect()->back()->with('message', 'Dilarang mengubah usulan.');
 		}
 
-		if($usulan_pkm_dokumen->usulan_pkm->status_usulan->keterangan != "BARU"){
+		if ($usulan_pkm_dokumen->usulan_pkm->status_usulan->keterangan != "BARU") {
 			return redirect()->route('share.pendaftaran.list')->with('message', 'Dilarang menghapus usulan.');
 		}
-		
+
 		$file = 'public/' . $file;
 		Storage::delete($file);
 		$usulan_pkm_dokumen->delete();
@@ -351,7 +351,7 @@ class PendaftaranController extends Controller
 			return redirect()->back()->with('message', 'Dilarang mengubah usulan.');
 		}
 
-		if($anggota_pkm->usulan_pkm->status_usulan->keterangan != "BARU"){
+		if ($anggota_pkm->usulan_pkm->status_usulan->keterangan != "BARU") {
 			return redirect()->route('share.pendaftaran.list')->with('message', 'Dilarang menghapus usulan.');
 		}
 
@@ -367,11 +367,11 @@ class PendaftaranController extends Controller
 
 		$usulan_pkm = UsulanPkm::findOrFail($request->usulan_pkm_id);
 
-		if($usulan_pkm->status_usulan->keterangan != "BARU"){
-		// if(!in_array($usulan_pkm->status_usulan->keterangan, ["BARU", "LANJUT"])){
+		if ($usulan_pkm->status_usulan->keterangan != "BARU") {
+			// if(!in_array($usulan_pkm->status_usulan->keterangan, ["BARU", "LANJUT"])){
 			// return redirect()->route('share.pendaftaran.list')->with('message', 'Dilarang menghapus usulan.');
-			if($usulan_pkm->status_usulan->keterangan == "LANJUT"){
-				if($usulan_pkm->penilaian_reviewer->count() > 0){
+			if ($usulan_pkm->status_usulan->keterangan == "LANJUT") {
+				if ($usulan_pkm->penilaian_reviewer->count() > 0) {
 					return ['status' => 'error', 'message' => 'Dilarang menghapus usulan.'];
 				}
 			}
@@ -445,31 +445,31 @@ class PendaftaranController extends Controller
 		$tahun = date('Y');
 		$usulan_pkm_id = $request->usulan_pkm_id;
 		$usulan_pkm_selected = null;
-		if($usulan_pkm_id){
+		if ($usulan_pkm_id) {
 			$kamar_taken = JenisPkm::whereHas('usulan_pkm', function (Builder $query) use ($request, $tahun) {
-									$query->where('mhs_nim', $request->mhs_nim)
-										->where('tahun', $tahun);
-								})->where('kategori_kegiatan_id', $request->kategori_kegiatan_id)
-								->distinct('kamar') // Membuat hasil distinct berdasarkan kolom 'kamar'
-								->pluck('kamar');
+				$query->where('mhs_nim', $request->mhs_nim)
+					->where('tahun', $tahun);
+			})->where('kategori_kegiatan_id', $request->kategori_kegiatan_id)
+				->distinct('kamar') // Membuat hasil distinct berdasarkan kolom 'kamar'
+				->pluck('kamar');
 			$usulan_pkm_selected = UsulanPkm::where('id', $usulan_pkm_id)->firstOrFail();
-		}else{
+		} else {
 			$kamar_taken = JenisPkm::whereHas('usulan_pkm', function (Builder $query) use ($request, $tahun) {
-									$query->where('mhs_nim', $request->mhs_nim)
-										->where('tahun', $tahun);
-								})->where('kategori_kegiatan_id', $request->kategori_kegiatan_id)
-								->distinct('kamar') // Membuat hasil distinct berdasarkan kolom 'kamar'
-								->pluck('kamar');
+				$query->where('mhs_nim', $request->mhs_nim)
+					->where('tahun', $tahun);
+			})->where('kategori_kegiatan_id', $request->kategori_kegiatan_id)
+				->distinct('kamar') // Membuat hasil distinct berdasarkan kolom 'kamar'
+				->pluck('kamar');
 		}
 		$jenis_pkm_list = JenisPkm::where('kategori_kegiatan_id', $request->kategori_kegiatan_id)
-										->whereNotIn('kamar', $kamar_taken)
-										->get();
-		
-		if(!empty($usulan_pkm_selected)){
-			if($usulan_pkm_selected->jenis_pkm->kategori_kegiatan_id == $request->kategori_kegiatan_id){
+			->whereNotIn('kamar', $kamar_taken)
+			->get();
+
+		if (!empty($usulan_pkm_selected)) {
+			if ($usulan_pkm_selected->jenis_pkm->kategori_kegiatan_id == $request->kategori_kegiatan_id) {
 				$jenis_pkm_list = $jenis_pkm_list instanceof \Illuminate\Support\Collection
-								? $jenis_pkm_list
-								: collect($jenis_pkm_list);
+					? $jenis_pkm_list
+					: collect($jenis_pkm_list);
 
 				// Tambahkan $jenis_pkm ke dalam $jenis_pkm_list
 				$jenis_pkm_list = $jenis_pkm_list->merge([$usulan_pkm_selected->jenis_pkm]);
@@ -477,8 +477,6 @@ class PendaftaranController extends Controller
 				// Hapus item duplikat jika diperlukan
 				$jenis_pkm_list = $jenis_pkm_list->unique('id');
 			}
-			
-
 		}
 		$this->_data['jenis_pkm_list'] = $jenis_pkm_list;
 
@@ -488,7 +486,7 @@ class PendaftaranController extends Controller
 	public function list(Request $request)
 	{
 		// $usulan_pkm = UsulanPkm::all()->sortBy("judul");
-		$tahun = date('Y');
+		$tahun = $request->input('tahun', date('Y'));
 		if (UserHelp::get_selected_role() == "SUPER") {
 			$usulan_pkm = UsulanPkm::where('tahun', $tahun)->get();
 		}
@@ -554,6 +552,20 @@ class PendaftaranController extends Controller
 		}
 
 		$this->_data['usulan_pkm'] = $usulan_pkm;
+		$this->_data['tahun'] = $tahun;
+
+		// Get list of available years from database
+		$this->_data['tahun_list'] = UsulanPkm::select('tahun')
+			->distinct()
+			->orderBy('tahun', 'desc')
+			->pluck('tahun')
+			->toArray();
+
+		// If current year is not in the list, add it
+		if (!in_array($tahun, $this->_data['tahun_list'])) {
+			$this->_data['tahun_list'][] = $tahun;
+			rsort($this->_data['tahun_list']);
+		}
 
 		// echo '<pre>';
 		// foreach($usulan_pkm as $u){
@@ -623,7 +635,7 @@ class PendaftaranController extends Controller
 
 		$setting = Setting::where('status_aplikasi', '1')->first();
 
-		if(empty($setting)){
+		if (empty($setting)) {
 			return view('pages.closed');
 		}
 
@@ -691,7 +703,7 @@ class PendaftaranController extends Controller
 			return redirect()->route('share.pendaftaran.list')->with('message', 'Dilarang menghapus usulan.');
 		}
 
-		if($usulan_pkm->status_usulan->keterangan != "BARU"){
+		if ($usulan_pkm->status_usulan->keterangan != "BARU") {
 			return redirect()->route('share.pendaftaran.list')->with('message', 'Dilarang menghapus usulan.');
 		}
 
@@ -738,7 +750,7 @@ class PendaftaranController extends Controller
 			$usulan_pkm->delete();
 		});
 
-		
+
 
 		return redirect()->route('share.pendaftaran.list')->with('message', 'Data berhasil di-hapus.');
 	}
@@ -910,7 +922,7 @@ class PendaftaranController extends Controller
 					$nilai_total = $nilai_total / $jml_reviewer;
 					$usulan_pkm->nilai_total = $nilai_total;
 				}
-				
+
 				$usulan_pkm->save();
 			}
 			$request->session()->flash('message', 'Data berhasil di-simpan.');
@@ -974,41 +986,40 @@ class PendaftaranController extends Controller
 	}
 
 	public function report(Request $request)
-    {
-        $tahun = date('Y');
-        if(UserHelp::get_selected_role() == 'ADMINFAKULTAS' || UserHelp::get_selected_role() == 'WD1'){
+	{
+		$tahun = date('Y');
+		if (UserHelp::get_selected_role() == 'ADMINFAKULTAS' || UserHelp::get_selected_role() == 'WD1') {
 			$kode_fakultas = UserHelp::get_selected_kode_fakultas();
-			$jenis_pkm = JenisPkm::whereHas('usulan_pkm', function($query) use($tahun, $kode_fakultas) {
+			$jenis_pkm = JenisPkm::whereHas('usulan_pkm', function ($query) use ($tahun, $kode_fakultas) {
 				$query->where('tahun', date('Y'))->where('kode_fakultas', $kode_fakultas);
 			})->orderBy('kategori_kegiatan_id')->get();
-		}else{
-			$jenis_pkm = JenisPkm::whereHas('usulan_pkm', function($query) use($tahun) {
+		} else {
+			$jenis_pkm = JenisPkm::whereHas('usulan_pkm', function ($query) use ($tahun) {
 				$query->where('tahun', date('Y'));
 			})->orderBy('kategori_kegiatan_id')->get();
 		}
 		$usulan_pkm_list = collect(); // Inisialisasi koleksi kosong
 
 		foreach ($jenis_pkm as $jenis) { // Gunakan variabel berbeda untuk elemen loop
-			if(UserHelp::get_selected_role() == 'ADMINFAKULTAS' || UserHelp::get_selected_role() == 'WD1'){
+			if (UserHelp::get_selected_role() == 'ADMINFAKULTAS' || UserHelp::get_selected_role() == 'WD1') {
 				$usulan_data = UsulanPkm::where('jenis_pkm_id', $jenis->id)
 					->where('tahun', $tahun)
 					->with(['anggota_pkm.mhs', 'usulan_pkm_dokumen'])
 					->where('kode_fakultas', $kode_fakultas)
 					->orderBy('created_at')
 					->get();
-			}else{
+			} else {
 				$usulan_data = UsulanPkm::where('jenis_pkm_id', $jenis->id)
 					->where('tahun', $tahun)
 					->with(['anggota_pkm.mhs', 'usulan_pkm_dokumen'])
 					->orderBy('created_at')
 					->get();
 			}
-		
+
 			$usulan_pkm_list = $usulan_pkm_list->merge($usulan_data); // Gabungkan data ke dalam koleksi utama
 		}
 		$this->_data['usulan_pkm_list'] = $usulan_pkm_list;
-        $this->_data['tahun'] = $tahun;
-        return view('pendaftaran.report', $this->_data);
-
+		$this->_data['tahun'] = $tahun;
+		return view('pendaftaran.report', $this->_data);
 	}
 }
