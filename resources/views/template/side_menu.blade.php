@@ -85,6 +85,13 @@
 				</li>
 
 				<li class=" nav-item small">
+					<a class="p-0 mt-1" href="{{ route('tema-usulan-pkm.index') }}">
+						<i class="fa fa-tags"></i>
+						<span class="menu-title" data-i18n="nav.category.general">Tema</span>
+					</a>
+				</li>
+
+				<li class=" nav-item small">
 					<a class="p-0 mt-1" href="#">
 						<i class="fa fa-pencil-square"></i>
 						<span class="menu-title" data-i18n="nav.category.general">Penilaian</span>

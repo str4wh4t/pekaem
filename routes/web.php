@@ -76,6 +76,10 @@ Route::prefix('admin')->group(function () {
     Route::resource('/kategori-kegiatan', 'KategoriKegiatanController');
 });
 
+Route::prefix('admin')->group(function () {
+    Route::resource('/tema-usulan-pkm', 'TemaUsulanPkmController');
+});
+
 Route::prefix('admin/kategori-kegiatan/{kategori_kegiatan}')->group(function () {
     Route::resource('jenis-pkm', 'JenisPkmController');
     Route::get('jenis-pkm/{jenis_pkm}/daftar-penilaian', 'JenisPkmController@daftar_penilaian')->name('jenis-pkm.daftar-penilaian');
