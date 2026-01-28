@@ -411,13 +411,27 @@ $('#kategori_kegiatan').trigger('change');
 										<div class="col-md-6">
 											<div class="form-group">
 												<label for="email">Email</label>
-												<input type="text" id="email" class="form-control" placeholder="Email" name="email" value="{{ $mhs->sso_email }}" readonly="readonly" >
+												<input
+													type="text"
+													id="email"
+													class="form-control"
+													placeholder="Email"
+													name="email"
+													value="{{ old('email', !empty($usulan_pkm->mhs_email) ? $usulan_pkm->mhs_email : $mhs->sso_email) }}"
+												>
 											</div>
 										</div>
 										<div class="col-md-6">
 											<div class="form-group">
 												<label for="telp">No Telp/WA</label>
-												<input type="text" id="telp" class="form-control" placeholder="Telp" name="telp" value="{{ $mhs->hp }}" readonly="readonly" >
+												<input
+													type="text"
+													id="telp"
+													class="form-control"
+													placeholder="Telp"
+													name="telp"
+													value="{{ old('telp', !empty($usulan_pkm->mhs_no_telp) ? $usulan_pkm->mhs_no_telp : $mhs->hp) }}"
+												>
 											</div>
 										</div>
 									</div>

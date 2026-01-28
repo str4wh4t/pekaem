@@ -37,7 +37,7 @@ class PendaftaranController extends Controller
 
 	public function simpan(Request $request)
 	{
-		//    	 dd($request->input());
+		// dd($request->input());
 		// dd($request->input('list_nim'));
 		// die;
 		//$list_nim = array_column($request->input('list_nim'), 'nim');
@@ -64,6 +64,11 @@ class PendaftaranController extends Controller
 			$usulan_pkm = UsulanPkm::where('uuid', $request->id)->first();
 			$id = $usulan_pkm->id;
 
+			// Cek apakah sudah ada berkas tersimpan
+			$hasExistingDocs = $usulan_pkm->usulan_pkm_dokumen()->exists();
+			$berkasRule = $hasExistingDocs ? 'nullable|array' : 'required|array';
+			$berkasEachRule = 'file|mimes:pdf|max:5120';
+
 			$anggota_pkm_existing = $usulan_pkm->anggota_pkm->count() - 1;
 
 			$max_anggota = 4;
@@ -83,9 +88,12 @@ class PendaftaranController extends Controller
 				'jenis_pkm_id'	=> 'required|exists:jenis_pkm,id',
 				'tema_usulan_pkm_id'	=> 'required|exists:tema_usulan_pkm,id',
 				'tema_usulan_pkm_id'	=> 'required|exists:tema_usulan_pkm,id',
-				'berkas' => 'required|array', // Pastikan 'berkas' adalah array
-				'berkas.*' => 'file|mimes:pdf|max:5120', // Validasi setiap file dalam array
+				// Jika belum ada berkas tersimpan, wajib upload; jika sudah ada, boleh kosong
+				'berkas' => $berkasRule, // Pastikan 'berkas' adalah array jika ada
+				'berkas.*' => $berkasEachRule, // Validasi setiap file dalam array
 				'pegawai_id'	=> 'required',
+				'email' => 'required|email',
+				'telp' => 'required|numeric',
 				'list_nim' => $required . '|min:' . $min_anggota_valid . '|max:' . $max_anggota_valid,
 				'list_nim.*.nim' => 'required|distinct',
 			], [
@@ -110,6 +118,8 @@ class PendaftaranController extends Controller
 				'berkas' => 'required|array', // Pastikan 'berkas' adalah array
 				'berkas.*' => 'file|mimes:pdf|max:5120', // Validasi setiap file dalam array
 				'pegawai_id'	=> 'required',
+				'email' => 'required|email',
+				'telp' => 'required|numeric',
 				'list_nim' => 'required|array|min:2|max:4',
 				'list_nim.*.nim' => 'required|distinct',
 			], [
@@ -134,6 +144,8 @@ class PendaftaranController extends Controller
 		$usulan_pkm->jenis_pkm_id = $request->jenis_pkm_id;
 		$usulan_pkm->tema_usulan_pkm_id = $request->tema_usulan_pkm_id;
 		$usulan_pkm->pegawai_id = $request->pegawai_id; // UNTUK INSERT PEMBIMBING
+		$usulan_pkm->mhs_email = $request->email;
+		$usulan_pkm->mhs_no_telp = $request->telp;
 		$usulan_pkm->tahun = date('Y');
 		$usulan_pkm->created_by = UserHelp::admin_get_logged_nip();
 
@@ -487,63 +499,119 @@ class PendaftaranController extends Controller
 	{
 		// $usulan_pkm = UsulanPkm::all()->sortBy("judul");
 		$tahun = $request->input('tahun', date('Y'));
+		$perPage = $request->input('per_page', 15); // Default 15 items per page
+		$search = $request->input('search');
+
+		$query = null;
+
 		if (UserHelp::get_selected_role() == "SUPER") {
-			$usulan_pkm = UsulanPkm::where('tahun', $tahun)->get();
+			$query = UsulanPkm::where('tahun', $tahun);
 		}
 
-
 		if (UserHelp::get_selected_role() == "MHS") {
-			$usulan_pkm = UsulanPkm::where('tahun', $tahun)->where('mhs_nim', UserHelp::mhs_get_logged_nim())->get();
+			$query = UsulanPkm::where('tahun', $tahun)->where('mhs_nim', UserHelp::mhs_get_logged_nim());
 		}
 		if (UserHelp::get_selected_role() == "PEMBIMBING") {
 			$pembimbing = UserHelp::admin_get_record_by_nip(UserHelp::admin_get_logged_nip());
-			$usulan_pkm = UsulanPkm::where('tahun', $tahun)
+			$query = UsulanPkm::where('tahun', $tahun)
 				->where('pegawai_id', $pembimbing->id)
 				->whereHas('status_usulan', function (Builder $query) {
 					$query->where('urutan', '>', 0);
-				})
-				->get();
+				});
 		}
 		if (UserHelp::get_selected_role() == "ADMINFAKULTAS") {
 			$kode_fakultas = UserHelp::get_selected_kode_fakultas();
-			$usulan_pkm = UsulanPkm::where('kode_fakultas', $kode_fakultas)
-				->where('tahun', $tahun)
-				->get();
+			$query = UsulanPkm::where('kode_fakultas', $kode_fakultas)
+				->where('tahun', $tahun);
 		}
 		if (UserHelp::get_selected_role() == "WD1") {
 			$kode_fakultas = UserHelp::get_selected_kode_fakultas();
-			$usulan_pkm = UsulanPkm::whereHas('status_usulan', function (Builder $query) {
+			$query = UsulanPkm::whereHas('status_usulan', function (Builder $query) {
 				$query->where('urutan', '>', 1);
 			})
 				->where('kode_fakultas', $kode_fakultas)
-				->where('tahun', $tahun)
-				->get();
+				->where('tahun', $tahun);
 		}
 		if (UserHelp::get_selected_role() == "ADMIN") {
 			// $usulan_pkm = UsulanPkm::where('status_usulan_id',StatusUsulan::where('keterangan','DISETUJUI')->first()->id)
-			$usulan_pkm = UsulanPkm::where('tahun', $tahun)
+			$query = UsulanPkm::where('tahun', $tahun)
 				->whereHas('status_usulan', function (Builder $query) {
 					$query->where('urutan', '>', 2);
-				})
-				->get();
+				});
 			if (!empty($request->jenis)) {
 				if ($request->jenis == 'pembimbing') {
-					$usulan_pkm = UsulanPkm::where('tahun', $tahun)->where('pegawai_id', $request->pegawai_id)->get();
+					$query = UsulanPkm::where('tahun', $tahun)->where('pegawai_id', $request->pegawai_id);
 				}
 				if ($request->jenis == 'reviewer') {
-					$usulan_pkm = UsulanPkm::where('tahun', $tahun)
+					$query = UsulanPkm::where('tahun', $tahun)
 						->wherehas('reviewer', function (Builder $query) use ($request) {
 							$query->where('reviewer.id', $request->pegawai_id);
-						})->get();
+						});
 				}
 			}
 		}
 		if (UserHelp::get_selected_role() == "REVIEWER") {
 			$reviewer = UserHelp::admin_get_record_by_nip(UserHelp::admin_get_logged_nip());
-			$usulan_pkm = UsulanPkm::where('tahun', $tahun)
+			$query = UsulanPkm::where('tahun', $tahun)
 				->wherehas('reviewer', function (Builder $query) use ($reviewer) {
 					$query->where('reviewer.id', $reviewer->id);
-				})->get();
+				});
+		}
+
+		// Apply search filter if search term exists (only search in judul, NIM, and nama mahasiswa)
+		if (!empty($search)) {
+			if ($query) {
+				$query->where(function ($q) use ($search) {
+					$q->where('judul', 'like', '%' . $search . '%')
+						->orWhereHas('mhs', function ($q) use ($search) {
+							$q->where('nim', 'like', '%' . $search . '%')
+								->orWhere('nama', 'like', '%' . $search . '%');
+						});
+				});
+			} else {
+				// If no role query but has search, create base query
+				$query = UsulanPkm::where('tahun', $tahun)
+					->where(function ($q) use ($search) {
+						$q->where('judul', 'like', '%' . $search . '%')
+							->orWhereHas('mhs', function ($q) use ($search) {
+								$q->where('nim', 'like', '%' . $search . '%')
+									->orWhere('nama', 'like', '%' . $search . '%');
+							});
+					});
+			}
+		}
+
+		// Apply eager loading and pagination if query exists
+		if ($query) {
+			$usulan_pkm = $query->with([
+				'mhs:nim,nama',
+				'jenis_pkm:id,nama_pkm,kategori_kegiatan_id',
+				'jenis_pkm.kategori_kegiatan:id,nama_kategori_kegiatan',
+				'tema_usulan_pkm:id,nama_tema',
+				'pegawai:id,nama,glr_dpn,glr_blkg',
+				'status_usulan:id,keterangan,urutan',
+				'penilaian_reviewer:id,usulan_pkm_id,reviewer_id',
+				'reviewer_usulan_pkm:id,usulan_pkm_id,reviewer_id'
+			])
+				->orderBy('created_at', 'desc')
+				->paginate($perPage)
+				->appends($request->except('page'));
+		} else {
+			// Fallback if no role matches
+			$usulan_pkm = UsulanPkm::where('tahun', $tahun)
+				->with([
+					'mhs:nim,nama',
+					'jenis_pkm:id,nama_pkm,kategori_kegiatan_id',
+					'jenis_pkm.kategori_kegiatan:id,nama_kategori_kegiatan',
+					'tema_usulan_pkm:id,nama_tema',
+					'pegawai:id,nama,glr_dpn,glr_blkg',
+					'status_usulan:id,keterangan,urutan',
+					'penilaian_reviewer:id,usulan_pkm_id,reviewer_id',
+					'reviewer_usulan_pkm:id,usulan_pkm_id,reviewer_id'
+				])
+				->orderBy('created_at', 'desc')
+				->paginate($perPage)
+				->appends($request->except('page'));
 		}
 
 		if (UserHelp::is_admin()) {
@@ -567,11 +635,6 @@ class PendaftaranController extends Controller
 			rsort($this->_data['tahun_list']);
 		}
 
-		// echo '<pre>';
-		// foreach($usulan_pkm as $u){
-		// var_dump($u->has('reviewer')->get());
-		// }
-		// die;
 		return view('pendaftaran.list', $this->_data);
 	}
 
@@ -987,17 +1050,20 @@ class PendaftaranController extends Controller
 
 	public function report(Request $request)
 	{
-		$tahun = date('Y');
+		// Gunakan tahun yang dipilih di dashboard/list, default ke tahun berjalan
+		$tahun = $request->input('tahun', date('Y'));
+
 		if (UserHelp::get_selected_role() == 'ADMINFAKULTAS' || UserHelp::get_selected_role() == 'WD1') {
 			$kode_fakultas = UserHelp::get_selected_kode_fakultas();
 			$jenis_pkm = JenisPkm::whereHas('usulan_pkm', function ($query) use ($tahun, $kode_fakultas) {
-				$query->where('tahun', date('Y'))->where('kode_fakultas', $kode_fakultas);
+				$query->where('tahun', $tahun)->where('kode_fakultas', $kode_fakultas);
 			})->orderBy('kategori_kegiatan_id')->get();
 		} else {
 			$jenis_pkm = JenisPkm::whereHas('usulan_pkm', function ($query) use ($tahun) {
-				$query->where('tahun', date('Y'));
+				$query->where('tahun', $tahun);
 			})->orderBy('kategori_kegiatan_id')->get();
 		}
+
 		$usulan_pkm_list = collect(); // Inisialisasi koleksi kosong
 
 		foreach ($jenis_pkm as $jenis) { // Gunakan variabel berbeda untuk elemen loop
@@ -1018,8 +1084,10 @@ class PendaftaranController extends Controller
 
 			$usulan_pkm_list = $usulan_pkm_list->merge($usulan_data); // Gabungkan data ke dalam koleksi utama
 		}
+
 		$this->_data['usulan_pkm_list'] = $usulan_pkm_list;
 		$this->_data['tahun'] = $tahun;
+
 		return view('pendaftaran.report', $this->_data);
 	}
 }
