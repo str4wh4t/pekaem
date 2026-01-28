@@ -1,6 +1,6 @@
 @php
 header("Content-Type: application/vnd.ms-excel; charset=UTF-8");
-header("Content-Disposition: attachment; filename=\"usulan_pkm.xls\"");
+header("Content-Disposition: attachment; filename=\"usulan_pkm_laporan_lr_1.xls\"");
 @endphp
 <table border="1">
     <thead>

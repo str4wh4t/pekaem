@@ -1,26 +1,23 @@
 @php
 header("Content-Type: application/vnd.ms-excel");
-header("Content-Disposition: attachment; filename=\"usulan_pkm_per_kegiatan.xls\"");
+header("Content-Disposition: attachment; filename=\"usulan_pkm_per_kegiatan_laporan_lr_3.xls\"");
 @endphp
 <table border="1">
     <thead>
         <tr>
-            <th colspan="16">Laporan Pengajuan PKM</th>
+            <th colspan="21">Laporan Pengajuan PKM</th>
         </tr>
         <tr>
-            <th colspan="16">Universitas Diponegoro</th>
+            <th colspan="21">Universitas Diponegoro</th>
         </tr>
         <tr>
-            <th colspan="16">Tahun {{ $tahun }}</th>
-        </tr>
-        <tr>
-            <th colspan="16">&nbsp;</th>
+            <th colspan="21">Tahun {{ $tahun }}</th>
         </tr>
         <tr>
             <th rowspan="2">No</th>
             <th rowspan="2">Judul</th>
-            <th colspan="5">Mahasiswa</th>
-            <th colspan="2">Dosen Pendamping</th>
+            <th colspan="7">Mahasiswa</th>
+            <th colspan="4">Dosen Pendamping</th>
             <th rowspan="2">Jenis</th>
             <th rowspan="2">Tema</th>
             <th rowspan="2">File Proposal</th>
@@ -60,8 +57,12 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm_per_kegiatan.xls\
             <td><span>{{ "Ketua" }}</span></td>
             <td><span>{{ $mhs->nama_fak_ijazah }}</span></td>
             <td><span>{{ $mhs->nama_forlap }}</span></td>
+            <td><span>{{ $usulan_pkm->mhs_email }}</span></td>
+            <td><span>{{ "'" . $usulan_pkm->mhs_no_telp }}</span></td>
             <td rowspan="{{ $jml_anggota_pkm }}"><span style="white-space: nowrap;">{{ $usulan_pkm->pegawai->glr_dpn . ' ' . $usulan_pkm->pegawai->nama . ' ' . $usulan_pkm->pegawai->glr_blkg }}</span></td>
             <td rowspan="{{ $jml_anggota_pkm }}"><span>{{ "'". $usulan_pkm->pegawai->nuptk }}</span></td>
+            <td rowspan="{{ $jml_anggota_pkm }}"><span>{{ $usulan_pkm->pegawai_email_sso }}</span></td>
+            <td rowspan="{{ $jml_anggota_pkm }}"><span>{{ "'" . $usulan_pkm->pegawai_hp }}</span></td>
             <td rowspan="{{ $jml_anggota_pkm }}"><span>{{ "'". $usulan_pkm->jenis_pkm->nama_pkm }}</span></td>
             <td rowspan="{{ $jml_anggota_pkm }}"><span>{{ !empty($usulan_pkm->tema_usulan_pkm_id) ? $usulan_pkm->tema_usulan_pkm->nama_tema : "-" }}</span></td>
             <td rowspan="{{ $jml_anggota_pkm }}">
@@ -134,6 +135,8 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm_per_kegiatan.xls\
             <td><span>{{ "Anggota" }}</span></td>
             <td><span>{{ $anggota_pkm->mhs->nama_fak_ijazah }}</span></td>
             <td><span>{{ $anggota_pkm->mhs->nama_forlap }}</span></td>
+            <td><span style="background-color: #aaaaaa;">&nbsp;</span></td>
+            <td><span style="background-color: #aaaaaa;">&nbsp;</span></td>
         </tr>
         @endforeach
         @endforeach
