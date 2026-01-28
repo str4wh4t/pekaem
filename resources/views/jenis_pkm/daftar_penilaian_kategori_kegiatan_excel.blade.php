@@ -34,8 +34,12 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm_per_kegiatan_lapo
             <th>Jabatan</th>
             <th>Fakultas</th>
             <th>Prodi</th>
+            <th>Email</th>
+            <th>No Telp</th>
             <th>Nama</th>
             <th>NUPTK</th>
+            <th>Email</th>
+            <th>HP</th>
             <th>a</th>
             <th>b</th>
             <th>(a+b)/2</th>
