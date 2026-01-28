@@ -146,6 +146,8 @@ class PendaftaranController extends Controller
 		$usulan_pkm->pegawai_id = $request->pegawai_id; // UNTUK INSERT PEMBIMBING
 		$usulan_pkm->mhs_email = $request->email;
 		$usulan_pkm->mhs_no_telp = $request->telp;
+		$usulan_pkm->pegawai_email_sso = $request->pegawai_email_sso;
+		$usulan_pkm->pegawai_hp = $request->pegawai_hp;
 		$usulan_pkm->tahun = date('Y');
 		$usulan_pkm->created_by = UserHelp::admin_get_logged_nip();
 

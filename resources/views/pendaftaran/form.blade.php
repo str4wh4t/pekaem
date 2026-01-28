@@ -117,6 +117,13 @@ $("#pembimbing").select2({
 			};
 		}
   }
+}).on('select2:select', function (e) {
+	// Saat pembimbing dipilih, isi field detail otomatis
+	var data = e.params.data || {};
+	$('#pembimbing_nip').val(data.nip || '');
+	$('#pembimbing_nuptk').val(data.nuptk || '');
+	$('#pembimbing_email').val(data.email_sso || '');
+	$('#pembimbing_hp').val(data.hp || '');
 });
 
 @isset($usulan_pkm->pegawai_id)
@@ -469,7 +476,9 @@ $('#kategori_kegiatan').trigger('change');
 									</div>
 
 									@isset($usulan_pkm->anggota_pkm)
-										@php($j = 1)
+										@php
+										$j = 1;
+										@endphp
 										@forelse($usulan_pkm->anggota_pkm as $anggota)
 										@continue($anggota->sebagai == 0)
 										<div class="row">
@@ -490,7 +499,9 @@ $('#kategori_kegiatan').trigger('change');
 											</div>
 											@endif
 										</div>
-										@php($j++)
+										@php
+										$j++;
+										@endphp
 										@empty
 
 										@endforelse
@@ -581,6 +592,73 @@ $('#kategori_kegiatan').trigger('change');
 	                                        <select id="pembimbing" class="form-control" placeholder="Cari dosen" name="pegawai_id" style="width: 80%"></select>
 	                                    </div>
                                     @endisset
+
+									@php
+										$pembimbing = isset($usulan_pkm) ? $usulan_pkm->pegawai : null;
+									@endphp
+
+									<div class="mt-2">
+										<div class="row">
+											<div class="col-md-3">
+												<label for="pembimbing_nip">NIP</label>
+											</div>
+											<div class="col-md-9">
+												<input
+													type="text"
+													id="pembimbing_nip"
+													class="form-control"
+													placeholder="NIP"
+													value="{{ optional($pembimbing)->nip }}"
+													readonly
+												>
+											</div>
+										</div>
+										<div class="row mt-1">
+											<div class="col-md-3">
+												<label for="pembimbing_nuptk">NUPTK</label>
+											</div>
+											<div class="col-md-9">
+												<input
+													type="text"
+													id="pembimbing_nuptk"
+													class="form-control"
+													placeholder="NUPTK"
+													value="{{ optional($pembimbing)->nuptk }}"
+													readonly
+												>
+											</div>
+										</div>
+										<div class="row mt-1">
+											<div class="col-md-3">
+												<label for="pembimbing_email">Email</label>
+											</div>
+											<div class="col-md-9">
+												<input
+													type="text"
+													id="pembimbing_email"
+													class="form-control"
+													placeholder="Email SSO"
+													name="pegawai_email_sso"
+													value="{{ old('pegawai_email_sso', optional($usulan_pkm)->pegawai_email_sso) }}"
+												>
+											</div>
+										</div>
+										<div class="row mt-1">
+											<div class="col-md-3">
+												<label for="pembimbing_hp">No HP</label>
+											</div>
+											<div class="col-md-9">
+												<input
+													type="text"
+													id="pembimbing_hp"
+													class="form-control"
+													placeholder="No HP"
+													name="pegawai_hp"
+													value="{{ old('pegawai_hp', optional($usulan_pkm)->pegawai_hp) }}"
+												>
+											</div>
+										</div>
+									</div>
 
                                     <br>
 

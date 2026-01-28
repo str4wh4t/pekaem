@@ -29,8 +29,8 @@ class AdminController extends Controller
         // $pegawai_roles = PegawaiRoles::all()->sortBy("pegawai_id");
         $roles = Roles::all()->where('id', '!=', 1)->where('id', '!=', 3)->sortBy("id"); /// EXCEPT SUPER
         $pegawai_has_role = Pegawai::whereHas('roles', function ($query) {
-                                    $query->where('role', '!=', 'PEMBIMBING'); // Kondisi untuk mengecualikan role "PEMBIMBING"
-                                })->with('pegawai_roles.roles')->get();
+            $query->where('role', '!=', 'PEMBIMBING'); // Kondisi untuk mengecualikan role "PEMBIMBING"
+        })->with('pegawai_roles.roles')->get();
         // dd($pegawai_has_role);
         $this->_data['roles'] = $roles;
         $this->_data['pegawai_has_role'] = $pegawai_has_role;
@@ -88,7 +88,7 @@ class AdminController extends Controller
             $query->where('nip', 'LIKE', '%' . $request->text . '%')
                 ->orWhere('nama', 'LIKE', '%' . $request->text . '%');
         })
-            ->whereIn('status', ['1','20']) // AKTIF, TUGAS BELAJAT TDK MENINGGALKAN JAB
+            ->whereIn('status', ['1', '20']) // AKTIF, TUGAS BELAJAT TDK MENINGGALKAN JAB
             ->whereDoesntHave('roles', function (Builder $query) use ($request) {
                 $query->where('roles.id', $request->role);
             })
@@ -116,10 +116,10 @@ class AdminController extends Controller
         // dd($request->role);
         $tahun = date('Y');
         $pembimbing = Pegawai::where(function ($query) use ($request) {
-                $query->where('nip', 'LIKE', '%' . $request->text . '%')
-                    ->orWhere('nama', 'LIKE', '%' . $request->text . '%')
-                    ->orWhere('nuptk', 'LIKE', '%' . $request->text . '%');
-            })
+            $query->where('nip', 'LIKE', '%' . $request->text . '%')
+                ->orWhere('nama', 'LIKE', '%' . $request->text . '%')
+                ->orWhere('nuptk', 'LIKE', '%' . $request->text . '%');
+        })
             ->where('jnspeg', '1') // HANYA DOSEN
             ->whereIn('status', ['1', '20', '6', '22']) // AKTIF, TUGAS BELAJAT TDK MENINGGALKAN JAB, IJIN BELAJAR
             ->whereNotNull('nuptk')->where('nuptk', '!=', '0')
@@ -129,10 +129,17 @@ class AdminController extends Controller
             // })
             ->whereDoesntHave('usulan_pkm', function (Builder $query) use ($request, $tahun) {
                 $query->where('tahun', $tahun)
-                    ->havingRaw('COUNT(*) > 9'); 
+                    ->havingRaw('COUNT(*) > 9');
             })
-            // ->get(['id', DB::raw('CONCAT(glr_dpn," ",nama," ",glr_blkg," ","[",nip,"]"," ","[",nidn,"]") as text')]);
-            ->get(['id', DB::raw('CONCAT(glr_dpn," ",nama," ",glr_blkg," ","[",nip,"]"," ","[",nuptk,"]") as text')]);
+            ->get([
+                'id',
+                'nip',
+                'nuptk',
+                'email_sso',
+                'hp',
+                // DB::raw('CONCAT(glr_dpn," ",nama," ",glr_blkg," ","[",nip,"]"," ","[",nuptk,"]") as text'),
+                DB::raw('CONCAT(glr_dpn," ",nama," ",glr_blkg) as text')
+            ]);
 
         $this->_data['items'] = $pembimbing;
 
@@ -194,8 +201,7 @@ class AdminController extends Controller
             $mhs = Mhs::where(function ($query) use ($request, $kode_fakultas) {
                 $query->where('nim', 'LIKE', '%' . $request->text . '%')
                     ->orWhere('nama', 'LIKE', '%' . $request->text . '%');
-                    
-                })
+            })
                 // ->where('kode_fakultas', $kode_fakultas)
                 ->whereNotIn('strata', ['pasca', 'Sp1', 'S3', 'PPDS I'])
                 ->where('status_terakhir', 'Aktif')
@@ -203,11 +209,11 @@ class AdminController extends Controller
                     $query->whereHas('usulan_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
                         $query->where('usulan_pkm.tahun', $tahun)
                             ->whereHas('jenis_pkm', function (Builder $query) use ($request, $jenis_pkm) {
-                                if(!empty($jenis_pkm)){
+                                if (!empty($jenis_pkm)) {
                                     $query->where('jenis_pkm.kamar', '!=', $jenis_pkm->kamar);
                                 }
                             });
-                    }); 
+                    });
                 })
                 // ->whereDoesntHave('anggota_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
                 //     $query->whereHas('usulan_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
@@ -235,31 +241,31 @@ class AdminController extends Controller
         $jenis_pkm = JenisPkm::find($request->jenis_pkm_id);
         $ketua_nim = $request->ketua_nim;
         $mhs = [];
-        if(!empty($jenis_pkm)){
+        if (!empty($jenis_pkm)) {
             if (UserHelp::get_selected_role() == "ADMINFAKULTAS") {
                 $kode_fakultas = UserHelp::get_selected_kode_fakultas();
                 // if($usulan_pkm_id){
-    
+
                 // }else{
 
-                    $mhs = Mhs::where(function ($query) use ($request, $kode_fakultas, $ketua_nim) {
-                        $query->where('nim', 'LIKE', '%' . $request->text . '%')
-                            ->orWhere('nama', 'LIKE', '%' . $request->text . '%');
-                        })
-                        ->where('nim', '!=', $ketua_nim)
-                        // ->where('kode_fakultas', $kode_fakultas)
-                        ->where('status_terakhir', 'Aktif')
-                        ->whereDoesntHave('anggota_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
-                            $query->whereHas('usulan_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
-                                $query->where('usulan_pkm.tahun', $tahun)
-                                    ->whereHas('jenis_pkm', function (Builder $query) use ($request, $jenis_pkm) {
-                                        $query->where('jenis_pkm.kamar', '!=', $jenis_pkm->kamar);
-                                        // $query->where('jenis_pkm.kamar', $jenis_pkm->kamar)
-                                            // ->where('jenis_pkm.kategori_kegiatan_id', $jenis_pkm->kategori_kegiatan_id);
-                                    });
-                            }); 
-                        })
-                        ->get(['nim AS id', DB::raw('CONCAT(nama," ","[",nim,"]"," ","[",nama_forlap,"]"," ","[",nama_fak_ijazah,"]") as text')]);
+                $mhs = Mhs::where(function ($query) use ($request, $kode_fakultas, $ketua_nim) {
+                    $query->where('nim', 'LIKE', '%' . $request->text . '%')
+                        ->orWhere('nama', 'LIKE', '%' . $request->text . '%');
+                })
+                    ->where('nim', '!=', $ketua_nim)
+                    // ->where('kode_fakultas', $kode_fakultas)
+                    ->where('status_terakhir', 'Aktif')
+                    ->whereDoesntHave('anggota_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
+                        $query->whereHas('usulan_pkm', function (Builder $query) use ($request, $tahun, $jenis_pkm) {
+                            $query->where('usulan_pkm.tahun', $tahun)
+                                ->whereHas('jenis_pkm', function (Builder $query) use ($request, $jenis_pkm) {
+                                    $query->where('jenis_pkm.kamar', '!=', $jenis_pkm->kamar);
+                                    // $query->where('jenis_pkm.kamar', $jenis_pkm->kamar)
+                                    // ->where('jenis_pkm.kategori_kegiatan_id', $jenis_pkm->kategori_kegiatan_id);
+                                });
+                        });
+                    })
+                    ->get(['nim AS id', DB::raw('CONCAT(nama," ","[",nim,"]"," ","[",nama_forlap,"]"," ","[",nama_fak_ijazah,"]") as text')]);
                 // }
             }
         }
@@ -338,7 +344,7 @@ class AdminController extends Controller
 
     public function setting(Request $request)
     {
-        if(UserHelp::get_selected_role() != 'ADMIN' && UserHelp::get_selected_role() != 'SUPER'){
+        if (UserHelp::get_selected_role() != 'ADMIN' && UserHelp::get_selected_role() != 'SUPER') {
             return redirect()->route('dashboard');
         }
         // buat listener dari ajax untuk update status aplikasi
