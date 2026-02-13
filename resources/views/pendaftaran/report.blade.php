@@ -26,6 +26,7 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm_laporan_lr_1.xls\
             <th colspan="4">Dosen Pendamping</th>
             <th rowspan="2">File Proposal</th>
             <th rowspan="2">SubmittedAt</th>
+            <th rowspan="2" colspan="2">Catatan</th>
         </tr>
         <tr>
             <th>Nama</th>
@@ -39,6 +40,8 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm_laporan_lr_1.xls\
             <th>NUPTK</th>
             <th>Email</th>
             <th>Hp</th>
+            <th>Reviewer 1</th>
+            <th>Reviewer 2</th>
         </tr>
     </thead>
     <tbody>
@@ -69,6 +72,28 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm_laporan_lr_1.xls\
                 @endforeach
             </td>
             <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ $usulan_pkm->created_at }}</span></td>
+            @php
+            $reviewer1 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 1)->first();
+            $catatan_reviewer1 = "";
+            if (!empty($reviewer1)) {
+                $review1 = $usulan_pkm->review()->where('pegawai_id', $reviewer1->reviewer_id)->first();
+                if (!empty($review1)) {
+                    $catatan_reviewer1 = $review1->catatan_reviewer;
+                }
+            }
+            @endphp
+            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ $catatan_reviewer1 }}</span></td>
+            @php
+            $reviewer2 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 2)->first();
+            $catatan_reviewer2 = "";
+            if (!empty($reviewer2)) {
+                $review2 = $usulan_pkm->review()->where('pegawai_id', $reviewer2->reviewer_id)->first();
+                if (!empty($review2)) {
+                    $catatan_reviewer2 = $review2->catatan_reviewer;
+                }
+            }
+            @endphp
+            <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><span>{{ $catatan_reviewer2 }}</span></td>
         </tr>
         @foreach ($usulan_pkm->anggota_pkm()->where('sebagai', 1)->get() as $anggota_pkm)
         <tr>
