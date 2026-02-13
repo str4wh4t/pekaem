@@ -8,13 +8,13 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm_laporan_lr_1.xls\
             <th colspan="18">Laporan Pengajuan PKM</th>
         </tr>
         <tr>
-            <th colspan="18">Universitas Diponegoro</th>
+            <th colspan="19">Universitas Diponegoro</th>
         </tr>
         <tr>
-            <th colspan="18">Tahun {{ $tahun }}</th>
+            <th colspan="19">Tahun {{ $tahun }}</th>
         </tr>
         <tr>
-            <th colspan="18">&nbsp;</th>
+            <th colspan="19">&nbsp;</th>
         </tr>
         <tr>
             <th rowspan="2">No</th>
@@ -26,7 +26,7 @@ header("Content-Disposition: attachment; filename=\"usulan_pkm_laporan_lr_1.xls\
             <th colspan="4">Dosen Pendamping</th>
             <th rowspan="2">File Proposal</th>
             <th rowspan="2">SubmittedAt</th>
-            <th rowspan="2" colspan="2">Catatan</th>
+            <th colspan="2">Catatan</th>
         </tr>
         <tr>
             <th>Nama</th>

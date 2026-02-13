@@ -189,4 +189,9 @@ class PagesController extends Controller
         }
         return redirect('dashboard');
     }
+
+    public function apiUser(Request $request)
+    {
+        return $request->user();
+    }
 }
