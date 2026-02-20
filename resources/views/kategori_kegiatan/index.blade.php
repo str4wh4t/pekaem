@@ -126,24 +126,6 @@ $('.zero-configuration').DataTable();
                                     </tr>
                                     @endforeach
                                 </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <th rowspan="2">No</th>
-                                        <th rowspan="2">Nama Kategori Kegiatan</th>
-                                        <th rowspan="2">Deskripsi</th>
-                                        <th rowspan="2">Aksi</th>
-                                        @if(isset($tahun_list) && count($tahun_list) > 0)
-                                            <th class="text-center" colspan="{{ count($tahun_list) }}">Laporan LR-3</th>
-                                        @endif
-                                    </tr>
-                                    <tr>
-                                        @if(isset($tahun_list) && count($tahun_list) > 0)
-                                            @foreach($tahun_list as $tahun_item)
-                                                <th class="text-center">{{ $tahun_item }}</th>
-                                            @endforeach
-                                        @endif
-                                    </tr>
-                                </tfoot>
                             </table>
                             </div>
                         </div>
