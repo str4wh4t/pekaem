@@ -180,28 +180,33 @@ function batalkan_penilaian(){
                                                     @endforeach
                                                 </td>
                                                 <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ $usulan_pkm->created_at }}</b></td>
-                                                @if($usulan_pkm->reviewer_usulan_pkm->count() > 0)
                                                 @php
-                                                $reviewer1 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 1)->first();
+                                                $reviewer1 = null;
+                                                $reviewer2 = null;
+                                                if($usulan_pkm->reviewer_usulan_pkm->count() > 0) {
+                                                    $reviewer1 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 1)->first();
+                                                    $reviewer2 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 2)->first();
+                                                }
                                                 @endphp
+                                                @if(!empty($reviewer1))
                                                 <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b style="white-space: nowrap;">{{ $reviewer1->reviewer->glr_dpn . ' ' . $reviewer1->reviewer->nama . ' ' . $reviewer1->reviewer->glr_blkg }}</b></td>
-                                                    @php
-                                                    $reviewer2 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 2)->first();   
-                                                    @endphp
-                                                    @if(!empty($reviewer2))
-                                                    <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b style="white-space: nowrap;">{{ $reviewer2->reviewer->glr_dpn . ' ' . $reviewer2->reviewer->nama . ' ' . $reviewer2->reviewer->glr_blkg }}</b></td>
-                                                    @else
-                                                    <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ "" }}</b></td>
-                                                    @endif
                                                 @else
                                                 <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ "" }}</b></td>
+                                                @endif
+                                                @if(!empty($reviewer2))
+                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b style="white-space: nowrap;">{{ $reviewer2->reviewer->glr_dpn . ' ' . $reviewer2->reviewer->nama . ' ' . $reviewer2->reviewer->glr_blkg }}</b></td>
+                                                @else
                                                 <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ "" }}</b></td>
                                                 @endif
                                                 @if($usulan_pkm->status_usulan_id > 4)
                                                     <td class="text-center" rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
+                                                        @if(!empty($reviewer1))
                                                         <span class="text-danger">
                                                             <b><a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer1->reviewer_id]) }}">{{ $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer1->reviewer_id)->sum('nilai') }}</a></b>
                                                         </span>
+                                                        @else
+                                                        <span class="text-danger"><b>0</b></span>
+                                                        @endif
                                                     </td>
                                                     <td class="text-center" rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
                                                         @if(!empty($reviewer2))
