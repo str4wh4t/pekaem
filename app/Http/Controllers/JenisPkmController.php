@@ -145,9 +145,9 @@ class JenisPkmController extends Controller
 
 	}
 
-    public function daftar_penilaian_kategori_kegiatan_excel(KategoriKegiatan $kategoriKegiatan)
+    public function daftar_penilaian_kategori_kegiatan_excel(KategoriKegiatan $kategoriKegiatan, Request $request)
     {
-        $tahun = date('Y');
+        $tahun = $request->input('tahun', date('Y'));
         $jenisPkmIds = JenisPkm::where('kategori_kegiatan_id', $kategoriKegiatan->id)->pluck('id');
 
         if($jenisPkmIds->isEmpty()){

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\KategoriKegiatanRequest;
 use App\KategoriKegiatan;
+use App\UsulanPkm;
 use Illuminate\Http\Request;
 
 class KategoriKegiatanController extends Controller
@@ -17,6 +18,21 @@ class KategoriKegiatanController extends Controller
     {
         $kategori_kegiatan_list = KategoriKegiatan::all();
         $this->_data['kategori_kegiatan_list'] = $kategori_kegiatan_list;
+        
+        // Get list of available years from database
+        $this->_data['tahun_list'] = UsulanPkm::select('tahun')
+            ->distinct()
+            ->orderBy('tahun', 'desc')
+            ->pluck('tahun')
+            ->toArray();
+        
+        // If current year is not in the list, add it
+        $current_year = date('Y');
+        if (!in_array($current_year, $this->_data['tahun_list'])) {
+            $this->_data['tahun_list'][] = $current_year;
+            rsort($this->_data['tahun_list']);
+        }
+        
         return view('kategori_kegiatan.index', $this->_data);
     }
 
