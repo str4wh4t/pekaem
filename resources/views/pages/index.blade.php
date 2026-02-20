@@ -125,6 +125,161 @@
             </div>
          </div>
          <!-- project-info -->
+         <!-- Monitoring Target dan Capaian -->
+         <div class="card-subtitle line-on-side text-muted text-center font-small-3 mx-2 my-2">
+            <span><b>Monitoring Target dan Capaian Usulan PKM</b></span>
+         </div>
+         <div class="card-body">
+            @if(empty($kode_fakultas))
+               <!-- View for all faculties (super admin) -->
+               @if(isset($target_pkm_list) && count($target_pkm_list) > 0)
+                  <div class="table-responsive">
+                     <table class="table table-striped table-bordered">
+                        <thead>
+                           <tr>
+                              <th>Fakultas</th>
+                              <th>Target</th>
+                              <th>Capaian</th>
+                              <th>Persentase</th>
+                              <th>Status</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           @foreach($target_pkm_list as $target)
+                              @php
+                                 $capaian = \App\UsulanPkm::where('tahun', $tahun)->where('kode_fakultas', $target->kode_fakultas)->count();
+                                 $target_value = $target->target_usulan_pkm;
+                                 $persentase = $target_value > 0 ? round(($capaian / $target_value) * 100, 2) : 0;
+                                 $status_class = $persentase >= 100 ? 'success' : ($persentase >= 75 ? 'warning' : 'danger');
+                                 $status_text = $persentase >= 100 ? 'Tercapai' : ($persentase >= 75 ? 'Mendekati' : 'Belum Tercapai');
+                              @endphp
+                              <tr>
+                                 <td>{{ $target->fakultas ? $target->fakultas->nama_fak_ijazah : $target->kode_fakultas }}</td>
+                                 <td class="text-right">{{ number_format($target_value, 0, ',', '.') }}</td>
+                                 <td class="text-right">{{ number_format($capaian, 0, ',', '.') }}</td>
+                                 <td>
+                                    <div class="progress progress-md mt-1 mb-0">
+                                       <div class="progress-bar bg-{{ $status_class }}" role="progressbar" 
+                                            style="width: {{ min($persentase, 100) }}%" 
+                                            aria-valuenow="{{ $persentase }}" 
+                                            aria-valuemin="0" 
+                                            aria-valuemax="100">
+                                          {{ $persentase }}%
+                                       </div>
+                                    </div>
+                                 </td>
+                                 <td>
+                                    <span class="badge badge-{{ $status_class }}">{{ $status_text }}</span>
+                                 </td>
+                              </tr>
+                           @endforeach
+                           <tr class="font-weight-bold bg-light">
+                              <td>Total</td>
+                              <td class="text-right">{{ number_format($target_pkm_total, 0, ',', '.') }}</td>
+                              <td class="text-right">{{ number_format($usulan_pkm_total, 0, ',', '.') }}</td>
+                              <td>
+                                 @php
+                                    $total_persentase = $target_pkm_total > 0 ? round(($usulan_pkm_total / $target_pkm_total) * 100, 2) : 0;
+                                    $total_status_class = $total_persentase >= 100 ? 'success' : ($total_persentase >= 75 ? 'warning' : 'danger');
+                                 @endphp
+                                 <div class="progress progress-md mt-1 mb-0">
+                                    <div class="progress-bar bg-{{ $total_status_class }}" role="progressbar" 
+                                         style="width: {{ min($total_persentase, 100) }}%" 
+                                         aria-valuenow="{{ $total_persentase }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                       {{ $total_persentase }}%
+                                    </div>
+                                 </div>
+                              </td>
+                              <td>
+                                 <span class="badge badge-{{ $total_status_class }}">
+                                    {{ $total_persentase >= 100 ? 'Tercapai' : ($total_persentase >= 75 ? 'Mendekati' : 'Belum Tercapai') }}
+                                 </span>
+                              </td>
+                           </tr>
+                        </tbody>
+                     </table>
+                  </div>
+               @else
+                  <div class="alert alert-info">
+                     <i class="fa fa-info-circle"></i> Belum ada data target PKM untuk tahun {{ $tahun }}.
+                  </div>
+               @endif
+            @else
+               <!-- View for specific faculty -->
+               @if(isset($target_pkm) && $target_pkm)
+                  @php
+                     $capaian = $usulan_pkm_total;
+                     $target_value = $target_pkm->target_usulan_pkm;
+                     $persentase = $target_value > 0 ? round(($capaian / $target_value) * 100, 2) : 0;
+                     $status_class = $persentase >= 100 ? 'success' : ($persentase >= 75 ? 'warning' : 'danger');
+                     $status_text = $persentase >= 100 ? 'Tercapai' : ($persentase >= 75 ? 'Mendekati' : 'Belum Tercapai');
+                  @endphp
+                  <div class="row">
+                     <div class="col-md-6">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                           <div class="card-body">
+                              <div class="row no-gutters align-items-center">
+                                 <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Target Usulan PKM</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ number_format($target_value, 0, ',', '.') }}</div>
+                                 </div>
+                                 <div class="col-auto">
+                                    <i class="fa fa-bullseye fa-2x text-gray-300"></i>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="col-md-6">
+                        <div class="card border-left-info shadow h-100 py-2">
+                           <div class="card-body">
+                              <div class="row no-gutters align-items-center">
+                                 <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Capaian Usulan PKM</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ number_format($capaian, 0, ',', '.') }}</div>
+                                 </div>
+                                 <div class="col-auto">
+                                    <i class="fa fa-check-circle fa-2x text-gray-300"></i>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="row mt-3">
+                     <div class="col-md-12">
+                        <div class="card">
+                           <div class="card-body">
+                              <h6 class="card-title">Persentase Pencapaian</h6>
+                              <div class="progress progress-lg mt-2">
+                                 <div class="progress-bar bg-{{ $status_class }}" role="progressbar" 
+                                      style="width: {{ min($persentase, 100) }}%" 
+                                      aria-valuenow="{{ $persentase }}" 
+                                      aria-valuemin="0" 
+                                      aria-valuemax="100">
+                                    <strong>{{ $persentase }}%</strong>
+                                 </div>
+                              </div>
+                              <div class="mt-2">
+                                 <span class="badge badge-{{ $status_class }} badge-lg">{{ $status_text }}</span>
+                                 <span class="text-muted ml-2">
+                                    ({{ number_format($capaian, 0, ',', '.') }} dari {{ number_format($target_value, 0, ',', '.') }} target)
+                                 </span>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               @else
+                  <div class="alert alert-warning">
+                     <i class="fa fa-exclamation-triangle"></i> Belum ada data target PKM untuk fakultas ini pada tahun {{ $tahun }}.
+                  </div>
+               @endif
+            @endif
+         </div>
+         <!-- End Monitoring Target dan Capaian -->
          <div class="card-body">
             @foreach($kategori_kegiatan_list as $kategori_kegiatan)
             <div class="card-subtitle line-on-side text-muted text-center font-small-3 mx-2 my-1">

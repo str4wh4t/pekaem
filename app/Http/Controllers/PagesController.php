@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Helpers\User as UserHelp;
 use App\KategoriKegiatan;
 use App\Pegawai;
+use App\TargetPkmTahunan;
 
 class PagesController extends Controller
 {
@@ -57,18 +58,28 @@ class PagesController extends Controller
             $this->_data['usulan_pkm_belum_dinilai'] = UsulanPkm::where('tahun', $tahun)->where('status_usulan_id', StatusUsulan::where('keterangan', 'LANJUT')->first()->id)->count();
             $this->_data['usulan_pkm_sudah_dinilai'] = UsulanPkm::where('tahun', $tahun)->where('status_usulan_id', StatusUsulan::where('keterangan', 'SUDAH_DINILAI')->first()->id)->count();
             $this->_data['usulan_pkm'] = UsulanPkm::where('tahun', $tahun)->get();
+            
+            // Get target data for all faculties
+            $this->_data['target_pkm_list'] = TargetPkmTahunan::where('tahun', $tahun)->with('fakultas')->get();
+            $this->_data['target_pkm_total'] = TargetPkmTahunan::where('tahun', $tahun)->sum('target_usulan_pkm');
         } else {
             $this->_data['usulan_pkm_total'] = UsulanPkm::where('tahun', $tahun)->where('kode_fakultas', $kode_fakultas)->count();
             $this->_data['usulan_pkm_proses'] = UsulanPkm::where('tahun', $tahun)->where('kode_fakultas', $kode_fakultas)->whereIn('status_usulan_id', StatusUsulan::whereIn('keterangan', ['BARU', 'DISETUJUI'])->pluck('id'))->count();
             $this->_data['usulan_pkm_sudah_dinilai'] = UsulanPkm::where('tahun', $tahun)->where('kode_fakultas', $kode_fakultas)->where('status_usulan_id', StatusUsulan::where('keterangan', 'SUDAH_DINILAI')->first()->id)->count();
             $this->_data['usulan_pkm_belum_dinilai'] = UsulanPkm::where('tahun', $tahun)->where('kode_fakultas', $kode_fakultas)->where('status_usulan_id', StatusUsulan::where('keterangan', 'LANJUT')->first()->id)->count();
             $this->_data['usulan_pkm'] = UsulanPkm::where('tahun', $tahun)->where('kode_fakultas', $kode_fakultas)->get();
+            
+            // Get target data for selected faculty
+            $target_pkm = TargetPkmTahunan::where('tahun', $tahun)->where('kode_fakultas', $kode_fakultas)->first();
+            $this->_data['target_pkm'] = $target_pkm;
+            $this->_data['target_pkm_total'] = $target_pkm ? $target_pkm->target_usulan_pkm : 0;
         }
 
         // dd($this->_data);
 
         $this->_data['kategori_kegiatan_list'] = KategoriKegiatan::all();
         $this->_data['tahun'] = $tahun;
+        $this->_data['kode_fakultas'] = $kode_fakultas;
 
         // Get list of available years from database
         $this->_data['tahun_list'] = UsulanPkm::select('tahun')
