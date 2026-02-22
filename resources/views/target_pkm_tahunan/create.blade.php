@@ -30,9 +30,12 @@
                                 @csrf
                                 <div class="form-body">
                                     <div class="form-group">
-                                        <label for="tahun">Tahun <span class="text-danger">*</span></label>
-                                        <input type="number" id="tahun" class="form-control" name="tahun" value="{{ old('tahun', date('Y')) }}" placeholder="Tahun" min="2000" max="2100" required>
-                                        <small class="form-text text-muted">Masukkan tahun (contoh: 2025)</small>
+                                        <label>Tahun</label>
+                                        <div class="form-control" style="background-color: #f5f5f5; cursor: not-allowed;">
+                                            <strong>{{ isset($tahun) ? $tahun : date('Y') }}</strong>
+                                        </div>
+                                        <input type="hidden" name="tahun" value="{{ old('tahun', isset($tahun) ? $tahun : date('Y')) }}">
+                                        <small class="form-text text-muted">Tahun yang dipilih dari filter</small>
                                     </div>
                                     <div class="form-group">
                                         <label for="kode_fakultas">Fakultas <span class="text-danger">*</span></label>
@@ -61,7 +64,7 @@
                                     <button type="submit" class="btn btn-primary">
                                         <i class="fa fa-check-square-o"></i> Save
                                     </button>
-                                    <a href="{{ route('target-pkm-tahunan.index') }}" class="btn btn-warning">
+                                    <a href="{{ route('target-pkm-tahunan.index', ['tahun' => isset($tahun) ? $tahun : date('Y')]) }}" class="btn btn-warning">
                                         <i class="fa fa-undo"></i> Kembali
                                     </a>
                                 </div>

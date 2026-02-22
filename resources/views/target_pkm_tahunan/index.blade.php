@@ -1,5 +1,26 @@
 @extends('template.main')
 
+@push('page_level_js')
+<!-- BEGIN PAGE LEVEL JS-->
+<script type="text/javascript">
+
+   // Handle tahun filter change
+   document.addEventListener('DOMContentLoaded', function() {
+      var tahunFilter = document.getElementById('tahun_filter');
+      if (tahunFilter) {
+         tahunFilter.addEventListener('change', function() {
+            var selectedTahun = this.value;
+            var currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('tahun', selectedTahun);
+            window.location.href = currentUrl.toString();
+         });
+      }
+   });
+
+</script>
+<!-- END PAGE LEVEL JS-->
+@endpush
+
 @section('content')
 <div class="content-header row">
     <div class="content-header-left col-md-6 col-12 mb-2">
@@ -16,7 +37,15 @@
                         <h4 class="card-title">Daftar Target PKM Tahunan</h4>
                         <a class="heading-elements-toggle"><i class="fa fa-ellipsis-v font-medium-3"></i></a>
                         <div class="heading-elements">
-                            <a href="{{ route('target-pkm-tahunan.create') }}" class="btn btn-primary"><i class="fa fa-plus"></i> Tambah Target</a>
+                            <div class="form-group mb-0 mr-2" style="display: inline-block;">
+                                <label for="tahun_filter" class="mr-2" style="margin-bottom: 0;">Tahun:</label>
+                                <select id="tahun_filter" name="tahun" class="form-control form-control-sm" style="display: inline-block; width: auto; min-width: 100px;">
+                                    @foreach($tahun_list as $tahun_option)
+                                    <option value="{{ $tahun_option }}" {{ $tahun == $tahun_option ? 'selected' : '' }}>{{ $tahun_option }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <a href="{{ route('target-pkm-tahunan.create', ['tahun' => $tahun]) }}" class="btn btn-primary"><i class="fa fa-plus"></i> Tambah Target</a>
                         </div>
                     </div>
                     <div class="card-content collapse show">

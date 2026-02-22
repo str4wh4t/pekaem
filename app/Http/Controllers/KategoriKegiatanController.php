@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\KategoriKegiatanRequest;
 use App\KategoriKegiatan;
 use App\UsulanPkm;
+use App\JenisPkm;
 use Illuminate\Http\Request;
 
 class KategoriKegiatanController extends Controller
@@ -67,9 +68,42 @@ class KategoriKegiatanController extends Controller
      * @param  \App\KategoriKegiatan  $kategoriKegiatan
      * @return \Illuminate\Http\Response
      */
-    public function show(KategoriKegiatan $kategoriKegiatan)
+    public function show(KategoriKegiatan $kategoriKegiatan, Request $request)
     {
-        //
+        $tahun = $request->input('tahun', date('Y'));
+
+        // Get jenis PKM dari kategori kegiatan
+        $jenis_pkm_list = JenisPkm::where('kategori_kegiatan_id', $kategoriKegiatan->id)
+            ->with('kategori_kriteria')
+            ->orderBy('nama_pkm')
+            ->get();
+
+        // Get jumlah usulan untuk setiap jenis PKM
+        foreach ($jenis_pkm_list as $jenis_pkm) {
+            $jenis_pkm->jumlah_usulan = UsulanPkm::where('jenis_pkm_id', $jenis_pkm->id)
+                ->where('tahun', $tahun)
+                ->count();
+        }
+
+        // Get list of available years from database
+        $tahun_list = UsulanPkm::select('tahun')
+            ->distinct()
+            ->orderBy('tahun', 'desc')
+            ->pluck('tahun')
+            ->toArray();
+
+        // If current year is not in the list, add it
+        if (!in_array($tahun, $tahun_list)) {
+            $tahun_list[] = $tahun;
+            rsort($tahun_list);
+        }
+
+        $this->_data['kategori_kegiatan'] = $kategoriKegiatan;
+        $this->_data['jenis_pkm_list'] = $jenis_pkm_list;
+        $this->_data['tahun'] = $tahun;
+        $this->_data['tahun_list'] = $tahun_list;
+
+        return view('kategori_kegiatan.show', $this->_data);
     }
 
     /**

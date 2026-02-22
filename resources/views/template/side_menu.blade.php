@@ -105,15 +105,16 @@
 					</a>
 					<ul class="menu-content" style="">
 						@foreach (\App\KategoriKegiatan::all() as $kategori_kegiatan)
-						<li class="has-sub">
-							<a class="menu-item" href="#" data-i18n="nav.navbars.nav_hide_on_scroll.main">{{ $kategori_kegiatan->nama_kategori_kegiatan }}</a>
-							<ul class="menu-content" style="">
+						{{-- <li class="has-sub"> --}}
+						<li>
+							<a class="menu-item" href="{{ route('kategori-kegiatan.show', ['kategori_kegiatan' => $kategori_kegiatan]) }}" data-i18n="nav.navbars.nav_hide_on_scroll.main">{{ $kategori_kegiatan->nama_kategori_kegiatan }}</a>
+							{{-- <ul class="menu-content" style="">
 								@foreach ($kategori_kegiatan->jenis_pkm as $jenis_pkm)
 								<li style="background-color: #ffeecc;">
 									<a class="menu-item" href="{{ route('jenis-pkm.daftar-penilaian', ['kategori_kegiatan' => $kategori_kegiatan, 'jenis_pkm' => $jenis_pkm]) }}" data-i18n="nav.navbars.nav_hide_on_scroll.nav_hide_on_scroll_top">{{ $jenis_pkm->nama_pkm }}</a>
 								</li>
 								@endforeach
-							</ul>
+							</ul> --}}
 						</li>
 						@endforeach
 					</ul>

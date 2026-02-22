@@ -31,9 +31,12 @@
                                 @method('PUT')
                                 <div class="form-body">
                                     <div class="form-group">
-                                        <label for="tahun">Tahun <span class="text-danger">*</span></label>
-                                        <input type="number" id="tahun" class="form-control" name="tahun" value="{{ old('tahun', $target->tahun) }}" placeholder="Tahun" min="2000" max="2100" required>
-                                        <small class="form-text text-muted">Masukkan tahun (contoh: 2025)</small>
+                                        <label>Tahun</label>
+                                        <div class="form-control" style="background-color: #f5f5f5; cursor: not-allowed;">
+                                            <strong>{{ old('tahun', $target->tahun) }}</strong>
+                                        </div>
+                                        <input type="hidden" name="tahun" value="{{ old('tahun', $target->tahun) }}">
+                                        <small class="form-text text-muted">Tahun dari data yang dipilih</small>
                                     </div>
                                     <div class="form-group">
                                         <label for="kode_fakultas">Fakultas <span class="text-danger">*</span></label>
@@ -62,7 +65,7 @@
                                     <button type="submit" class="btn btn-primary">
                                         <i class="fa fa-check-square-o"></i> Update
                                     </button>
-                                    <a href="{{ route('target-pkm-tahunan.index') }}" class="btn btn-warning">
+                                    <a href="{{ route('target-pkm-tahunan.index', ['tahun' => $target->tahun]) }}" class="btn btn-warning">
                                         <i class="fa fa-undo"></i> Kembali
                                     </a>
                                 </div>
