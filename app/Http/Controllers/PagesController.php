@@ -62,6 +62,17 @@ class PagesController extends Controller
             // Get target data for all faculties
             $this->_data['target_pkm_list'] = TargetPkmTahunan::where('tahun', $tahun)->with('fakultas')->get();
             $this->_data['target_pkm_total'] = TargetPkmTahunan::where('tahun', $tahun)->sum('target_usulan_pkm');
+            
+            // Pre-calculate capaian untuk setiap fakultas untuk menghindari N+1 query
+            $capaian_per_fakultas = UsulanPkm::where('tahun', $tahun)
+                ->selectRaw('kode_fakultas, COUNT(*) as jumlah')
+                ->groupBy('kode_fakultas')
+                ->pluck('jumlah', 'kode_fakultas')
+                ->toArray();
+            
+            foreach ($this->_data['target_pkm_list'] as $target) {
+                $target->capaian = isset($capaian_per_fakultas[$target->kode_fakultas]) ? $capaian_per_fakultas[$target->kode_fakultas] : 0;
+            }
         } else {
             $this->_data['usulan_pkm_total'] = UsulanPkm::where('tahun', $tahun)->where('kode_fakultas', $kode_fakultas)->count();
             $this->_data['usulan_pkm_proses'] = UsulanPkm::where('tahun', $tahun)->where('kode_fakultas', $kode_fakultas)->whereIn('status_usulan_id', StatusUsulan::whereIn('keterangan', ['BARU', 'DISETUJUI'])->pluck('id'))->count();

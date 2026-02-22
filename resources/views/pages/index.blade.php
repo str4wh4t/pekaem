@@ -5,11 +5,102 @@
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/template/robust/app-assets/css/pages/project.css') }}">
 <style type="text/css">
    .project-info-sub-icon:hover {
-       background-color: #007bff !important; /* Biru Bootstrap */
-       color: white; /* Opsional: Ubah warna teks atau ikon */
-       cursor: pointer; /* Opsional: Tampilkan kursor pointer */
+       background-color: #007bff !important;
+       color: white;
+       cursor: pointer;
+       transform: scale(1.1);
+       transition: all 0.3s ease;
    }
-   </style>
+   
+   .project-info-count {
+       margin-bottom: 20px;
+   }
+   
+   .project-info-icon {
+       transition: all 0.3s ease;
+       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+   }
+   
+   .project-info-icon:hover {
+       transform: translateY(-5px);
+       box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+   }
+   
+   .stat-card {
+       border-radius: 10px;
+       transition: all 0.3s ease;
+       border: none;
+       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+   }
+   
+   .stat-card:hover {
+       transform: translateY(-3px);
+       box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+   }
+   
+   .stat-card-primary {
+       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+       color: white;
+   }
+   
+   .stat-card-warning {
+       background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+       color: white;
+   }
+   
+   .stat-card-danger {
+       background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+       color: white;
+   }
+   
+   .stat-card-success {
+       background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+       color: white;
+   }
+   
+   .insights {
+       background: #f8f9fa;
+       border-radius: 8px;
+       padding: 15px;
+       margin-bottom: 15px;
+       border-left: 4px solid #17a2b8;
+       transition: all 0.3s ease;
+       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+   }
+   
+   .insights:hover {
+       transform: translateX(5px);
+       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+       background: #fff;
+   }
+   
+   .monitoring-card {
+       border-radius: 10px;
+       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+       margin-bottom: 20px;
+   }
+   
+   .table th {
+       background-color: #f8f9fa;
+       font-weight: 600;
+       text-transform: uppercase;
+       font-size: 0.85rem;
+       letter-spacing: 0.5px;
+   }
+   
+   .progress {
+       height: 25px;
+       border-radius: 10px;
+       overflow: hidden;
+   }
+   
+   .progress-bar {
+       font-weight: 600;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+   }
+</style>
 <!-- END PAGE LEVEL JS-->
 @endpush
 
@@ -75,66 +166,74 @@
             </div> --}}
          </div>
          <!-- project-info -->
-         <div class="card-subtitle line-on-side text-muted text-center font-small-3 mx-2 my-2">
-            <span><b>Rekap Usulan Proposal</b></span>
+         <div class="card-subtitle line-on-side text-muted text-center font-small-3 mx-2 my-3">
+            <span><b><i class="fa fa-bar-chart"></i> Rekap Usulan Proposal</b></span>
          </div>
-         <div id="project-info" class="card-body row p-0">
-            <div class="project-info-count col-lg-3 col-md-12">
-               <div class="project-info-icon" onclick="return openlink('{{ route('dashboard') }}')">
-                  <h2><?= $usulan_pkm_total ?></h2>
-                  <div class="project-info-sub-icon">
-                     <span class="fa fa-files-o"></span>
+         <div id="project-info" class="card-body row p-3">
+            <div class="project-info-count col-lg-3 col-md-6 col-sm-12 mb-3">
+               <div class="stat-card stat-card-primary text-center p-4" onclick="return openlink('{{ route('dashboard') }}')" style="cursor: pointer;">
+                  <div class="d-flex justify-content-between align-items-center">
+                     <div>
+                        <h6 class="text-white-50 mb-2" style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Proposal Masuk</h6>
+                        <h2 class="mb-0 text-white" style="font-weight: 700; font-size: 2.5rem;">{{ number_format($usulan_pkm_total, 0, ',', '.') }}</h2>
+                     </div>
+                     <div>
+                        <i class="fa fa-file-text-o fa-3x text-white-50"></i>
+                     </div>
                   </div>
-               </div>
-               <div class="project-info-text">
-                  <h5>Proposal Masuk</h5>
                </div>
             </div>
-            <div class="project-info-count col-lg-3 col-md-12">
-               <div class="project-info-icon bg-warning">
-                  <h2 style="color: #fff"><?= $usulan_pkm_proses ?></h2>
-                  <div class="project-info-sub-icon">
-                     <span class="fa fa-files-o"></span>
+            <div class="project-info-count col-lg-3 col-md-6 col-sm-12 mb-3">
+               <div class="stat-card stat-card-warning text-center p-4">
+                  <div class="d-flex justify-content-between align-items-center">
+                     <div>
+                        <h6 class="text-white-50 mb-2" style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Proposal Proses</h6>
+                        <h2 class="mb-0 text-white" style="font-weight: 700; font-size: 2.5rem;">{{ number_format($usulan_pkm_proses, 0, ',', '.') }}</h2>
+                     </div>
+                     <div>
+                        <i class="fa fa-clock-o fa-3x text-white-50"></i>
+                     </div>
                   </div>
-               </div>
-               <div class="project-info-text">
-                  <h5>Proposal Proses</h5>
                </div>
             </div>
-            <div class="project-info-count col-lg-3 col-md-12">
-               <div class="project-info-icon bg-danger">
-                  <h2 style="color: #fff"><?= $usulan_pkm_belum_dinilai ?></h2>
-                  <div class="project-info-sub-icon">
-                     <span class="fa fa-files-o"></span>
+            <div class="project-info-count col-lg-3 col-md-6 col-sm-12 mb-3">
+               <div class="stat-card stat-card-danger text-center p-4">
+                  <div class="d-flex justify-content-between align-items-center">
+                     <div>
+                        <h6 class="text-white-50 mb-2" style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Belum Dinilai</h6>
+                        <h2 class="mb-0 text-white" style="font-weight: 700; font-size: 2.5rem;">{{ number_format($usulan_pkm_belum_dinilai, 0, ',', '.') }}</h2>
+                     </div>
+                     <div>
+                        <i class="fa fa-exclamation-triangle fa-3x text-white-50"></i>
+                     </div>
                   </div>
-               </div>
-               <div class="project-info-text">
-                  <h5>Proposal Belum Dinilai</h5>
                </div>
             </div>
-            <div class="project-info-count col-lg-3 col-md-12">
-               <div class="project-info-icon bg-success">
-                  <h2 style="color: #fff"><?= $usulan_pkm_sudah_dinilai ?></h2>
-                  <div class="project-info-sub-icon">
-                     <span class="fa fa-files-o"></span>
+            <div class="project-info-count col-lg-3 col-md-6 col-sm-12 mb-3">
+               <div class="stat-card stat-card-success text-center p-4">
+                  <div class="d-flex justify-content-between align-items-center">
+                     <div>
+                        <h6 class="text-white-50 mb-2" style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Sudah Dinilai</h6>
+                        <h2 class="mb-0 text-white" style="font-weight: 700; font-size: 2.5rem;">{{ number_format($usulan_pkm_sudah_dinilai, 0, ',', '.') }}</h2>
+                     </div>
+                     <div>
+                        <i class="fa fa-check-circle fa-3x text-white-50"></i>
+                     </div>
                   </div>
-               </div>
-               <div class="project-info-text">
-                  <h5>Proposal Sudah Dinilai</h5>
                </div>
             </div>
          </div>
          <!-- project-info -->
          <!-- Monitoring Target dan Capaian -->
-         <div class="card-subtitle line-on-side text-muted text-center font-small-3 mx-2 my-2">
-            <span><b>Monitoring Target dan Capaian Usulan PKM</b></span>
+         <div class="card-subtitle line-on-side text-muted text-center font-small-3 mx-2 my-3">
+            <span><b><i class="fa fa-line-chart"></i> Monitoring Target dan Capaian Usulan PKM</b></span>
          </div>
          <div class="card-body">
             @if(empty($kode_fakultas))
                <!-- View for all faculties (super admin) -->
                @if(isset($target_pkm_list) && count($target_pkm_list) > 0)
-                  <div class="table-responsive">
-                     <table class="table table-striped table-bordered">
+                  <div class="table-responsive monitoring-card">
+                     <table class="table table-striped table-bordered table-hover">
                         <thead>
                            <tr>
                               <th>Fakultas</th>
@@ -147,16 +246,16 @@
                         <tbody>
                            @foreach($target_pkm_list as $target)
                               @php
-                                 $capaian = \App\UsulanPkm::where('tahun', $tahun)->where('kode_fakultas', $target->kode_fakultas)->count();
+                                 $capaian = isset($target->capaian) ? $target->capaian : 0;
                                  $target_value = $target->target_usulan_pkm;
                                  $persentase = $target_value > 0 ? round(($capaian / $target_value) * 100, 2) : 0;
                                  $status_class = $persentase >= 100 ? 'success' : ($persentase >= 75 ? 'warning' : 'danger');
                                  $status_text = $persentase >= 100 ? 'Tercapai' : ($persentase >= 75 ? 'Mendekati' : 'Belum Tercapai');
                               @endphp
                               <tr>
-                                 <td>{{ $target->fakultas ? $target->fakultas->nama_fak_ijazah : $target->kode_fakultas }}</td>
-                                 <td class="text-right">{{ number_format($target_value, 0, ',', '.') }}</td>
-                                 <td class="text-right">{{ number_format($capaian, 0, ',', '.') }}</td>
+                                 <td><strong>{{ $target->fakultas ? $target->fakultas->nama_fak_ijazah : $target->kode_fakultas }}</strong></td>
+                                 <td class="text-right"><strong>{{ number_format($target_value, 0, ',', '.') }}</strong></td>
+                                 <td class="text-right"><strong>{{ number_format($capaian, 0, ',', '.') }}</strong></td>
                                  <td>
                                     <div class="progress progress-md mt-1 mb-0">
                                        <div class="progress-bar bg-{{ $status_class }}" role="progressbar" 
@@ -282,21 +381,30 @@
          <!-- End Monitoring Target dan Capaian -->
          <div class="card-body">
             @foreach($kategori_kegiatan_list as $kategori_kegiatan)
-            <div class="card-subtitle line-on-side text-muted text-center font-small-3 mx-2 my-1">
-               <span>Rasio Usulan {{ $kategori_kegiatan->nama_kategori_kegiatan }}</span>
+            <div class="card-subtitle line-on-side text-muted text-center font-small-3 mx-2 my-3">
+               <span><b><i class="fa fa-pie-chart"></i> Rasio Usulan {{ $kategori_kegiatan->nama_kategori_kegiatan }}</b></span>
             </div>
             <div class="row py-2">
                @foreach($kategori_kegiatan->jenis_pkm as $jenis_pkm_row)
-               <div class="col-lg-2 col-md-6 mb-1">
-                  <div class="insights px-2">
-                     <div><span class="text-info h3 ">{{ count($usulan_pkm->where('jenis_pkm_id',$jenis_pkm_row->id)) }}</span> <span class="float-right">{{ $jenis_pkm_row->nama_pkm }}</span></div>
-                     <div class="progress progress-md mt-1 mb-0">
+               @php
+                  $jumlah_jenis = count($usulan_pkm->where('jenis_pkm_id',$jenis_pkm_row->id));
+                  $persentase_jenis = !empty($usulan_pkm_total) ? round(($jumlah_jenis/$usulan_pkm_total)*100,2) : 0;
+               @endphp
+               <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                  <div class="insights">
+                     <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-info h4 mb-0" style="font-weight: 700;">{{ number_format($jumlah_jenis, 0, ',', '.') }}</span>
+                        <span class="badge badge-info">{{ $persentase_jenis }}%</span>
+                     </div>
+                     <div class="mb-2">
+                        <small class="text-muted font-weight-bold">{{ $jenis_pkm_row->nama_pkm }}</small>
+                     </div>
+                     <div class="progress progress-md mt-2 mb-0">
                          @if(!empty($usulan_pkm_total))
-                         <div class="progress-bar bg-info" role="progressbar" style="width: {{ round((count($usulan_pkm->where('jenis_pkm_id',$jenis_pkm_row->id))/$usulan_pkm_total)*100,2) }}%" aria-valuenow="{{ round((count($usulan_pkm->where('jenis_pkm_id',$jenis_pkm_row->id))/$usulan_pkm_total)*100,2) }}" aria-valuemin="0" aria-valuemax="100">
-                           {{ round((count($usulan_pkm->where('jenis_pkm_id',$jenis_pkm_row->id))/$usulan_pkm_total)*100,2) }}%
+                         <div class="progress-bar bg-info" role="progressbar" style="width: {{ $persentase_jenis }}%" aria-valuenow="{{ $persentase_jenis }}" aria-valuemin="0" aria-valuemax="100">
                         </div>
                          @else
-                         <div class="progress-bar bg-info" role="progressbar" style="width: {{ 0 }}%" aria-valuenow="{{ 0 }}" aria-valuemin="0" aria-valuemax="100">{{ 0 }}%</div>
+                         <div class="progress-bar bg-info" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                          @endif
                      </div>
                   </div>
