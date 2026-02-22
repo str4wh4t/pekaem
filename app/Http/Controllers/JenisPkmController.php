@@ -119,10 +119,22 @@ class JenisPkmController extends Controller
     public function daftar_penilaian(KategoriKegiatan $kategoriKegiatan, JenisPkm $jenisPkm, Request $request)
     {
         $tahun = $request->input('tahun', date('Y'));
-        $usulan_pkm_list =  UsulanPkm::where('jenis_pkm_id', $jenisPkm->id)
+        $usulan_pkm_list = UsulanPkm::where('jenis_pkm_id', $jenisPkm->id)
             ->where('tahun', $tahun)
-            ->with(['anggota_pkm.mhs', 'usulan_pkm_dokumen'])
-            ->orderBy('nilai_total', 'desc')->get();
+            ->with([
+                'anggota_pkm.mhs',
+                'usulan_pkm_dokumen',
+                'pegawai:id,nama,glr_dpn,glr_blkg,nuptk',
+                'tema_usulan_pkm:id,nama_tema',
+                'reviewer_usulan_pkm.reviewer:id,nama,glr_dpn,glr_blkg',
+                'penilaian_reviewer:id,usulan_pkm_id,reviewer_id,nilai'
+            ])
+            ->orderBy('nilai_total', 'desc')
+            ->get();
+
+        // Pre-calculate data to avoid N+1 queries
+        $this->_preCalculateUsulanPkmData($usulan_pkm_list);
+
         $this->_data['usulan_pkm_list'] = $usulan_pkm_list;
         $this->_data['kategori_kegiatan'] = $kategoriKegiatan;
         $this->_data['jenis_pkm'] = $jenisPkm;
@@ -133,10 +145,22 @@ class JenisPkmController extends Controller
     public function daftar_penilaian_excel(KategoriKegiatan $kategoriKegiatan, JenisPkm $jenisPkm, Request $request)
     {
         $tahun = $request->input('tahun', date('Y'));
-        $usulan_pkm_list =  UsulanPkm::where('jenis_pkm_id', $jenisPkm->id)
+        $usulan_pkm_list = UsulanPkm::where('jenis_pkm_id', $jenisPkm->id)
             ->where('tahun', $tahun)
-            ->with(['anggota_pkm.mhs', 'usulan_pkm_dokumen'])
-            ->orderBy('nilai_total', 'desc')->get();
+            ->with([
+                'anggota_pkm.mhs',
+                'usulan_pkm_dokumen',
+                'pegawai:id,nama,glr_dpn,glr_blkg,nuptk',
+                'tema_usulan_pkm:id,nama_tema',
+                'reviewer_usulan_pkm.reviewer:id,nama,glr_dpn,glr_blkg',
+                'penilaian_reviewer:id,usulan_pkm_id,reviewer_id,nilai'
+            ])
+            ->orderBy('nilai_total', 'desc')
+            ->get();
+
+        // Pre-calculate data to avoid N+1 queries
+        $this->_preCalculateUsulanPkmData($usulan_pkm_list);
+
         $this->_data['usulan_pkm_list'] = $usulan_pkm_list;
         $this->_data['kategori_kegiatan'] = $kategoriKegiatan;
         $this->_data['jenis_pkm'] = $jenisPkm;
@@ -155,13 +179,62 @@ class JenisPkmController extends Controller
 
         $usulan_pkm_list = UsulanPkm::whereIn('jenis_pkm_id', $jenisPkmIds)
             ->where('tahun', $tahun)
-            ->with(['anggota_pkm', 'anggota_pkm.mhs', 'usulan_pkm_dokumen', 'jenis_pkm'])
+            ->with([
+                'anggota_pkm.mhs',
+                'usulan_pkm_dokumen',
+                'jenis_pkm:id,nama_pkm',
+                'pegawai:id,nama,glr_dpn,glr_blkg,nuptk',
+                'tema_usulan_pkm:id,nama_tema',
+                'reviewer_usulan_pkm.reviewer:id,nama,glr_dpn,glr_blkg',
+                'penilaian_reviewer:id,usulan_pkm_id,reviewer_id,nilai'
+            ])
             ->orderBy('nilai_total', 'desc')
             ->get();
+
+        // Pre-calculate data to avoid N+1 queries
+        $this->_preCalculateUsulanPkmData($usulan_pkm_list);
 
         $this->_data['usulan_pkm_list'] = $usulan_pkm_list;
         $this->_data['kategori_kegiatan'] = $kategoriKegiatan;
         $this->_data['tahun'] = $tahun;
         return view('jenis_pkm.daftar_penilaian_kategori_kegiatan_excel', $this->_data);
+    }
+
+    /**
+     * Helper method to pre-calculate usulan PKM data to avoid N+1 queries
+     */
+    private function _preCalculateUsulanPkmData($usulan_pkm_list)
+    {
+        foreach ($usulan_pkm_list as $usulan_pkm) {
+            // Pre-calculate anggota count
+            $usulan_pkm->anggota_count = $usulan_pkm->anggota_pkm->count();
+
+            // Pre-get ketua (anggota dengan sebagai = 0)
+            $usulan_pkm->ketua = $usulan_pkm->anggota_pkm->where('sebagai', 0)->first();
+
+            // Pre-get anggota (anggota dengan sebagai = 1)
+            $usulan_pkm->anggota_list = $usulan_pkm->anggota_pkm->where('sebagai', 1);
+
+            // Pre-get reviewers
+            $usulan_pkm->reviewer1 = $usulan_pkm->reviewer_usulan_pkm->where('urutan', 1)->first();
+            $usulan_pkm->reviewer2 = $usulan_pkm->reviewer_usulan_pkm->where('urutan', 2)->first();
+
+            // Pre-calculate penilaian sums
+            if ($usulan_pkm->reviewer1) {
+                $usulan_pkm->nilai_reviewer1 = $usulan_pkm->penilaian_reviewer
+                    ->where('reviewer_id', $usulan_pkm->reviewer1->reviewer_id)
+                    ->sum('nilai');
+            } else {
+                $usulan_pkm->nilai_reviewer1 = 0;
+            }
+
+            if ($usulan_pkm->reviewer2) {
+                $usulan_pkm->nilai_reviewer2 = $usulan_pkm->penilaian_reviewer
+                    ->where('reviewer_id', $usulan_pkm->reviewer2->reviewer_id)
+                    ->sum('nilai');
+            } else {
+                $usulan_pkm->nilai_reviewer2 = 0;
+            }
+        }
     }
 }

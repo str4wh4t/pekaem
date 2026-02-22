@@ -165,84 +165,81 @@ function batalkan_penilaian(){
                                         <tbody>
                                             @foreach ($usulan_pkm_list as $usulan_pkm)
                                             <tr>
-                                                <td class="text-center" rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">{{ $loop->iteration }}</td>
-                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ $usulan_pkm->judul }}</b></td>
-                                                @php
-                                                $mhs = $usulan_pkm->anggota_pkm()->where('sebagai', 0)->first()->mhs;
-                                                @endphp
-                                                <td><b style="white-space: nowrap;">{{ $mhs->nama }}</b></td>
-                                                <td><b>{{ $mhs->nim }}</b></td>
+                                                <td class="text-center" rowspan="{{ $usulan_pkm->anggota_count }}">{{ $loop->iteration }}</td>
+                                                <td rowspan="{{ $usulan_pkm->anggota_count }}"><b>{{ $usulan_pkm->judul }}</b></td>
+                                                @if($usulan_pkm->ketua && $usulan_pkm->ketua->mhs)
+                                                <td><b style="white-space: nowrap;">{{ $usulan_pkm->ketua->mhs->nama }}</b></td>
+                                                <td><b>{{ $usulan_pkm->ketua->mhs->nim }}</b></td>
                                                 <td><b>{{ "Ketua" }}</b></td>
-                                                <td><b>{{ $mhs->nama_fak_ijazah }}</b></td>
-                                                <td><b>{{ $mhs->nama_forlap }}</b></td>
-                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b style="white-space: nowrap;">{{ $usulan_pkm->pegawai->glr_dpn . ' ' . $usulan_pkm->pegawai->nama . ' ' . $usulan_pkm->pegawai->glr_blkg }}</b></td>
-                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ $usulan_pkm->pegawai->nuptk }}</b></td>
-                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ !empty($usulan_pkm->tema_usulan_pkm_id) ? $usulan_pkm->tema_usulan_pkm->nama_tema : "-" }}</b></td>
-                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
+                                                <td><b>{{ $usulan_pkm->ketua->mhs->nama_fak_ijazah }}</b></td>
+                                                <td><b>{{ $usulan_pkm->ketua->mhs->nama_forlap }}</b></td>
+                                                @else
+                                                <td><b>-</b></td>
+                                                <td><b>-</b></td>
+                                                <td><b>-</b></td>
+                                                <td><b>-</b></td>
+                                                <td><b>-</b></td>
+                                                @endif
+                                                <td rowspan="{{ $usulan_pkm->anggota_count }}"><b style="white-space: nowrap;">{{ $usulan_pkm->pegawai ? ($usulan_pkm->pegawai->glr_dpn . ' ' . $usulan_pkm->pegawai->nama . ' ' . $usulan_pkm->pegawai->glr_blkg) : '-' }}</b></td>
+                                                <td rowspan="{{ $usulan_pkm->anggota_count }}"><b>{{ $usulan_pkm->pegawai ? $usulan_pkm->pegawai->nuptk : '-' }}</b></td>
+                                                <td rowspan="{{ $usulan_pkm->anggota_count }}"><b>{{ $usulan_pkm->tema_usulan_pkm ? $usulan_pkm->tema_usulan_pkm->nama_tema : "-" }}</b></td>
+                                                <td rowspan="{{ $usulan_pkm->anggota_count }}">
                                                     @foreach ($usulan_pkm->usulan_pkm_dokumen as $i => $usulan_pkm_dokumen)
                                                     <b style="display:block;"><a href="{{ asset('storage/' . $usulan_pkm_dokumen->document_path ) }}" target="_blank">{{ 'dokumen('. ($i + 1) . ')' }}</a></b>
                                                     @endforeach
                                                 </td>
-                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ $usulan_pkm->created_at }}</b></td>
-                                                @php
-                                                $reviewer1 = null;
-                                                $reviewer2 = null;
-                                                if($usulan_pkm->reviewer_usulan_pkm->count() > 0) {
-                                                    $reviewer1 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 1)->first();
-                                                    $reviewer2 = $usulan_pkm->reviewer_usulan_pkm()->where('urutan', 2)->first();
-                                                }
-                                                @endphp
-                                                @if(!empty($reviewer1))
-                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b style="white-space: nowrap;">{{ $reviewer1->reviewer->glr_dpn . ' ' . $reviewer1->reviewer->nama . ' ' . $reviewer1->reviewer->glr_blkg }}</b></td>
+                                                <td rowspan="{{ $usulan_pkm->anggota_count }}"><b>{{ $usulan_pkm->created_at }}</b></td>
+                                                @if($usulan_pkm->reviewer1 && $usulan_pkm->reviewer1->reviewer)
+                                                <td rowspan="{{ $usulan_pkm->anggota_count }}"><b style="white-space: nowrap;">{{ $usulan_pkm->reviewer1->reviewer->glr_dpn . ' ' . $usulan_pkm->reviewer1->reviewer->nama . ' ' . $usulan_pkm->reviewer1->reviewer->glr_blkg }}</b></td>
                                                 @else
-                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ "" }}</b></td>
+                                                <td rowspan="{{ $usulan_pkm->anggota_count }}"><b>{{ "" }}</b></td>
                                                 @endif
-                                                @if(!empty($reviewer2))
-                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b style="white-space: nowrap;">{{ $reviewer2->reviewer->glr_dpn . ' ' . $reviewer2->reviewer->nama . ' ' . $reviewer2->reviewer->glr_blkg }}</b></td>
+                                                @if($usulan_pkm->reviewer2 && $usulan_pkm->reviewer2->reviewer)
+                                                <td rowspan="{{ $usulan_pkm->anggota_count }}"><b style="white-space: nowrap;">{{ $usulan_pkm->reviewer2->reviewer->glr_dpn . ' ' . $usulan_pkm->reviewer2->reviewer->nama . ' ' . $usulan_pkm->reviewer2->reviewer->glr_blkg }}</b></td>
                                                 @else
-                                                <td rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}"><b>{{ "" }}</b></td>
+                                                <td rowspan="{{ $usulan_pkm->anggota_count }}"><b>{{ "" }}</b></td>
                                                 @endif
                                                 @if($usulan_pkm->status_usulan_id > 4)
-                                                    <td class="text-center" rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
-                                                        @if(!empty($reviewer1))
+                                                    <td class="text-center" rowspan="{{ $usulan_pkm->anggota_count }}">
+                                                        @if($usulan_pkm->reviewer1)
                                                         <span class="text-danger">
-                                                            <b><a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer1->reviewer_id]) }}">{{ $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer1->reviewer_id)->sum('nilai') }}</a></b>
+                                                            <b><a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $usulan_pkm->reviewer1->reviewer_id]) }}">{{ $usulan_pkm->nilai_reviewer1 }}</a></b>
                                                         </span>
                                                         @else
                                                         <span class="text-danger"><b>0</b></span>
                                                         @endif
                                                     </td>
-                                                    <td class="text-center" rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
-                                                        @if(!empty($reviewer2))
+                                                    <td class="text-center" rowspan="{{ $usulan_pkm->anggota_count }}">
+                                                        @if($usulan_pkm->reviewer2)
                                                         <span class="text-danger">
-                                                            <b><a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $reviewer2->reviewer_id]) }}">{{ $usulan_pkm->penilaian_reviewer()->where('reviewer_id', $reviewer2->reviewer_id)->sum('nilai') }}</a></b>
+                                                            <b><a href="{{ route('penilaian-reviewer.lihat', ['usulan_pkm' => $usulan_pkm, 'reviewer' => $usulan_pkm->reviewer2->reviewer_id]) }}">{{ $usulan_pkm->nilai_reviewer2 }}</a></b>
                                                         </span>
                                                         @else
                                                         <span class="text-danger"><b>0</b></span>
                                                         @endif
                                                     </td>
-                                                    <td class="text-center" rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
+                                                    <td class="text-center" rowspan="{{ $usulan_pkm->anggota_count }}">
                                                         <span class="text-danger"><b>{{ $usulan_pkm->nilai_total }}</b></span>
                                                     </td>
                                                 @else
-                                                    <td class="text-center" rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
+                                                    <td class="text-center" rowspan="{{ $usulan_pkm->anggota_count }}">
                                                         <span class="text-danger"><b>0</b></span>
                                                     </td>
-                                                    <td class="text-center" rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
+                                                    <td class="text-center" rowspan="{{ $usulan_pkm->anggota_count }}">
                                                         <span class="text-danger"><b>0</b></span>
                                                     </td>
-                                                    <td class="text-center" rowspan="{{ $usulan_pkm->anggota_pkm()->count() }}">
+                                                    <td class="text-center" rowspan="{{ $usulan_pkm->anggota_count }}">
                                                         <span class="text-danger"><b>0</b></span>
                                                     </td>
                                                 @endif
                                             </tr>
-                                            @foreach ($usulan_pkm->anggota_pkm()->where('sebagai', 1)->get() as $anggota_pkm)
+                                            @foreach ($usulan_pkm->anggota_list as $anggota_pkm)
                                             <tr>
-                                                <td><b style="white-space: nowrap;">{{ $anggota_pkm->mhs->nama }}</b></td>
-                                                <td><b>{{ $anggota_pkm->mhs->nim }}</b></td>
+                                                <td><b style="white-space: nowrap;">{{ $anggota_pkm->mhs ? $anggota_pkm->mhs->nama : '-' }}</b></td>
+                                                <td><b>{{ $anggota_pkm->mhs ? $anggota_pkm->mhs->nim : '-' }}</b></td>
                                                 <td><b>{{ "Anggota" }}</b></td>
-                                                <td><b>{{ $anggota_pkm->mhs->nama_fak_ijazah }}</b></td>
-                                                <td><b>{{ $anggota_pkm->mhs->nama_forlap }}</b></td>
+                                                <td><b>{{ $anggota_pkm->mhs ? $anggota_pkm->mhs->nama_fak_ijazah : '-' }}</b></td>
+                                                <td><b>{{ $anggota_pkm->mhs ? $anggota_pkm->mhs->nama_forlap : '-' }}</b></td>
                                             </tr>
                                             @endforeach
                                             @endforeach

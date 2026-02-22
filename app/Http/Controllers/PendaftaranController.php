@@ -1055,36 +1055,60 @@ class PendaftaranController extends Controller
 		// Gunakan tahun yang dipilih di dashboard/list, default ke tahun berjalan
 		$tahun = $request->input('tahun', date('Y'));
 
+		// Optimize query: langsung query usulan_pkm dengan eager loading lengkap
+		$query = UsulanPkm::where('tahun', $tahun)
+			->with([
+				'anggota_pkm.mhs',
+				'usulan_pkm_dokumen',
+				'jenis_pkm.kategori_kegiatan:id,nama_kategori_kegiatan',
+				'jenis_pkm:id,nama_pkm,kategori_kegiatan_id',
+				'pegawai:id,nama,glr_dpn,glr_blkg,nuptk',
+				'tema_usulan_pkm:id,nama_tema',
+				'reviewer_usulan_pkm.reviewer:id,nama,glr_dpn,glr_blkg',
+				'review:id,usulan_pkm_id,pegawai_id,catatan_reviewer'
+			])
+			->orderBy('created_at');
+
+		// Filter berdasarkan role
 		if (UserHelp::get_selected_role() == 'ADMINFAKULTAS' || UserHelp::get_selected_role() == 'WD1') {
 			$kode_fakultas = UserHelp::get_selected_kode_fakultas();
-			$jenis_pkm = JenisPkm::whereHas('usulan_pkm', function ($query) use ($tahun, $kode_fakultas) {
-				$query->where('tahun', $tahun)->where('kode_fakultas', $kode_fakultas);
-			})->orderBy('kategori_kegiatan_id')->get();
-		} else {
-			$jenis_pkm = JenisPkm::whereHas('usulan_pkm', function ($query) use ($tahun) {
-				$query->where('tahun', $tahun);
-			})->orderBy('kategori_kegiatan_id')->get();
+			$query->where('kode_fakultas', $kode_fakultas);
 		}
 
-		$usulan_pkm_list = collect(); // Inisialisasi koleksi kosong
+		$usulan_pkm_list = $query->get();
 
-		foreach ($jenis_pkm as $jenis) { // Gunakan variabel berbeda untuk elemen loop
-			if (UserHelp::get_selected_role() == 'ADMINFAKULTAS' || UserHelp::get_selected_role() == 'WD1') {
-				$usulan_data = UsulanPkm::where('jenis_pkm_id', $jenis->id)
-					->where('tahun', $tahun)
-					->with(['anggota_pkm.mhs', 'usulan_pkm_dokumen'])
-					->where('kode_fakultas', $kode_fakultas)
-					->orderBy('created_at')
-					->get();
-			} else {
-				$usulan_data = UsulanPkm::where('jenis_pkm_id', $jenis->id)
-					->where('tahun', $tahun)
-					->with(['anggota_pkm.mhs', 'usulan_pkm_dokumen'])
-					->orderBy('created_at')
-					->get();
+		// Pre-calculate data to avoid N+1 queries
+		foreach ($usulan_pkm_list as $usulan_pkm) {
+			// Pre-calculate anggota count
+			$usulan_pkm->anggota_count = $usulan_pkm->anggota_pkm->count();
+
+			// Pre-get ketua (anggota dengan sebagai = 0)
+			$usulan_pkm->ketua = $usulan_pkm->anggota_pkm->where('sebagai', 0)->first();
+
+			// Pre-get anggota (anggota dengan sebagai = 1)
+			$usulan_pkm->anggota_list = $usulan_pkm->anggota_pkm->where('sebagai', 1);
+
+			// Pre-get reviewers
+			$usulan_pkm->reviewer1 = $usulan_pkm->reviewer_usulan_pkm->where('urutan', 1)->first();
+			$usulan_pkm->reviewer2 = $usulan_pkm->reviewer_usulan_pkm->where('urutan', 2)->first();
+
+			// Pre-get catatan reviewer dari review
+			$usulan_pkm->catatan_reviewer1 = '';
+			$usulan_pkm->catatan_reviewer2 = '';
+			
+			if ($usulan_pkm->reviewer1) {
+				$review1 = $usulan_pkm->review->where('pegawai_id', $usulan_pkm->reviewer1->reviewer_id)->first();
+				if ($review1) {
+					$usulan_pkm->catatan_reviewer1 = $review1->catatan_reviewer;
+				}
 			}
-
-			$usulan_pkm_list = $usulan_pkm_list->merge($usulan_data); // Gabungkan data ke dalam koleksi utama
+			
+			if ($usulan_pkm->reviewer2) {
+				$review2 = $usulan_pkm->review->where('pegawai_id', $usulan_pkm->reviewer2->reviewer_id)->first();
+				if ($review2) {
+					$usulan_pkm->catatan_reviewer2 = $review2->catatan_reviewer;
+				}
+			}
 		}
 
 		$this->_data['usulan_pkm_list'] = $usulan_pkm_list;
