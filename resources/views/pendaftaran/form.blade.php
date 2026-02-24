@@ -362,8 +362,9 @@ $('#kategori_kegiatan').trigger('change');
 										</div>
 										<div class="col-md-6">
 											<div class="form-group">
-												<label for="semester">Semester</label>
-												<input type="text" id="semester" class="form-control" placeholder="semester" name="semester" value="{{ $mhs->nim }}" readonly="readonly" >
+												<label for="semester">Semester <span class="text-danger">*</span></label>
+												<input type="number" id="semester" class="form-control" placeholder="semester" name="semester" value="{{ old('semester', $semester) }}" min="1" required>
+												<small class="form-text text-muted">Semester dihitung otomatis berdasarkan tahun masuk dan semester masuk. Anda dapat mengubahnya jika diperlukan.</small>
 											</div>
 										</div>
 									</div>
@@ -384,28 +385,32 @@ $('#kategori_kegiatan').trigger('change');
 									<div class="row">
 										<div class="col-md-6">
 											<div class="form-group">
-												<label for="email">Email</label>
+												<label for="email">Email <span class="text-danger">*</span></label>
 												<input
-													type="text"
+													type="email"
 													id="email"
 													class="form-control"
-													placeholder="Email"
-													name="email"
-													value="{{ old('email', !empty($usulan_pkm->mhs_email) ? $usulan_pkm->mhs_email : $mhs->sso_email) }}"
+													placeholder="contoh@email.com"
+													name="mhs_email"
+													required
+													value="{{ old('mhs_email', !empty($usulan_pkm->mhs_email) ? $usulan_pkm->mhs_email : $mhs->sso_user_email) }}"
 												>
+												<small class="form-text text-muted">Masukkan alamat email aktif yang dapat dihubungi untuk keperluan komunikasi terkait usulan PKM.</small>
 											</div>
 										</div>
 										<div class="col-md-6">
 											<div class="form-group">
-												<label for="telp">No Telp/WA</label>
+												<label for="telp">No Telp/WA <span class="text-danger">*</span></label>
 												<input
 													type="text"
 													id="telp"
 													class="form-control"
-													placeholder="Telp"
+													placeholder="081234567890"
 													name="telp"
+													required
 													value="{{ old('telp', !empty($usulan_pkm->mhs_no_telp) ? $usulan_pkm->mhs_no_telp : $mhs->hp) }}"
 												>
+												<small class="form-text text-muted">Masukkan nomor telepon atau WhatsApp yang aktif untuk keperluan komunikasi terkait usulan PKM.</small>
 											</div>
 										</div>
 									</div>

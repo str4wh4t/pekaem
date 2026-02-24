@@ -397,7 +397,7 @@ $(document).on('click','#btn_gagal',function(){
 										<div class="col-md-6">
 											<div class="form-group">
 												<label for="semester">Semester</label>
-												<input type="text" id="semester" class="form-control" placeholder="semester" name="semester" value="{{ $mhs->nim }}" readonly="readonly" >
+												<input type="text" id="semester" class="form-control" placeholder="semester" name="semester" value="{{ $semester }}" readonly="readonly" >
 											</div>
 										</div>
 									</div>
@@ -419,13 +419,13 @@ $(document).on('click','#btn_gagal',function(){
 										<div class="col-md-6">
 											<div class="form-group">
 												<label for="projectinput3">Email</label>
-												<input type="text" id="email" class="form-control" placeholder="Email" name="email" value="{{ $mhs->sso_email }}" disabled="disabled" >
+												<input type="text" id="email" class="form-control" placeholder="Email" name="mhs_email" value="{{ $usulan_pkm->mhs_email }}" disabled="disabled" >
 											</div>
 										</div>
 										<div class="col-md-6">
 											<div class="form-group">
 												<label for="projectinput4">No Telp/WA</label>
-												<input type="text" id="telp" class="form-control" placeholder="Telp" name="telp" value="{{ $mhs->hp }}" disabled="disabled" >
+												<input type="text" id="telp" class="form-control" placeholder="Telp" name="telp" value="{{ $usulan_pkm->mhs_no_telp }}" disabled="disabled" >
 											</div>
 										</div>
 									</div>
