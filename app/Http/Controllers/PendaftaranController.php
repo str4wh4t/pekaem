@@ -566,6 +566,13 @@ class PendaftaranController extends Controller
 				});
 		}
 
+		// Filter usulan by reviewer when opened from list reviewer (jenis=reviewer, pegawai_id=reviewer id)
+		if ($request->jenis === 'reviewer' && $request->pegawai_id && $query) {
+			$query->whereHas('reviewer', function (Builder $q) use ($request) {
+				$q->where('reviewer.id', (int) $request->pegawai_id);
+			});
+		}
+
 		// Apply search filter if search term exists (only search in judul, NIM, and nama mahasiswa)
 		if (!empty($search)) {
 			if ($query) {
