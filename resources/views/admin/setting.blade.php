@@ -162,7 +162,37 @@ $(document).ready(function () {
     <section id="configuration">
         <div class="row">
             <div class="col-12">
-                <div id="statusCard" class="card {{ $setting ? 'status-card active' : 'status-card inactive' }}">
+                @if(session('message'))
+                    <div class="alert alert-success alert-dismissible mb-2" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        {{ session('message') }}
+                    </div>
+                @endif
+                <div class="card mt-2">
+                    <div class="card-header">
+                        <h4 class="card-title">
+                            <i class="fa fa-calendar"></i> Tahun Dipilih
+                        </h4>
+                    </div>
+                    <div class="card-content collapse show">
+                        <div class="card-body">
+                            <p class="text-muted mb-3">
+                                Tahun ini digunakan secara global untuk memfilter data (usulan PKM, target PKM tahunan, laporan, dll). Pilih tahun yang aktif untuk aplikasi.
+                            </p>
+                            <form action="{{ route('admin.setting.update_tahun') }}" method="post" class="form-inline">
+                                @csrf
+                                <label class="mr-2" for="tahun_dipilih">Tahun:</label>
+                                <select name="tahun_dipilih" id="tahun_dipilih" class="form-control mr-2" required>
+                                    @foreach($tahun_list as $t)
+                                        <option value="{{ $t }}" {{ ((int)($setting->tahun_dipilih ?? date('Y')) === (int)$t) ? 'selected' : '' }}>{{ $t }}</option>
+                                    @endforeach
+                                </select>
+                                <button type="submit" class="btn btn-primary">Simpan Tahun</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="statusCard" class="card {{ $setting->status_aplikasi ? 'status-card active' : 'status-card inactive' }}">
                     <div class="card-header">
                         <h4 class="card-title">
                             <i class="fa fa-cog"></i> Pengaturan Status Aplikasi
@@ -187,13 +217,13 @@ $(document).ready(function () {
                             <div class="switch-container">
                                 <div class="switch-info">
                                     <div class="mb-3">
-                                        <span id="statusIndicator" class="status-indicator {{ $setting ? 'active' : 'inactive' }}"></span>
-                                        <span id="statusText" class="h4 {{ $setting ? 'text-success' : 'text-danger' }} mb-2">
-                                            {{ $setting ? 'Aplikasi DIBUKA' : 'Aplikasi DITUTUP' }}
+                                        <span id="statusIndicator" class="status-indicator {{ $setting->status_aplikasi ? 'active' : 'inactive' }}"></span>
+                                        <span id="statusText" class="h4 {{ $setting->status_aplikasi ? 'text-success' : 'text-danger' }} mb-2">
+                                            {{ $setting->status_aplikasi ? 'Aplikasi DIBUKA' : 'Aplikasi DITUTUP' }}
                                         </span>
                                     </div>
                                     <div id="statusDescription" class="text-muted">
-                                        @if($setting)
+                                        @if($setting->status_aplikasi)
                                             <i class="fa fa-check-circle text-success"></i> Pengguna dapat mengajukan proposal PKM
                                         @else
                                             <i class="fa fa-times-circle text-danger"></i> Pengguna <strong>tidak dapat</strong> mengajukan proposal PKM
@@ -202,10 +232,10 @@ $(document).ready(function () {
                                 </div>
                                 <div class="switch-control">
                                     <label class="d-block text-center mb-2"><strong>Toggle Status</strong></label>
-                                    <input type="checkbox" id="switchStatusAplikasi" class="switchery" data-color="success" {{ $setting ? 'checked' : '' }}/>
+                                    <input type="checkbox" id="switchStatusAplikasi" class="switchery" data-color="success" {{ $setting->status_aplikasi ? 'checked' : '' }}/>
                                     <div class="text-center mt-2">
                                         <small class="text-muted">
-                                            <span id="switchLabel">{{ $setting ? 'ON' : 'OFF' }}</span>
+                                            <span id="switchLabel">{{ $setting->status_aplikasi ? 'ON' : 'OFF' }}</span>
                                         </small>
                                     </div>
                                 </div>
