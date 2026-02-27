@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\TargetPkmTahunan;
 use App\Fakultas;
+use App\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -16,28 +17,15 @@ class TargetPkmTahunanController extends Controller
      */
     public function index(Request $request)
     {
-        $tahun = $request->input('tahun', date('Y'));
-        
+        $tahun = Setting::getTahunDipilih();
+
         $this->_data['target_list'] = TargetPkmTahunan::with('fakultas')
             ->where('tahun', $tahun)
             ->orderBy('kode_fakultas', 'asc')
             ->get();
-        
-        // Get list of available years from database
-        $this->_data['tahun_list'] = TargetPkmTahunan::select('tahun')
-            ->distinct()
-            ->orderBy('tahun', 'desc')
-            ->pluck('tahun')
-            ->toArray();
-        
-        // If current year is not in the list, add it
-        if (!in_array($tahun, $this->_data['tahun_list'])) {
-            $this->_data['tahun_list'][] = $tahun;
-            rsort($this->_data['tahun_list']);
-        }
-        
+
         $this->_data['tahun'] = $tahun;
-        
+
         return view('target_pkm_tahunan.index', $this->_data);
     }
 
@@ -48,7 +36,7 @@ class TargetPkmTahunanController extends Controller
      */
     public function create(Request $request)
     {
-        $tahun = $request->input('tahun', date('Y'));
+        $tahun = Setting::getTahunDipilih();
         $this->_data['fakultas_list'] = Fakultas::orderBy('nama_fak_ijazah')->get();
         $this->_data['tahun'] = $tahun;
         return view('target_pkm_tahunan.create', $this->_data);

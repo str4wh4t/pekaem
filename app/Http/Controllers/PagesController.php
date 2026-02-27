@@ -11,6 +11,7 @@ use App\Helpers\User as UserHelp;
 use App\KategoriKegiatan;
 use App\Pegawai;
 use App\TargetPkmTahunan;
+use App\Setting;
 
 class PagesController extends Controller
 {
@@ -50,7 +51,7 @@ class PagesController extends Controller
 
         $kode_fakultas = UserHelp::get_selected_kode_fakultas();
 
-        $tahun = $request->input('tahun', date('Y'));
+        $tahun = Setting::getTahunDipilih();
 
         if (empty($kode_fakultas)) {
             $this->_data['usulan_pkm_total'] = UsulanPkm::where('tahun', $tahun)->count();
@@ -91,19 +92,6 @@ class PagesController extends Controller
         $this->_data['kategori_kegiatan_list'] = KategoriKegiatan::all();
         $this->_data['tahun'] = $tahun;
         $this->_data['kode_fakultas'] = $kode_fakultas;
-
-        // Get list of available years from database
-        $this->_data['tahun_list'] = UsulanPkm::select('tahun')
-            ->distinct()
-            ->orderBy('tahun', 'desc')
-            ->pluck('tahun')
-            ->toArray();
-
-        // If current year is not in the list, add it
-        if (!in_array($tahun, $this->_data['tahun_list'])) {
-            $this->_data['tahun_list'][] = $tahun;
-            rsort($this->_data['tahun_list']);
-        }
 
         return view('pages.index', $this->_data);
     }

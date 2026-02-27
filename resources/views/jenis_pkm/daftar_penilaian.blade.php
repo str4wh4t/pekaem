@@ -124,11 +124,11 @@ function batalkan_penilaian(){
                                 <b>Kategori Kriteria : </b> {{ $jenis_pkm->kategori_kriteria->nama_kategori_kriteria }}
                             </div>
                             <div class="alert alert-info">
-                                <b>Tahun : </b> {{ isset($tahun) ? $tahun : date('Y') }}
+                                <b>Tahun : </b> {{ $tahun }}
                             </div>
                             <div class="block mb-1">
-                                <a class="btn btn-primary" href="{{ route('jenis-pkm.daftar-penilaian-excel', ['kategori_kegiatan' => $jenis_pkm->kategori_kegiatan,'jenis_pkm' => $jenis_pkm, 'tahun' => isset($tahun) ? $tahun : date('Y')]) }}"><i class="fa fa-file"></i> Laporan LR-2</a>
-                                <a class="btn btn-warning" href="{{ route('kategori-kegiatan.show', ['kategori_kegiatan' => $jenis_pkm->kategori_kegiatan, 'tahun' => isset($tahun) ? $tahun : date('Y')]) }}"><i class="fa fa-arrow-left"></i> Kembali</a>
+                                <a class="btn btn-primary" href="{{ route('jenis-pkm.daftar-penilaian-excel', ['kategori_kegiatan' => $jenis_pkm->kategori_kegiatan,'jenis_pkm' => $jenis_pkm, 'tahun' => $tahun]) }}"><i class="fa fa-file"></i> Laporan LR-2</a>
+                                <a class="btn btn-warning" href="{{ route('kategori-kegiatan.show', ['kategori_kegiatan' => $jenis_pkm->kategori_kegiatan]) }}"><i class="fa fa-arrow-left"></i> Kembali</a>
                             </div>
 								<div class="form-body">
                                     

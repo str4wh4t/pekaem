@@ -53,6 +53,7 @@ Route::get('admin/reviewer/list', 'AdminController@list_reviewer')->name('admin.
 Route::get('admin/pendaftaran/report', 'PendaftaranController@report')->name('admin.pendaftaran.report');
 Route::get('admin/setting/index', 'AdminController@setting')->name('admin.setting.index');
 Route::post('admin/setting/update-status-aplikasi', 'AdminController@setting')->name('admin.setting.update_status_aplikasi');
+Route::post('admin/setting/update-tahun', 'AdminController@updateTahunSetting')->name('admin.setting.update_tahun');
 
 Route::get('sso/login', 'SsoController@login')->name('sso.login');
 Route::get('sso/logout', 'SsoController@logout')->name('sso.logout');

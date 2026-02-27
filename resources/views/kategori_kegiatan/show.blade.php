@@ -45,19 +45,6 @@
                     <div class="card-header">
                         <h4 class="card-title">Daftar Jenis PKM - {{ $kategori_kegiatan->nama_kategori_kegiatan }}</h4>
                         <a class="heading-elements-toggle"><i class="fa fa-ellipsis-v font-medium-3"></i></a>
-                        <div class="heading-elements">
-                            <div class="form-group mb-0 mr-2" style="display: inline-block;">
-                                <label for="tahun_filter" class="mr-2" style="margin-bottom: 0;">Tahun:</label>
-                                <select id="tahun_filter" name="tahun" class="form-control form-control-sm" style="display: inline-block; width: auto; min-width: 100px;">
-                                    @foreach($tahun_list as $tahun_option)
-                                    <option value="{{ $tahun_option }}" {{ $tahun == $tahun_option ? 'selected' : '' }}>{{ $tahun_option }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            {{-- <ul class="list-inline mb-0">
-                                <li><a data-action="expand"><i class="ft-maximize"></i></a></li>
-                            </ul> --}}
-                        </div>
                     </div>
                     <div class="card-content collapse show">
                         <div class="card-body card-dashboard">
@@ -132,18 +119,6 @@
 
 @push('page_level_js')
 <script type="text/javascript">
-    // Handle tahun filter change
-    document.addEventListener('DOMContentLoaded', function() {
-        var tahunFilter = document.getElementById('tahun_filter');
-        if (tahunFilter) {
-            tahunFilter.addEventListener('change', function() {
-                var selectedTahun = this.value;
-                var currentUrl = new URL(window.location.href);
-                currentUrl.searchParams.set('tahun', selectedTahun);
-                window.location.href = currentUrl.toString();
-            });
-        }
-    });
 </script>
 @endpush
 @endsection

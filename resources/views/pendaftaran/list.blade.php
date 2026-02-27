@@ -245,17 +245,7 @@ function hideLoading() {
     $('#loading-overlay').removeClass('show').css('display', 'none');
 }
 
-// Handle tahun filter change
 $(document).ready(function() {
-    $('#tahun_filter').on('change', function() {
-        showLoading();
-        var selectedTahun = $(this).val();
-        var currentUrl = new URL(window.location.href);
-        currentUrl.searchParams.set('tahun', selectedTahun);
-        currentUrl.searchParams.delete('page'); // Reset to first page when filter changes
-        window.location.href = currentUrl.toString();
-    });
-    
     // Handle search form submit
     $('#searchForm').on('submit', function(e) {
         showLoading();
@@ -330,16 +320,6 @@ $(document).ready(function() {
                                 {{-- <li><a data-action="collapse"><i class="ft-minus"></i></a></li>
                                 <li><a data-action="reload"><i class="ft-rotate-cw"></i></a></li>
                                 <li><a data-action="close"><i class="ft-x"></i></a></li> --}}
-                                <li>
-                                    <div class="form-group mb-0">
-                                        <label for="tahun_filter" class="mr-2" style="margin-bottom: 0;">Tahun:</label>
-                                        <select id="tahun_filter" name="tahun" class="form-control form-control-sm" style="display: inline-block; width: auto; min-width: 100px;">
-                                            @foreach($tahun_list as $tahun_option)
-                                            <option value="{{ $tahun_option }}" {{ $tahun == $tahun_option ? 'selected' : '' }}>{{ $tahun_option }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </li>
                                 <li><a data-action="expand"><i class="ft-maximize"></i></a></li>
                             </ul>
                         </div>
@@ -355,7 +335,7 @@ $(document).ready(function() {
                             @if(request('search'))
                                 <div class="alert alert-info">
                                     <i class="fa fa-info-circle"></i> Menampilkan hasil pencarian untuk: <strong>"{{ request('search') }}"</strong>
-                                    <a href="{{ route('share.pendaftaran.list', array_merge(request()->except(['search', 'page']), ['tahun' => $tahun])) }}" class="float-right">
+                                    <a href="{{ route('share.pendaftaran.list', request()->except(['search', 'page'])) }}" class="float-right">
                                         <i class="fa fa-times"></i> Hapus filter
                                     </a>
                                 </div>
@@ -365,21 +345,21 @@ $(document).ready(function() {
                             <button class="btn btn-success" id="usulkanButton" type="button">
                                 <i class="fa fa-paper-plane"></i> Usulkan
                             </button>
-                            <a class="btn btn-secondary" href="{{ route('admin.pendaftaran.report', ['tahun' => $tahun])  }}"><i class="fa fa-file"></i> Laporan LR-1</a>
+                            <a class="btn btn-secondary" href="{{ route('admin.pendaftaran.report') }}"><i class="fa fa-file"></i> Laporan LR-1</a>
                             <hr>
                             @endif
                             @if(UserHelp::get_selected_role() == 'WD1')
                             <button class="btn btn-success" id="lanjutkanButton" type="button">
                                 <i class="fa fa-paper-plane"></i> Lanjutkan
                             </button>
-                            <a class="btn btn-secondary" href="{{ route('admin.pendaftaran.report', ['tahun' => $tahun])  }}"><i class="fa fa-file"></i> Laporan LR-1</a>
+                            <a class="btn btn-secondary" href="{{ route('admin.pendaftaran.report') }}"><i class="fa fa-file"></i> Laporan LR-1</a>
                             <hr>
                             @endif
                             @if(UserHelp::get_selected_role() == 'ADMIN')
                             <button class="btn btn-success" id="tetapkanNilaiButton" type="button">
                                 <i class="fa fa-paper-plane"></i> Tetapkan Nilai
                             </button>
-                            <a class="btn btn-secondary" href="{{ route('admin.pendaftaran.report', ['tahun' => $tahun])  }}"><i class="fa fa-file"></i> Laporan LR-1</a>
+                            <a class="btn btn-secondary" href="{{ route('admin.pendaftaran.report') }}"><i class="fa fa-file"></i> Laporan LR-1</a>
                             <hr>
                             @endif
                             <!-- Search Form -->
@@ -390,7 +370,6 @@ $(document).ready(function() {
                                             <input type="text" name="search" id="search_input" class="form-control" 
                                                    placeholder="Cari berdasarkan judul, NIM, atau nama mahasiswa..." 
                                                    value="{{ request('search') }}">
-                                            <input type="hidden" name="tahun" value="{{ $tahun }}">
                                             @if(request('jenis'))
                                                 <input type="hidden" name="jenis" value="{{ request('jenis') }}">
                                             @endif
@@ -404,7 +383,7 @@ $(document).ready(function() {
                                             <i class="fa fa-search"></i> Cari
                                         </button>
                                         @if(request('search'))
-                                            <a href="{{ route('share.pendaftaran.list', array_merge(request()->except(['search', 'page']), ['tahun' => $tahun])) }}" class="btn btn-secondary">
+                                            <a href="{{ route('share.pendaftaran.list', request()->except(['search', 'page'])) }}" class="btn btn-secondary">
                                                 <i class="fa fa-times"></i> Reset
                                             </a>
                                         @endif

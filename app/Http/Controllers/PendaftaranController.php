@@ -151,7 +151,7 @@ class PendaftaranController extends Controller
 		$usulan_pkm->mhs_no_telp = $request->telp;
 		$usulan_pkm->pegawai_email_sso = $request->pegawai_email_sso;
 		$usulan_pkm->pegawai_hp = $request->pegawai_hp;
-		$usulan_pkm->tahun = date('Y');
+		$usulan_pkm->tahun = Setting::getTahunDipilih();
 		$usulan_pkm->semester = $request->semester;
 		$usulan_pkm->created_by = UserHelp::admin_get_logged_nip();
 
@@ -463,7 +463,7 @@ class PendaftaranController extends Controller
 
 	private function _get_jenis_pkm(Request $request)
 	{
-		$tahun = date('Y');
+		$tahun = Setting::getTahunDipilih();
 		$usulan_pkm_id = $request->usulan_pkm_id;
 		$usulan_pkm_selected = null;
 		if ($usulan_pkm_id) {
@@ -506,8 +506,7 @@ class PendaftaranController extends Controller
 
 	public function list(Request $request)
 	{
-		// $usulan_pkm = UsulanPkm::all()->sortBy("judul");
-		$tahun = $request->input('tahun', date('Y'));
+		$tahun = Setting::getTahunDipilih();
 		$perPage = $request->input('per_page', 15); // Default 15 items per page
 		$search = $request->input('search');
 
@@ -630,19 +629,6 @@ class PendaftaranController extends Controller
 
 		$this->_data['usulan_pkm'] = $usulan_pkm;
 		$this->_data['tahun'] = $tahun;
-
-		// Get list of available years from database
-		$this->_data['tahun_list'] = UsulanPkm::select('tahun')
-			->distinct()
-			->orderBy('tahun', 'desc')
-			->pluck('tahun')
-			->toArray();
-
-		// If current year is not in the list, add it
-		if (!in_array($tahun, $this->_data['tahun_list'])) {
-			$this->_data['tahun_list'][] = $tahun;
-			rsort($this->_data['tahun_list']);
-		}
 
 		return view('pendaftaran.list', $this->_data);
 	}
@@ -1067,8 +1053,7 @@ class PendaftaranController extends Controller
 
 	public function report(Request $request)
 	{
-		// Gunakan tahun yang dipilih di dashboard/list, default ke tahun berjalan
-		$tahun = $request->input('tahun', date('Y'));
+		$tahun = Setting::getTahunDipilih();
 
 		// Optimize query: langsung query usulan_pkm dengan eager loading lengkap
 		$query = UsulanPkm::where('tahun', $tahun)

@@ -12,6 +12,7 @@ use App\Pegawai;
 use App\Reviewer;
 use App\JenisPkm;
 use App\UsulanPkm;
+use App\TargetPkmTahunan;
 use App\Mhs;
 use App\Http\Controllers\Controller;
 use App\KriteriaPenilaian;
@@ -114,7 +115,7 @@ class AdminController extends Controller
     private function _cari_pembimbing(Request $request)
     {
         // dd($request->role);
-        $tahun = date('Y');
+        $tahun = Setting::getTahunDipilih();
         $pembimbing = Pegawai::where(function ($query) use ($request) {
             $query->where('nip', 'LIKE', '%' . $request->text . '%')
                 ->orWhere('nama', 'LIKE', '%' . $request->text . '%')
@@ -194,7 +195,7 @@ class AdminController extends Controller
     {
         // dd($request->role);
         $mhs = [];
-        $tahun = date('Y');
+        $tahun = Setting::getTahunDipilih();
         $jenis_pkm = JenisPkm::find($request->jenis_pkm_id);
         if (UserHelp::get_selected_role() == "ADMINFAKULTAS") {
             $kode_fakultas = UserHelp::get_selected_kode_fakultas();
@@ -236,7 +237,7 @@ class AdminController extends Controller
     {
         // dd($request->role);
         $mhs = [];
-        $tahun = date('Y');
+        $tahun = Setting::getTahunDipilih();
         $usulan_pkm_id = $request->usulan_pkm_id;
         $jenis_pkm = JenisPkm::find($request->jenis_pkm_id);
         $ketua_nim = $request->ketua_nim;
@@ -306,7 +307,7 @@ class AdminController extends Controller
     //
     public function list_pembimbing()
     {
-        $tahun = date('Y');
+        $tahun = Setting::getTahunDipilih();
         // $pegawai_roles = PegawaiRoles::all()->sortBy("pegawai_id");
         if (UserHelp::get_selected_role() == 'PEMBIMBING') {
             $pembimbing = Pegawai::where('nip', UserHelp::admin_get_logged_nip())->get();
@@ -330,14 +331,18 @@ class AdminController extends Controller
 
     public function list_reviewer()
     {
-        $tahun = date('Y');
-        // $pegawai_roles = PegawaiRoles::all()->sortBy("pegawai_id");
+        $tahun = Setting::getTahunDipilih();
+
         $reviewer = Reviewer::whereHas('usulan_pkm', function (Builder $query) use ($tahun) {
             $query->where('usulan_pkm.tahun', $tahun);
         })
+            ->with(['usulan_pkm' => function ($query) use ($tahun) {
+                $query->where('usulan_pkm.tahun', $tahun);
+            }])
             ->get();
 
         $this->_data['reviewer'] = $reviewer;
+        $this->_data['tahun'] = $tahun;
 
         return view('admin.list_reviewer', $this->_data);
     }
@@ -347,17 +352,49 @@ class AdminController extends Controller
         if (UserHelp::get_selected_role() != 'ADMIN' && UserHelp::get_selected_role() != 'SUPER') {
             return redirect()->route('dashboard');
         }
-        // buat listener dari ajax untuk update status aplikasi
-        $setting = Setting::where('status_aplikasi', '1')->first();
-        if ($request->post()) {
-            $setting = Setting::whereIn('status_aplikasi', ['1', '0'])->first();
-            if (!$setting) {
-                $setting = new Setting;
-            }
+        $setting = Setting::first();
+        if (!$setting) {
+            $setting = Setting::create([
+                'status_aplikasi' => 0,
+                'tahun_dipilih'   => (int) date('Y'),
+            ]);
+        }
+        if ($request->post() && $request->ajax()) {
             $setting->status_aplikasi = $request->post('status_aplikasi');
             $setting->save();
             return ['status' => 'ok'];
         }
-        return view('admin.setting', ['setting' => $setting]);
+        $tahun_list = collect()
+            ->merge(UsulanPkm::select('tahun')->distinct()->pluck('tahun'))
+            ->merge(TargetPkmTahunan::select('tahun')->distinct()->pluck('tahun'))
+            ->push((int) date('Y'))
+            ->unique()
+            ->sort()
+            ->reverse()
+            ->values()
+            ->toArray();
+        return view('admin.setting', [
+            'setting'    => $setting,
+            'tahun_list' => $tahun_list,
+        ]);
+    }
+
+    public function updateTahunSetting(Request $request)
+    {
+        if (UserHelp::get_selected_role() != 'ADMIN' && UserHelp::get_selected_role() != 'SUPER') {
+            return redirect()->route('dashboard');
+        }
+        $request->validate(['tahun_dipilih' => 'required|integer|min:2000|max:2100']);
+        $setting = Setting::first();
+        if (!$setting) {
+            $setting = Setting::create([
+                'status_aplikasi' => 0,
+                'tahun_dipilih'   => (int) $request->tahun_dipilih,
+            ]);
+        } else {
+            $setting->tahun_dipilih = (int) $request->tahun_dipilih;
+            $setting->save();
+        }
+        return redirect()->route('admin.setting.index')->with('message', 'Tahun aplikasi berhasil diperbarui.');
     }
 }

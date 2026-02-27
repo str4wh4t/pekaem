@@ -26,15 +26,15 @@ class SemesterHelper
         $bulan_sekarang = (int)date('m');
         $tahun_masuk = !empty($mhs->tahun_masuk) ? (int)$mhs->tahun_masuk : $tahun_sekarang;
         $smt_masuk = !empty($mhs->smt_masuk) ? (int)$mhs->smt_masuk : 1;
-        
+
         // Tentukan semester saat ini berdasarkan bulan
         // Semester 1: Januari (1) - Juli (7)
         // Semester 2: Agustus (8) - Desember (12)
         $smt_sekarang = ($bulan_sekarang >= 1 && $bulan_sekarang <= 7) ? 1 : 2;
-        
+
         // Hitung selisih tahun
         $selisih_tahun = $tahun_sekarang - $tahun_masuk;
-        
+
         // Hitung semester ke berapa
         if ($selisih_tahun == 0) {
             // Tahun masuk sama dengan tahun sekarang
@@ -60,7 +60,7 @@ class SemesterHelper
                 $semester = ($selisih_tahun * 2) + ($smt_sekarang == 2 ? 1 : 0);
             }
         }
-        
+
         // Pastikan semester minimal 1
         return max(1, $semester);
     }

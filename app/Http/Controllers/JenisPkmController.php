@@ -7,6 +7,7 @@ use App\JenisPkm;
 use App\KategoriKegiatan;
 use App\KategoriKriteria;
 use App\UsulanPkm;
+use App\Setting;
 use Illuminate\Http\Request;
 
 class JenisPkmController extends Controller
@@ -118,7 +119,7 @@ class JenisPkmController extends Controller
 
     public function daftar_penilaian(KategoriKegiatan $kategoriKegiatan, JenisPkm $jenisPkm, Request $request)
     {
-        $tahun = $request->input('tahun', date('Y'));
+        $tahun = $request->input('tahun', Setting::getTahunDipilih());
         $usulan_pkm_list = UsulanPkm::where('jenis_pkm_id', $jenisPkm->id)
             ->where('tahun', $tahun)
             ->with([
@@ -144,7 +145,7 @@ class JenisPkmController extends Controller
 
     public function daftar_penilaian_excel(KategoriKegiatan $kategoriKegiatan, JenisPkm $jenisPkm, Request $request)
     {
-        $tahun = $request->input('tahun', date('Y'));
+        $tahun = $request->input('tahun', Setting::getTahunDipilih());
         $usulan_pkm_list = UsulanPkm::where('jenis_pkm_id', $jenisPkm->id)
             ->where('tahun', $tahun)
             ->with([
@@ -170,7 +171,7 @@ class JenisPkmController extends Controller
 
     public function daftar_penilaian_kategori_kegiatan_excel(KategoriKegiatan $kategoriKegiatan, Request $request)
     {
-        $tahun = $request->input('tahun', date('Y'));
+        $tahun = $request->input('tahun', Setting::getTahunDipilih());
         $jenisPkmIds = JenisPkm::where('kategori_kegiatan_id', $kategoriKegiatan->id)->pluck('id');
 
         if ($jenisPkmIds->isEmpty()) {

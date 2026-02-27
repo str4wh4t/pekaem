@@ -64,7 +64,7 @@
                                     <button type="submit" class="btn btn-primary">
                                         <i class="fa fa-check-square-o"></i> Save
                                     </button>
-                                    <a href="{{ route('target-pkm-tahunan.index', ['tahun' => isset($tahun) ? $tahun : date('Y')]) }}" class="btn btn-warning">
+                                    <a href="{{ route('target-pkm-tahunan.index') }}" class="btn btn-warning">
                                         <i class="fa fa-undo"></i> Kembali
                                     </a>
                                 </div>
