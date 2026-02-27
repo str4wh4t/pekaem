@@ -65,6 +65,15 @@ $('.zero-configuration').DataTable();
                         <a class="heading-elements-toggle"><i class="fa fa-ellipsis-v font-medium-3"></i></a>
                         <div class="heading-elements">
                             <ul class="list-inline mb-0">
+                                <li>
+                                    <form method="GET" action="{{ route('admin.reviewer.list') }}" id="formTahunList" class="d-inline-block">
+                                        <select name="tahun" id="tahun_filter" class="form-control form-control-sm d-inline-block" style="width: auto; min-width: 90px;" onchange="this.form.submit()">
+                                            @foreach($tahun_list as $t)
+                                                <option value="{{ $t }}" {{ (int)$tahun === (int)$t ? 'selected' : '' }}>{{ $t }}</option>
+                                            @endforeach
+                                        </select>
+                                    </form>
+                                </li>
                                 <li><a data-action="expand"><i class="ft-maximize"></i></a></li>
                             </ul>
                         </div>
@@ -102,7 +111,7 @@ $('.zero-configuration').DataTable();
                                            {{ count($pegawai->usulan_pkm) }} Proposal
                                         </td>
                                         <td>
-                                           <a class="btn btn-info btn-sm" href="{{ route('share.pendaftaran.list', ['jenis' => 'reviewer', 'pegawai_id' => $pegawai->id]) }}"><i class="fa fa-pencil-square-o" ></i> Lihat</a>
+                                           <a class="btn btn-info btn-sm" href="{{ route('share.pendaftaran.list', ['jenis' => 'reviewer', 'pegawai_id' => $pegawai->id, 'tahun' => $tahun]) }}"><i class="fa fa-pencil-square-o"></i> Lihat</a>
                                         </td>
                                     </tr>
                                     @endforeach

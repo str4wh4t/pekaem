@@ -506,7 +506,7 @@ class PendaftaranController extends Controller
 
 	public function list(Request $request)
 	{
-		$tahun = Setting::getTahunDipilih();
+		$tahun = $request->input('tahun', Setting::getTahunDipilih());
 		$perPage = $request->input('per_page', 15); // Default 15 items per page
 		$search = $request->input('search');
 
@@ -636,6 +636,13 @@ class PendaftaranController extends Controller
 
 		$this->_data['usulan_pkm'] = $usulan_pkm;
 		$this->_data['tahun'] = $tahun;
+
+		$tahun_list = UsulanPkm::select('tahun')->distinct()->orderBy('tahun', 'desc')->pluck('tahun')->toArray();
+		if (!in_array($tahun, $tahun_list)) {
+			$tahun_list[] = $tahun;
+			rsort($tahun_list);
+		}
+		$this->_data['tahun_list'] = $tahun_list;
 
 		return view('pendaftaran.list', $this->_data);
 	}

@@ -177,7 +177,7 @@ $(document).ready(function () {
                     <div class="card-content collapse show">
                         <div class="card-body">
                             <p class="text-muted mb-3">
-                                Tahun ini digunakan secara global untuk memfilter data (usulan PKM, target PKM tahunan, laporan, dll). Pilih tahun yang aktif untuk aplikasi.
+                                Pilih tahun yang aktif untuk aplikasi.
                             </p>
                             <form action="{{ route('admin.setting.update_tahun') }}" method="post" class="form-inline">
                                 @csrf

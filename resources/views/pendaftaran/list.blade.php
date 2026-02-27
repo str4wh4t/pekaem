@@ -317,9 +317,22 @@ $(document).ready(function() {
                         <a class="heading-elements-toggle"><i class="fa fa-ellipsis-v font-medium-3"></i></a>
                         <div class="heading-elements">
                             <ul class="list-inline mb-0">
-                                {{-- <li><a data-action="collapse"><i class="ft-minus"></i></a></li>
-                                <li><a data-action="reload"><i class="ft-rotate-cw"></i></a></li>
-                                <li><a data-action="close"><i class="ft-x"></i></a></li> --}}
+                                <li>
+                                    <form method="GET" action="{{ route('share.pendaftaran.list') }}" id="formTahunList" class="d-inline-block">
+                                        @if(request('jenis'))
+                                            <input type="hidden" name="jenis" value="{{ request('jenis') }}">
+                                        @endif
+                                        @if(request('pegawai_id'))
+                                            <input type="hidden" name="pegawai_id" value="{{ request('pegawai_id') }}">
+                                        @endif
+                                        <label for="tahun_filter" class="mr-1 mb-0 small text-white-50">Lihat data tahun:</label>
+                                        <select name="tahun" id="tahun_filter" class="form-control form-control-sm d-inline-block" style="width: auto; min-width: 90px;" onchange="this.form.submit()">
+                                            @foreach($tahun_list as $t)
+                                                <option value="{{ $t }}" {{ (int)$tahun === (int)$t ? 'selected' : '' }}>{{ $t }}</option>
+                                            @endforeach
+                                        </select>
+                                    </form>
+                                </li>
                                 <li><a data-action="expand"><i class="ft-maximize"></i></a></li>
                             </ul>
                         </div>
@@ -345,21 +358,23 @@ $(document).ready(function() {
                             <button class="btn btn-success" id="usulkanButton" type="button">
                                 <i class="fa fa-paper-plane"></i> Usulkan
                             </button>
-                            <a class="btn btn-secondary" href="{{ route('admin.pendaftaran.report') }}"><i class="fa fa-file"></i> Laporan LR-1</a>
+                            <a class="btn btn-secondary" href="{{ route('admin.pendaftaran.report', ['tahun' => $tahun]) }}"><i class="fa fa-file"></i> Laporan LR-1</a>
                             <hr>
                             @endif
                             @if(UserHelp::get_selected_role() == 'WD1')
                             <button class="btn btn-success" id="lanjutkanButton" type="button">
                                 <i class="fa fa-paper-plane"></i> Lanjutkan
                             </button>
-                            <a class="btn btn-secondary" href="{{ route('admin.pendaftaran.report') }}"><i class="fa fa-file"></i> Laporan LR-1</a>
+                            <a class="btn btn-secondary" href="{{ route('admin.pendaftaran.report', ['tahun' => $tahun]) }}">
+                                <i class="fa fa-file"></i> Laporan LR-1
+                            </a>
                             <hr>
                             @endif
                             @if(UserHelp::get_selected_role() == 'ADMIN')
                             <button class="btn btn-success" id="tetapkanNilaiButton" type="button">
                                 <i class="fa fa-paper-plane"></i> Tetapkan Nilai
                             </button>
-                            <a class="btn btn-secondary" href="{{ route('admin.pendaftaran.report') }}"><i class="fa fa-file"></i> Laporan LR-1</a>
+                            <a class="btn btn-secondary" href="{{ route('admin.pendaftaran.report', ['tahun' => $tahun]) }}"><i class="fa fa-file"></i> Laporan LR-1</a>
                             <hr>
                             @endif
                             <!-- Search Form -->
@@ -370,6 +385,7 @@ $(document).ready(function() {
                                             <input type="text" name="search" id="search_input" class="form-control" 
                                                    placeholder="Cari berdasarkan judul, NIM, atau nama mahasiswa..." 
                                                    value="{{ request('search') }}">
+                                            <input type="hidden" name="tahun" value="{{ $tahun }}">
                                             @if(request('jenis'))
                                                 <input type="hidden" name="jenis" value="{{ request('jenis') }}">
                                             @endif

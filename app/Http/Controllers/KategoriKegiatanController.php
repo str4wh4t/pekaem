@@ -71,7 +71,7 @@ class KategoriKegiatanController extends Controller
      */
     public function show(KategoriKegiatan $kategoriKegiatan, Request $request)
     {
-        $tahun = Setting::getTahunDipilih();
+        $tahun = $request->input('tahun', Setting::getTahunDipilih());
 
         $jenis_pkm_list = JenisPkm::where('kategori_kegiatan_id', $kategoriKegiatan->id)
             ->with('kategori_kriteria')
@@ -84,9 +84,16 @@ class KategoriKegiatanController extends Controller
                 ->count();
         }
 
+        $tahun_list = UsulanPkm::select('tahun')->distinct()->orderBy('tahun', 'desc')->pluck('tahun')->toArray();
+        if (!in_array($tahun, $tahun_list)) {
+            $tahun_list[] = $tahun;
+            rsort($tahun_list);
+        }
+
         $this->_data['kategori_kegiatan'] = $kategoriKegiatan;
         $this->_data['jenis_pkm_list'] = $jenis_pkm_list;
         $this->_data['tahun'] = $tahun;
+        $this->_data['tahun_list'] = $tahun_list;
 
         return view('kategori_kegiatan.show', $this->_data);
     }

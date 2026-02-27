@@ -83,25 +83,17 @@ $('.zero-configuration').DataTable();
                                 </div>
                             @endif
                             <a class="btn btn-primary" href="{{ route('kategori-kegiatan.create')  }}"><i class="fa fa-plus-circle"></i> Tambah data</a>
+                            <p class="text-muted small mt-2 mb-0"><i class="fa fa-info-circle"></i> Laporan LR-3: klik tombol tahun untuk download laporan kategori tersebut.</p>
                             <hr>
                             <div class="table-responsive">
                             <table class="table table-striped table-bordered zero-configuration">
                                 <thead>
                                     <tr>
-                                        <th rowspan="2">No</th>
-                                        <th rowspan="2">Nama Kategori Kegiatan</th>
-                                        <th rowspan="2">Deskripsi</th>
-                                        <th rowspan="2">Aksi</th>
-                                        @if(isset($tahun_list) && count($tahun_list) > 0)
-                                            <th class="text-center" colspan="{{ count($tahun_list) }}">Laporan LR-3</th>
-                                        @endif
-                                    </tr>
-                                    <tr>
-                                        @if(isset($tahun_list) && count($tahun_list) > 0)
-                                            @foreach($tahun_list as $tahun_item)
-                                                <th class="text-center">{{ $tahun_item }}</th>
-                                            @endforeach
-                                        @endif
+                                        <th>No</th>
+                                        <th>Nama Kategori Kegiatan</th>
+                                        <th>Deskripsi</th>
+                                        <th>Aksi</th>
+                                        <th class="text-center">Laporan LR-3</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -111,18 +103,20 @@ $('.zero-configuration').DataTable();
                                         <td>{{ $kategori_kegiatan->nama_kategori_kegiatan }}</td>
                                         <td>{{ $kategori_kegiatan->deskripsi }}</td>
                                         <td>
-                                           <a class="btn btn-info btn-sm" href="{{ route('kategori-kegiatan.edit', ['kategori_kegiatan' => $kategori_kegiatan]) }}"  ><i class="fa fa-pencil-square-o" ></i> Edit</a>
-                                           <a class="btn btn-success btn-sm" href="{{ route('jenis-pkm.index', ['kategori_kegiatan' => $kategori_kegiatan]) }}"  ><i class="fa fa-pencil-square-o" ></i> Subkegiatan</a>
+                                           <a class="btn btn-info btn-sm" href="{{ route('kategori-kegiatan.edit', ['kategori_kegiatan' => $kategori_kegiatan]) }}"><i class="fa fa-pencil-square-o"></i> Edit</a>
+                                           <a class="btn btn-success btn-sm" href="{{ route('jenis-pkm.index', ['kategori_kegiatan' => $kategori_kegiatan]) }}"><i class="fa fa-pencil-square-o"></i> Subkegiatan</a>
                                         </td>
-                                        @if(isset($tahun_list) && count($tahun_list) > 0)
-                                            @foreach($tahun_list as $tahun_item)
-                                                <td class="text-center">
-                                                    <a class="btn btn-primary btn-sm" href="{{ route('jenis-pkm.daftar-penilaian-kategori-kegiatan-excel', ['kategori_kegiatan' => $kategori_kegiatan, 'tahun' => $tahun_item]) }}"  >
-                                                        <i class="fa fa-file"></i> Download
+                                        <td class="text-center">
+                                            @if(isset($tahun_list) && count($tahun_list) > 0)
+                                                @foreach($tahun_list as $tahun_item)
+                                                    <a class="btn btn-primary btn-sm mr-1 mb-1" href="{{ route('jenis-pkm.daftar-penilaian-kategori-kegiatan-excel', ['kategori_kegiatan' => $kategori_kegiatan, 'tahun' => $tahun_item]) }}" title="Download LR-3 tahun {{ $tahun_item }}">
+                                                        <i class="fa fa-file"></i> {{ $tahun_item }}
                                                     </a>
-                                                </td>
-                                            @endforeach
-                                        @endif
+                                                @endforeach
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
+                                        </td>
                                     </tr>
                                     @endforeach
                                 </tbody>

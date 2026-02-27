@@ -329,9 +329,9 @@ class AdminController extends Controller
         return view('admin.list_pembimbing', $this->_data);
     }
 
-    public function list_reviewer()
+    public function list_reviewer(Request $request)
     {
-        $tahun = Setting::getTahunDipilih();
+        $tahun = $request->input('tahun', Setting::getTahunDipilih());
 
         $reviewer = Reviewer::whereHas('usulan_pkm', function (Builder $query) use ($tahun) {
             $query->where('usulan_pkm.tahun', $tahun);
@@ -341,8 +341,15 @@ class AdminController extends Controller
             }])
             ->get();
 
+        $tahun_list = UsulanPkm::select('tahun')->distinct()->orderBy('tahun', 'desc')->pluck('tahun')->toArray();
+        if (!in_array($tahun, $tahun_list)) {
+            $tahun_list[] = $tahun;
+            rsort($tahun_list);
+        }
+
         $this->_data['reviewer'] = $reviewer;
         $this->_data['tahun'] = $tahun;
+        $this->_data['tahun_list'] = $tahun_list;
 
         return view('admin.list_reviewer', $this->_data);
     }

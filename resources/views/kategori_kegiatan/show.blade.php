@@ -45,6 +45,19 @@
                     <div class="card-header">
                         <h4 class="card-title">Daftar Jenis PKM - {{ $kategori_kegiatan->nama_kategori_kegiatan }}</h4>
                         <a class="heading-elements-toggle"><i class="fa fa-ellipsis-v font-medium-3"></i></a>
+                        <div class="heading-elements">
+                            <ul class="list-inline mb-0">
+                                <li>
+                                    <form method="GET" action="{{ route('kategori-kegiatan.show', ['kategori_kegiatan' => $kategori_kegiatan]) }}" id="formTahunList" class="d-inline-block">
+                                        <select name="tahun" id="tahun_filter" class="form-control form-control-sm d-inline-block" style="width: auto; min-width: 90px;" onchange="this.form.submit()">
+                                            @foreach($tahun_list as $t)
+                                                <option value="{{ $t }}" {{ (int)$tahun === (int)$t ? 'selected' : '' }}>{{ $t }}</option>
+                                            @endforeach
+                                        </select>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                     <div class="card-content collapse show">
                         <div class="card-body card-dashboard">
